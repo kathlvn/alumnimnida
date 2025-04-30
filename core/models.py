@@ -5,7 +5,7 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, student_number, password=None, **extra_fields):
         if not student_number:
             raise ValueError("The Student Number is required.")
-        user = self.model(student_number=student_number, username=student_number, **extra_fields)
+        user = self.model(student_number=student_number, **extra_fields)  # removed username
         user.set_password(password or student_number)
         user.save()
         return user

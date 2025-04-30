@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from .models import Event
 
 @login_required
 def home(request):
@@ -9,9 +10,15 @@ def home(request):
 def profile_view(request):
     return render(request, 'core/profile.html')
 
+
+
+
 @login_required
 def events_view(request):
-    return render(request, 'core/events.html')
+    events = Event.objects.order_by('-date')
+    return render(request, 'core/events.html', {'events': events})
+
+
 
 @login_required
 def updates_view(request):

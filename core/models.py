@@ -1,5 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
+import datetime
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, student_number, password=None, **extra_fields):
@@ -23,9 +27,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     birthday = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=255, blank=True)
     location = models.CharField(max_length=100, blank=True)
-    degree = models.CharField(max_length=100, blank=True)
-    year_attended = models.IntegerField(null=True, blank=True)
-    year_graduated = models.IntegerField(null=True, blank=True)
+    degree_choices = [
+        ('BSCS', 'BS Computer Science'),
+        ('BSIT', 'BS Information Technology'),
+        ('BSEMC', 'BS Entertainment and Multimedia Computing'),
+        ('ACT', 'Associate in Computer Technology'),
+    ]
+    degree = models.CharField(max_length=100, choices=degree_choices, blank=True)
+    current_year = datetime.datetime.now().year
+    year_selection = [(year, str(year)) for year in range(current_year, 2015, -1)]  
+    year_attended = models.IntegerField(choices=year_selection, null=True, blank=True)
+    year_graduated = models.IntegerField(choices=year_selection, null=True, blank=True)
     contact = models.CharField(max_length=20, blank=True)
     club_orgs = models.TextField(blank=True)
     professional_background = models.TextField(blank=True)
@@ -41,6 +53,32 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.student_number
     
+    @property
+    def program(self):
+        return self.degree
+    
+    @property
+    def batch(self):
+        return self.year_graduated
+    
+
+#for filtering 
+# class Visibility(models.Model):
+#     VISIBILITY_CHOICES = [
+#         ('public', 'Public'),
+#         ('program', 'Program Only'),
+#         ('batch', 'Batch Only'),
+#     ]
+
+#     visibility_type = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
+#     batch = models.CharField(max_length=10, blank=True, null=True)
+#     program = models.CharField(max_length=50, blank=True, null=True)
+
+#     def __str__(self):
+#         return f"{self.visibility_type} | {self.program or ''} | {self.batch or ''}"
+
+
+
 
 
 #ext functions
@@ -54,3 +92,54 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class Updates(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    date_posted = models.DateTimeField(auto_now_add=True)
+    related_event = models.ForeignKey('Event', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+    
+
+
+class Forum(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date_posted = models.DateTimeField(auto_now_add=True)
+   # visibility = models.ForeignKey(Visibility, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.title
+
+
+
+
+# User = get_user_model()
+# class Forum(VisibilityMixin):
+#     author = models.ForeignKey(User, on_delete=models.CASCADE)
+#     title = models.CharField(max_length=255)
+#     content = models.TextField()
+#     date_posted = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.title
+
+# class Comment(models.Model):
+#     post = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='comments')
+#     author = models.ForeignKey(User, on_delete=models.CASCADE)
+#     content = models.TextField()
+#     date_posted = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"Comment by {self.author} on {self.post}"
+
+# class Like(models.Model):
+#     post = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='likes')
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+#     class Meta:
+#         unique_together = ('post', 'user')

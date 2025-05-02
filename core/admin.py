@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Event
+from .models import CustomUser, Event, Updates, Forum
 from .forms import AdminUserCreationForm
 
 class CustomUserAdmin(UserAdmin):
@@ -31,3 +31,5 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Event)
+admin.site.register(Updates)
+admin.site.register(Forum)

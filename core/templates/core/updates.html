@@ -1,5 +1,22 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Updates Page</h2>
-<p>School updates and announcements go here.</p>
+  <h2 class="text-2xl font-bold mb-4">Updates</h2>
+
+  {% if updates %}
+    <ul>
+      {% for update in updates %}
+        <li class="mb-4 border p-4 rounded bg-white shadow">
+          <h3 class="text-xl font-semibold">{{ update.title }}</h3>
+          <p>{{ update.content }}</p>
+          <p class="text-sm text-gray-500">Posted on {{ update.date_posted|date:"F j, Y, g:i a" }}</p>
+          {% if update.related_event %}
+            <p><strong>Related to:</strong> {{ update.related_event.title }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No updates available.</p>
+  {% endif %}
 {% endblock %}

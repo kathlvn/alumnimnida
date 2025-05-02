@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser
+from .models import CustomUser, Forum
 
 class AdminUserCreationForm(forms.ModelForm):
     class Meta:
@@ -17,3 +17,10 @@ class AdminUserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+
+class ForumPostForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ['title', 'content']
+

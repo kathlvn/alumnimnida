@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser, Forum
+from .models import CustomUser, Forum, Comment
 
 class AdminUserCreationForm(forms.ModelForm):
     class Meta:
@@ -23,4 +23,9 @@ class ForumPostForm(forms.ModelForm):
     class Meta:
         model = Forum
         fields = ['title', 'content']
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
 

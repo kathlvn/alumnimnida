@@ -1,40 +1,237 @@
 {% extends 'base.html' %}
 
-{% block content %}
-  <h2 class="text-2xl font-bold mb-4">Forum Posts</h2>
+<!-- ate mayda hin dd chenelen something, it nga tailwind (chatgpt-ed),
+ para hit nga modal ht edit ngan create. it iya pinakalink aadto ht base template. -->
 
-  <!-- {% if not request.user.is_staff %}
-    <a href="{% url 'forum_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Create Post</a>
-  {% endif %} -->
+ <!-- tapos dugangi nala daman hin list han mga nag-like han posts, parang fb style,
+  pag gin-hover pera la it kinikita pero pag iview list, naka modal -->
+
+{% block content %}
+<div class="max-w-3xl mx-auto p-6">
+  <h2 class="text-3xl font-bold mb-6">Forum Posts</h2>
 
   {% if request.user.is_authenticated and not request.user.is_staff %}
-    <a href="{% url 'forum_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Create Post</a>
+  <button onclick="toggleModal('createPostModal')" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+    + Create Post
+  </button>
   {% endif %}
 
+  <!-- CREATE POST MODAL -->
+  <div id="createPostModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h3 class="text-xl font-semibold mb-4">Create New Post</h3>
+      <form method="POST">
+        <input type="hidden" name="create_post" value="1">
+        {% csrf_token %}
+        {{ create_form.as_p }}
+        <div class="flex justify-end mt-4 gap-2">
+          <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Post</button>
+          <button type="button" onclick="toggleModal('createPostModal')" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <div class="mt-4 space-y-4">
+  <!-- POST LIST -->
+  <div class="mt-8 space-y-6">
     {% for post in posts %}
-      <div class="border p-4 rounded shadow bg-white">
-        <h3 class="text-xl font-semibold">{{ post.title }}</h3>
-        <p class="text-gray-700">{{ post.content }}</p>
-        <p class="text-sm text-gray-500">By {{ post.author.first_name }} {{ post.author.last_name }} | {{ post.date_posted|date:"F j, Y g:i A" }}
-        </p>
-        <!-- <p class="text-sm text-gray-500">Visibility: {{ post.visibility.get_visibility_type_display }}</p> -->
+    <div class="bg-white p-5 rounded shadow border">
+      <h4 class="text-xl font-semibold">{{ post.title }}</h4>
+      <p class="text-gray-700 mt-2">{{ post.content }}</p>
+      <p class="text-sm text-gray-500 mt-1">
+        By {{ post.author.first_name }} {{ post.author.last_name }} • {{ post.date_posted|date:"F j, Y g:i A" }}
+      </p>
 
-        {% if post.author == request.user %}
-          <div class="mt-2 space-x-2">
-            <a href="{% url 'forum_update' post.id %}" class="text-blue-500">Edit</a>
-            <a href="{% url 'forum_delete' post.id %}" class="text-red-500">Delete</a>
-          </div>
-        {% elif request.user.is_staff %}
-          <div class="mt-2">
-            <a href="{% url 'forum_delete' post.id %}" class="text-red-500">Delete</a>
-          </div>
-        {% endif %}
+  <!-- Like Section
+  <p class="like-count-{{ post.id }}">{{ post.likes.count }} Likes</p>
+  <button class="like-btn text-blue-500 hover:underline" data-post-id="{{ post.id }}">
+    {% if post.id in liked_post_ids %}
+      Unlike
+    {% else %}
+      Like
+    {% endif %}
+  </button> -->
+
+  <!-- Like Count and Button -->
+  <div class="mt-2 flex items-center gap-2">
+    <button 
+      class="like-btn text-blue-600 hover:underline" 
+      data-post-id="{{ post.id }}" 
+      id="like-btn-{{ post.id }}">
+      {% if post.id in liked_post_ids %}
+        Unlike
+      {% else %}
+        Like
+      {% endif %}
+    </button>
+    <span 
+      class="like-count text-sm text-gray-600 cursor-pointer hover:text-blue-600"
+      onclick="toggleModal('likesModal-{{ post.id }}')"
+      id="like-count-{{ post.id }}">
+      {{ post.likes.count }} Like{{ post.likes.count|pluralize }}
+    </span>
+  </div>
+
+
+
+
+
+    
+        
+
+
+  <!-- Comment Section -->
+  <div class="mt-4">
+    <h4 class="font-semibold mb-1">Comments</h4>
+    <ul class="space-y-1 mb-2 comment-list-{{ post.id }}">
+      {% for comment in post.comments.all %}
+        <li class="text-sm flex justify-between items-start gap-2">
+          <span>
+            <strong>{{ comment.user.first_name }} {{ comment.user.last_name }}:</strong> {{ comment.content }}
+          </span>
+          {% if comment.user == user or user.is_staff %}
+            <form action="{% url 'delete_comment' comment.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="text-red-500 text-xs hover:underline">Delete</button>
+            </form>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li class="text-sm text-gray-400">No comments yet.</li>
+      {% endfor %}
+    </ul>
+  
+    <!-- Add Comment Form -->
+    <form class="comment-form mt-2" data-post-id="{{ post.id }}">
+      {% csrf_token %}
+      <textarea name="comment_content" rows="2" class="w-full border rounded p-2 text-sm comment-input" placeholder="Write a comment..."></textarea>
+      <button type="submit" class="mt-1 bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">Comment</button>
+    </form>
+  </div>
+  
+
+
+      {% if post.author == request.user %}
+      <div class="mt-3 flex gap-4">
+        <button onclick="toggleModal('editModal-{{ post.id }}')" class="text-blue-600 hover:underline">Edit</button>
+        <form method="POST" action="{% url 'forum_delete' post.id %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="text-red-600 hover:underline">Delete</button>
+        </form>
       </div>
-    {% empty %}
-    <div class="text-gray-500 italic">No posts available. Be the first to post!</div>
 
+      <!-- EDIT POST MODAL -->
+      <div id="editModal-{{ post.id }}" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <h3 class="text-xl font-semibold mb-4">Edit Post</h3>
+          <form method="POST" action="{% url 'forum_update' post.id %}">
+            {% csrf_token %}
+            {{ post.edit_form.as_p }}
+            <div class="flex justify-end mt-4 gap-2">
+              <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
+              <button type="button" onclick="toggleModal('editModal-{{ post.id }}')" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-gray-500">No posts yet. Be the first to post!</p>
     {% endfor %}
   </div>
+</div>
+
+<!-- JavaScript for toggling modals -->
+<script>
+  function toggleModal(id) {
+    const modal = document.getElementById(id);
+    if (modal.classList.contains('hidden')) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    } else {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+</script>
+
+<!-- ajax -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.like-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        const postId = this.dataset.postId;
+
+        fetch("{% url 'like_post_ajax' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: `post_id=${postId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+          const likeBtn = document.getElementById(`like-btn-${postId}`);
+          const likeCount = document.getElementById(`like-count-${postId}`);
+
+          likeBtn.textContent = data.liked ? 'Unlike' : 'Like';
+          likeCount.textContent = `${data.like_count} Like${data.like_count !== 1 ? 's' : ''}`;
+        });
+      });
+    });
+  });
+</script>
+
+
+<script>
+  document.querySelectorAll('.comment-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const postId = this.dataset.postId;
+      const commentInput = this.querySelector('.comment-input');
+      const commentContent = commentInput.value;
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      if (!commentContent.trim()) return;
+
+      fetch("{% url 'comment_post' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          post_id: postId,
+          comment_content: commentContent
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const commentList = document.querySelector(`.comment-list-${postId}`);
+          const newComment = document.createElement('li');
+          newComment.classList.add('text-sm');
+          newComment.innerHTML = `<strong>${data.user_name}:</strong> ${data.comment_content}`;
+          commentList.appendChild(newComment);
+          commentInput.value = '';
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  function toggleLikesList(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('hidden');
+  }
+</script>
+
+
+
+
+
 {% endblock %}

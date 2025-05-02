@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Event, Updates, Forum
-from .forms import ForumPostForm
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+import json
+from .models import Event, Updates, Forum, Like, Comment
+from .forms import ForumPostForm, CommentForm
 
 @login_required
 def home(request):
@@ -41,25 +44,106 @@ def change_password_view(request):
     return render(request, 'core/change_password.html')
 
 
-
-
 @login_required
 def forum_list(request):
     posts = Forum.objects.all().order_by('-date_posted')
-    # if request.method == 'POST':
-    #     form = ForumPostForm(request.POST)
-        # if form.is_valid():
-        #     visibility = Visibility.objects.create(
-        #         visibility_type=form.cleaned_data['visibility_type'],
-        #         program=request.user.program,
-        #         batch=request.user.batch
-        #     )
-        #     post = form.save(commit=False)
-        #     post.author = request.user
-        #     post.visibility = visibility
-        #     post.save()
-        #     return redirect('forum-list')
-    return render(request, 'core/forum_list.html', {'posts': posts})
+
+
+    if request.method == 'POST':
+        if 'like_post' in request.POST:
+            post_id = request.POST.get('like_post')
+            post = get_object_or_404(Forum, id=post_id)
+            like, created = Like.objects.get_or_create(user=request.user, post=post)
+            if not created:
+                like.delete()
+            return redirect('forum')
+
+        elif 'comment_post' in request.POST:
+            post_id = request.POST.get('comment_post')
+            comment_content = request.POST.get('comment_content')
+            post = get_object_or_404(Forum, id=post_id)
+            if comment_content:
+                Comment.objects.create(user=request.user, post=post, content=comment_content)
+            return redirect('forum')
+
+        elif 'create_post' in request.POST:
+            form = ForumPostForm(request.POST)
+            if form.is_valid():
+                forum = form.save(commit=False)
+                forum.author = request.user
+                forum.save()
+            return redirect('forum')
+        
+    for post in posts:
+        post.edit_form = ForumPostForm(instance=post)
+
+
+    create_form = ForumPostForm()
+    comment_form = CommentForm()
+
+  
+    liked_post_ids = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
+
+    return render(request, 'core/forum_list.html', {
+        'posts': posts,
+        'create_form': create_form,
+        'comment_form': comment_form,
+        'liked_post_ids': liked_post_ids,
+    })
+
+@require_POST
+@login_required
+def like_post_ajax(request):
+    post_id = request.POST.get('post_id')
+    post = get_object_or_404(Forum, id=post_id)
+
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+
+    return JsonResponse({
+        'liked': liked,
+        'like_count': post.likes.count()
+    })
+
+@require_POST
+def comment_post_ajax(request):
+    data = json.loads(request.body)
+    post_id = data.get('post_id')
+    comment_content = data.get('comment_content')
+
+    post = get_object_or_404(Forum, id=post_id)
+
+    if comment_content.strip():
+        comment = Comment.objects.create(
+            user=request.user,
+            post=post,
+            content=comment_content
+        )
+        return JsonResponse({
+            'success': True,
+            'user_name': request.user.first_name,
+            'comment_content': comment.content
+        })
+
+    return JsonResponse({'success': False})
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if comment.user != request.user and not request.user.is_staff:
+        return redirect('forum')
+
+    if request.method == 'POST':
+        comment.delete()
+        return redirect('forum')
+
+    return render(request, 'core/comment_delete_confirm.html', {'comment': comment})
+
 
 
 @login_required
@@ -67,10 +151,10 @@ def forum_create(request):
     # if request.user.is_staff:
     #     return redirect('forum_list')  # Staff can't create
     if request.method == 'POST':
-        print("Form successfully submitted")
+        print("submitted")
         form = ForumPostForm(request.POST)
         if form.is_valid():
-            print("Form is valid")
+            print("valid")
             forum = form.save(commit=False)
             forum.author = request.user
             forum.save()

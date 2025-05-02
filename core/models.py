@@ -128,18 +128,16 @@ class Forum(models.Model):
 #     def __str__(self):
 #         return self.title
 
-# class Comment(models.Model):
-#     post = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='comments')
-#     author = models.ForeignKey(User, on_delete=models.CASCADE)
-#     content = models.TextField()
-#     date_posted = models.DateTimeField(auto_now_add=True)
+class Like(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.ForeignKey('Forum', on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
 
-#     def __str__(self):
-#         return f"Comment by {self.author} on {self.post}"
+    class Meta:
+        unique_together = ('user', 'post')
 
-# class Like(models.Model):
-#     post = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='likes')
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-#     class Meta:
-#         unique_together = ('post', 'user')
+class Comment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.ForeignKey('Forum', on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

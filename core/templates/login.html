@@ -1,12 +1,152 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-<head><title>Login</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Alumni Tracking and Engagement Management System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      padding: 5px 20px 30px;
+      width: 570px;
+      text-align: center;
+      position: relative;
+    }
+
+    .login-box img {
+      width: 125px;
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 10px;
+    }
+
+    .login-box h1 {
+      margin: 70px 0 5px;
+      color: #5b1780;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    .login-box h3 {
+      margin: 5px 0 30px;
+      color: #5b1780;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .login-form {
+      margin-top: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-weight: bold;
+      color: #5b1780;
+      font-size: 0.9rem;
+      width: 100px;
+      text-align: right;
+      margin-right: 10px;
+    }
+
+    .form-input {
+      width: 250px;
+      padding: 8px;
+      border: 2px solid #5b1780;
+      border-radius: 30px;
+      font-size: 0.9rem;
+    }
+
+    .form-group-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-left: calc(95px + 10px);
+      gap: 20px;
+    }
+
+    .login-button,
+    .login-admin {
+      background-color: #5b1780;
+      color: white;
+      border: none;
+      padding: 13px 30px;
+      border-radius: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-weight: bold;
+    }
+
+    .login-button:hover,
+    .login-admin:hover {
+      background-color: #044a19;
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
 <body>
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Log In</button>
-  </form>
+
+  <div class="login-box">
+    <img src="{% static 'logo.png' %}" alt="CCS Logo">
+    <h1>DEPARTMENT OF COMPUTER STUDIES</h1>
+    <h3>ALUMNI TRACKING AND ENGAGEMENT MANAGEMENT SYSTEM</h3>
+
+    {% if error %}
+      <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    <form class="login-form" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="username" class="form-label">USERNAME:</label>
+        <input type="text" id="username" name="username" class="form-input" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">PASSWORD:</label>
+        <input type="password" id="password" name="password" class="form-input" required>
+      </div>
+
+      <div class="form-group-buttons">
+        <button type="submit" class="login-button">LOGIN</button>
+        <button type="submit" class="login-admin">LOGIN AS ADMIN</button>
+      </div>
+    </form>
+  </div>
+
 </body>
 </html>

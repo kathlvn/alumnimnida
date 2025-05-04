@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser, Forum, Comment
+from .models import CustomUser,JobEntry, Forum, Comment
 
 class AdminUserCreationForm(forms.ModelForm):
     class Meta:
@@ -17,7 +17,23 @@ class AdminUserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-    
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'address',
+            'curr_location',
+            'contact',
+            'employment_status',
+            'industry',
+            'bio',
+        ]
+
+class JobEntryForm(forms.ModelForm):
+    class Meta:
+        model = JobEntry
+        fields = ['job_title']
 
 class ForumPostForm(forms.ModelForm):
     class Meta:

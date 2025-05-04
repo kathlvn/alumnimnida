@@ -3,18 +3,71 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 import json
-from .models import Event, Updates, Forum, Like, Comment
-from .forms import ForumPostForm, CommentForm
+from django.forms import inlineformset_factory
+from django.urls import reverse
+from django.contrib import messages
+from .models import CustomUser, JobEntry, Event, Updates, Forum, Like, Comment
+from .forms import ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
 
 @login_required
 def home(request):
     return render(request, 'core/home.html', {'user': request.user})
 
+JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
 @login_required
 def profile_view(request):
-    return render(request, 'core/profile.html')
+    user = request.user
+    can_edit = request.GET.get('edit') == '1'
 
+    if request.method == 'POST' and can_edit:
+        form = UserProfileForm(request.POST, instance=user)
+        formset = JobEntryFormSet(request.POST, instance=user)
 
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=user)
+        formset = JobEntryFormSet(instance=user)
+
+    return render(request, 'core/profile.html', {
+        'form': form,
+        'formset': formset,
+        'can_edit': can_edit
+    })
+
+@login_required
+def add_job_entry(request):
+    if request.method == 'POST':
+        form = JobEntryForm(request.POST)
+        if form.is_valid():
+            job = form.save(commit=False)
+            job.user = request.user
+            job.save()
+            return redirect('profile?edit=1')  # return to edit mode
+    return redirect('profile?edit=1')
+
+@login_required
+def edit_job_entry(request, entry_id):
+    job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
+    if request.method == 'POST':
+        form = JobEntryForm(request.POST, instance=job)
+        if form.is_valid():
+            form.save()
+            return redirect('profile?edit=1')
+    else:
+        form = JobEntryForm(instance=job)
+    return render(request, 'core/edit_job_entry.html', {'form': form, 'job': job})
+
+@login_required
+def delete_job_entry(request, entry_id):
+    job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
+    if request.method == 'POST':
+        job.delete()
+        return redirect('profile?edit=1')
+    return render(request, 'core/jobentry_confirm_delete.html', {'job': job})
 
 
 @login_required

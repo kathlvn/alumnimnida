@@ -26,7 +26,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50)
     birthday = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=255, blank=True)
-    location = models.CharField(max_length=100, blank=True)
+    curr_location = models.CharField(max_length=100, blank=True)
+
     degree_choices = [
         ('BSCS', 'BS Computer Science'),
         ('BSIT', 'BS Information Technology'),
@@ -38,9 +39,32 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     year_selection = [(year, str(year)) for year in range(current_year, 2015, -1)]  
     year_attended = models.IntegerField(choices=year_selection, null=True, blank=True)
     year_graduated = models.IntegerField(choices=year_selection, null=True, blank=True)
-    contact = models.CharField(max_length=20, blank=True)
+    
+    contact = models.CharField(max_length=11, blank=True)
     club_orgs = models.TextField(blank=True)
-    professional_background = models.TextField(blank=True)
+    bio = models.TextField(blank=True)
+
+    EMPLOYMENT_STATUS_CHOICES = [
+        ('employed', 'Employed'),
+        ('freelancing', 'Freelancing'),
+        ('unemployed', 'Unemployed'),
+        ('studying', 'Studying'),
+        ('other', 'Other'),
+    ]
+
+    INDUSTRY_CHOICES = [
+        ('it', 'Information Technology'),
+        ('education', 'Education'),
+        ('healthcare', 'Healthcare'),
+        ('business', 'Business'),
+        ('engineering', 'Engineering'),
+        ('arts', 'Arts'),
+        ('government', 'Government'),
+        ('others', 'Others'),
+    ]
+
+    employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
+    industry = models.CharField(max_length=50, choices=INDUSTRY_CHOICES, blank=True, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -60,6 +84,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def batch(self):
         return self.year_graduated
+    
+class JobEntry(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='job_history')
+    job_title = models.CharField(max_length=100)
+    company = models.CharField(max_length=100)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.job_title
     
 
 #for filtering 

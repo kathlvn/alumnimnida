@@ -1,13 +1,52 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import get_user_model
 from django.views.decorators.http import require_POST
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.http import JsonResponse
 import json
 from django.forms import inlineformset_factory
 from django.urls import reverse
 from django.contrib import messages
 from .models import CustomUser, JobEntry, Event, Updates, Forum, Like, Comment
-from .forms import ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
+from .forms import CustomUserCreationForm, ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
+
+
+CustomUser = get_user_model()
+
+def is_admin(user):
+    return user.is_staff or user.is_superuser
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_list(request):
+    users = CustomUser.objects.all()
+    return render(request, 'admin_panel/user_list.html', {'users': users})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_create(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_user_list')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': False})
+
+# @login_required
+# @user_passes_test(is_admin)
+# def admin_user_edit(request, user_id):
+#     user = get_object_or_404(CustomUser, id=user_id)
+#     if request.method == 'POST':
+#         form = CustomUserChangeForm(request.POST, instance=user)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('admin_user_list')
+#     else:
+#         form = CustomUserChangeForm(instance=user)
+#     return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
 
 @login_required
 def home(request):

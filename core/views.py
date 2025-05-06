@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, logout
 from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.http import JsonResponse
@@ -21,6 +21,8 @@ def is_admin(user):
 @user_passes_test(is_admin)
 def admin_user_list(request):
     users = CustomUser.objects.all()
+    for user in users:
+        print(user.id)
     return render(request, 'admin_panel/user_list.html', {'users': users})
 
 @login_required
@@ -35,18 +37,23 @@ def admin_user_create(request):
         form = CustomUserCreationForm()
     return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': False})
 
-# @login_required
-# @user_passes_test(is_admin)
-# def admin_user_edit(request, user_id):
-#     user = get_object_or_404(CustomUser, id=user_id)
-#     if request.method == 'POST':
-#         form = CustomUserChangeForm(request.POST, instance=user)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('admin_user_list')
-#     else:
-#         form = CustomUserChangeForm(instance=user)
-#     return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
+@login_required
+@user_passes_test(is_admin)
+def admin_user_edit(request, user_id):
+    print("edit")
+    user = get_object_or_404(CustomUser, id=user_id)
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST, instance=user)
+        if form.is_valid():
+            print("valid")
+            form.save()
+            return redirect('admin_user_list')
+    else:
+        form = CustomUserCreationForm(instance=user)
+    return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
+
+
+
 
 @login_required
 def home(request):
@@ -144,45 +151,7 @@ def login_view(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @login_required
-# def updates_view(request):
-#     event_id = request.GET.get('event')
-#     events = Event.objects.all()
-
-#     if event_id:
-#         updates = Updates.objects.filter(related_event_id=event_id).order_by('-date_posted')
-#     else:
-#         updates = Updates.objects.all().order_by('-date_posted')
-
-#     return render(request, 'core/updates.html', {'updates': updates, 'events': events, 'selected_event': event_id})
 def updates_view(request):
     updates = Updates.objects.order_by('-date_posted')
     return render(request, 'core/updates.html', {'updates': updates})
@@ -342,5 +311,9 @@ def forum_delete(request, post_id):
         return redirect('forum')
     
     return render(request, 'core/forum_delete.html', {'post': post})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')    
 
 

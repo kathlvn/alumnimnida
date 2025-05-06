@@ -21,13 +21,13 @@ from .models import CustomUser,JobEntry, Forum, Comment
 class CustomUserCreationForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['student_number', 'first_name', 'last_name', 'email', 'degree', 'year_graduated', 'is_active', 'is_staff', 'is_superuser']
+        fields = ['student_number', 'first_name', 'last_name', 'email', 'contact', 'birthday', 'address', 'curr_location', 'degree', 'year_attended', 'year_graduated', 'is_active', 'is_staff', 'is_superuser']
+        # fields = '__all__'
+        widgets = {'birthday': forms.DateInput(attrs={'type':'date'})}
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        # Set username = student number
         user.username = user.student_number
-        # Set password = student number
         user.set_password(user.student_number)
         if commit:
             user.save()
@@ -41,7 +41,6 @@ class UserProfileForm(forms.ModelForm):
             'curr_location',
             'contact',
             'employment_status',
-            'industry',
             'bio',
         ]
 

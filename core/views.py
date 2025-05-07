@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest, HttpResponse
 import json
 from django.forms import inlineformset_factory
 from django.urls import reverse
 from django.contrib import messages
 from .models import CustomUser, JobEntry, Event, Updates, Forum, Like, Comment
 from .forms import CustomUserCreationForm, ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
+from django.utils.crypto import get_random_string
+from django.db.models import Q
+
 
 
 CustomUser = get_user_model()
@@ -17,13 +20,24 @@ CustomUser = get_user_model()
 def is_admin(user):
     return user.is_staff or user.is_superuser
 
+
 @login_required
 @user_passes_test(is_admin)
 def admin_user_list(request):
+    query = request.GET.get('q', '')
     users = CustomUser.objects.all()
-    for user in users:
-        print(user.id)
-    return render(request, 'admin_panel/user_list.html', {'users': users})
+
+    if query:
+        users = users.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(student_number__icontains=query) |
+            Q(year_graduated__icontains=query) |
+            Q(degree__icontains=query)
+        )
+
+    return render(request, 'admin_panel/user_list.html', {'users': users, 'query': query})
 
 @login_required
 @user_passes_test(is_admin)
@@ -52,7 +66,24 @@ def admin_user_edit(request, user_id):
         form = CustomUserCreationForm(instance=user)
     return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def admin_user_delete(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    user.is_active = False
+    user.save()
+    messages.success(request, f"{user.get_full_name or user.username} has been deactivated.")
+    return redirect('admin_user_list')
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def admin_user_reset_password(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    new_password = user.username  # Or use `get_random_string(8)` if you want random
+    user.set_password(new_password)
+    user.save()
+    messages.success(request, f"Password for {user.get_full_name() or user.username} has been reset to: {new_password}")
+    return redirect('admin_user_list')
 
 
 @login_required
@@ -122,20 +153,6 @@ def events_view(request):
     return render(request, 'core/events.html', {'events': events})
 
 
-
-
-
-
-
-
-
-
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.http import HttpRequest, HttpResponse  # Optional, for type hinting
 
 def login_view(request):
     if request.method == 'POST':

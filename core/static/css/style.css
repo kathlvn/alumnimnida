@@ -1,273 +1,149 @@
-
-/* login form */
+/* homepage */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  background-color: #ffffff;
+  color: #5b1780;
+  padding: 2rem;
 }
 
-.login-box {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 30px;
+.container {
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 70px;
+}
+
+.header {
+  background-color: #ffffff;
   border: 3px solid #5b1780;
-  box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
-  padding: 5px 20px 30px;
-  width: 90%;
-  max-width: 570px;
+  border-radius: 20px;
+  padding: 2rem;
   text-align: center;
   position: relative;
 }
 
-.login-box img {
-  width: 125px;
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px;
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
-.login-box h1 {
-  margin: 70px 0 5px;
-  color: #5b1780;
-  font-size: 1.6rem;
-  font-weight: bold;
+.header p {
+  margin-top: 0.3rem;
+  font-size: 1rem;
+  letter-spacing: 2px;
 }
 
-.login-box h3 {
-  margin: 5px 0 30px;
-  color: #5b1780;
-  font-size: 0.9rem;
-  letter-spacing: 0.5px;
-}
-
-.login-form {
-  margin-top: 20px;
-}
-
-.form-group {
+.nav-bar {
   display: flex;
+  justify-content: space-between;
+  background-color: #ffffff;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 10px;
+  z-index: 1;
 }
 
-.form-label {
-  font-weight: bold;
-  color: #5b1780;
-  font-size: 0.9rem;
-  width: 100px;
-  text-align: right;
-  margin-right: 10px;
+.search-box {
+  flex-grow: 1;
+  margin-right: 1rem;
+  position: relative;
 }
 
-.form-input {
-  width: 250px;
-  padding: 8px;
-  border: 2px solid #5b1780;
+.search-box input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 3px solid #5b1780;
   border-radius: 30px;
-  font-size: 0.9rem;
+  outline: none;
+  font-size: 1rem;
 }
 
-.form-group-buttons {
+.nav-buttons button {
+  background: #5b1780;
+  border: 3px solid transparent;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
+  font-weight: 600;
+  margin: 0.3rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-buttons button:hover {
+  background-color: white;
+  border: 3px solid #5b1780;
+  color: #5b1780;
+}
+
+.cards {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-left: calc(100px + 10px);
-  gap: 20px;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: center;
+  gap: 2rem;
 }
 
-.login-button,
-.login-admin {
+.card {
+  background-color: white;
+  border: 3px solid #5b1780;
+  border-radius: 20px;
+  text-align: center;
+  padding: 1rem 1rem;
+  min-width: 90px;
+  box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
+  transition: transform 0.3s ease;
+  margin-top: 30px;
+}
+
+.card:hover {
+  transform: scale(1.03);
   background-color: #5b1780;
   color: white;
-  border: none;
-  padding: 13px 30px;
-  border-radius: 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-weight: bold;
+  
 }
 
-.login-button:hover,
-.login-admin:hover {
-  background-color: #044a19;
+.card img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 0.5rem;
 }
 
-.error-message {
-  color: red;
-  margin-bottom: 15px;
+.card h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
   font-size: 0.9rem;
+  color: #5b1780;
 }
 
-@media (max-width: 425px) {
-  .form-group {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form-label {
-    text-align: left;
-    width: 100%;
-    margin-bottom: 5px;
-  }
-
-  .form-input {
-    width: 100%;
-  }
-
-  .form-group-buttons {
-    margin-left: 0;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .login-button,
-  .login-admin {
-    width: 100%;
-    margin-bottom: 10px;
-  }
+.card:hover p {
+  color: white;
 }
-
-
-
-
-
-  /* homepage */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-  }
   
-  body {
-    background-color: #ffffff;
-    color: #5b1780;
-    padding: 2rem;
-  }
-  
-  .container {
-    max-width: 1200px;
-    margin: auto;
-  }
-  
-  .header {
-    background-color: #ffffff;
-    border: 3px solid #5b1780;
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    position: relative;
-  }
-  
-  .header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-  }
-  
-  .header p {
-    margin-top: 0.3rem;
-    font-size: 1rem;
-    letter-spacing: 2px;
-  }
-  
-  .nav-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-  }
-  
-  .search-box {
-    flex-grow: 1;
-    margin-right: 1rem;
-    position: relative;
-  }
-  
-  .search-box input {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border: 3px solid #5b1780;
-    border-radius: 30px;
-    outline: none;
-    font-size: 1rem;
-  }
-  
-  .nav-buttons button {
-    background: none;
-    border: 3px solid #5b1780;
-    color: #5b1780;
-    padding: 0.6rem 1.2rem;
-    border-radius: 30px;
-    font-weight: 600;
-    margin: 0.3rem;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .nav-buttons button:hover {
-    background-color: #5b1780;
-    color: white;
-  }
-  
+@media  (max-width: 425px) {
   .cards {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
+    flex-direction: column;
   }
-  
   .card {
-    background-color: white;
-    border: 3px solid #5b1780;
-    border-radius: 20px;
-    text-align: center;
-    padding: 1rem 1rem;
-    flex: 1 1 100px;
-    max-width: 30%;
-    min-width: 90px;
-    box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
-    transition: transform 0.3s ease;
-    margin-top: 30px;
+    width: 100%;
   }
-  
-  .card:hover {
-    transform: scale(1.03);
-    background-color: #5b1780;
-    color: white;
-    
+  .header {
+    font-size: 16px;
   }
-  
-  .card img {
-    width: 120px;
-    height: auto;
-    margin-bottom: 0.5rem;
+  .header h1 {
+    font-size: 1.5rem;
   }
-  
-  .card h3 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-  
-  .card p {
-    font-size: 0.9rem;
-    color: #5b1780;
-  }
-  
-  .card:hover p {
-    color: white;
-  }
-  
+
+}

@@ -20,6 +20,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(student_number, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    id = models.AutoField(primary_key=True)
     student_number = models.CharField(max_length=20, unique=True)
     email = models.EmailField(blank=True)
     first_name = models.CharField(max_length=50)
@@ -52,19 +53,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('other', 'Other'),
     ]
 
-    INDUSTRY_CHOICES = [
-        ('it', 'Information Technology'),
-        ('education', 'Education'),
-        ('healthcare', 'Healthcare'),
-        ('business', 'Business'),
-        ('engineering', 'Engineering'),
-        ('arts', 'Arts'),
-        ('government', 'Government'),
-        ('others', 'Others'),
-    ]
 
     employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
-    industry = models.CharField(max_length=50, choices=INDUSTRY_CHOICES, blank=True, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -80,6 +70,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def program(self):
         return self.degree
+    
+    @property
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
     
     @property
     def batch(self):

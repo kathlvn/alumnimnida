@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Event, Updates, Forum
-from .forms import AdminUserCreationForm
+from .forms import CustomUserCreationForm
 
 class CustomUserAdmin(UserAdmin):
-    add_form = AdminUserCreationForm
+    add_form = CustomUserCreationForm
     model = CustomUser
     list_display = ('student_number', 'first_name', 'last_name', 'email', 'degree')
     ordering = ('student_number',)

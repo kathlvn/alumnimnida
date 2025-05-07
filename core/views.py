@@ -1,17 +1,104 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.http import JsonResponse, HttpRequest, HttpResponse
 import json
 from django.forms import inlineformset_factory
 from django.urls import reverse
 from django.contrib import messages
 from .models import CustomUser, JobEntry, Event, Updates, Forum, Like, Comment
-from .forms import ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
+from .forms import CustomUserCreationForm, ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
+from django.utils.crypto import get_random_string
+from django.db.models import Q
+
+
+
+
+CustomUser = get_user_model()
+
+def is_admin(user):
+    return user.is_staff or user.is_superuser
+
 
 @login_required
-def home(request):
-    return render(request, 'core/home.html', {'user': request.user})
+@user_passes_test(is_admin)
+def admin_user_list(request):
+    query = request.GET.get('q', '')
+    users = CustomUser.objects.all()
+
+    if query:
+        users = users.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(student_number__icontains=query) |
+            Q(year_graduated__icontains=query) |
+            Q(degree__icontains=query)
+        )
+
+    return render(request, 'admin_panel/user_list.html', {'users': users, 'query': query})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_create(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_user_list')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': False})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_edit(request, user_id):
+    print("edit")
+    user = get_object_or_404(CustomUser, id=user_id)
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST, instance=user)
+        if form.is_valid():
+            print("valid")
+            form.save()
+            return redirect('admin_user_list')
+    else:
+        form = CustomUserCreationForm(instance=user)
+    return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def admin_user_delete(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    user.is_active = False
+    user.save()
+    messages.success(request, f"{user.get_full_name or user.username} has been deactivated.")
+    return redirect('admin_user_list')
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def admin_user_reset_password(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    new_password = user.username  # Or use `get_random_string(8)` if you want random
+    user.set_password(new_password)
+    user.save()
+    messages.success(request, f"Password for {user.get_full_name() or user.username} has been reset to: {new_password}")
+    return redirect('admin_user_list')
+
+
+@login_required
+def home(request): #kanan stats po in
+    stats = {
+        'total_alumni': CustomUser.objects.filter(is_active=True).count(),
+        'total_events': Event.objects.count(),
+        'total_posts': Forum.objects.count(),
+        'total_updates': Updates.objects.count(),
+        'total_comments': Comment.objects.count(),
+    }
+    return render(request, 'core/home.html', stats)
+
+
 
 JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
 @login_required
@@ -77,20 +164,6 @@ def events_view(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.http import HttpRequest, HttpResponse  # Optional, for type hinting
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -105,45 +178,7 @@ def login_view(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @login_required
-# def updates_view(request):
-#     event_id = request.GET.get('event')
-#     events = Event.objects.all()
-
-#     if event_id:
-#         updates = Updates.objects.filter(related_event_id=event_id).order_by('-date_posted')
-#     else:
-#         updates = Updates.objects.all().order_by('-date_posted')
-
-#     return render(request, 'core/updates.html', {'updates': updates, 'events': events, 'selected_event': event_id})
 def updates_view(request):
     updates = Updates.objects.order_by('-date_posted')
     return render(request, 'core/updates.html', {'updates': updates})
@@ -303,5 +338,9 @@ def forum_delete(request, post_id):
         return redirect('forum')
     
     return render(request, 'core/forum_delete.html', {'post': post})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')    
 
 

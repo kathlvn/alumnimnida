@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Admin Dashboard</h2>
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Manage Users</h5>
+          <p class="card-text">Add, update, or remove user accounts and batch upload students.</p>
+          <a href="{% url 'admin_user_list' %}" class="btn btn-primary">Go to Users</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Manage Events</h5>
+          <p class="card-text">Create and edit alumni events. Mark them as done when finished.</p>
+          <a href="{% url 'admin_event_list' %}" class="btn btn-primary">Go to Events</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Manage Updates</h5>
+          <p class="card-text">Post updates and announcements. Optionally link them to events.</p>
+          <a href="{% url 'admin_updates_list' %}" class="btn btn-primary">Go to Updates</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Manage Forum</h5>
+          <p class="card-text">Read and delete user forum posts and view comments.</p>
+          <a href="{% url 'admin_forum_list' %}" class="btn btn-primary">Go to Forum</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

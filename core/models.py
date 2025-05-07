@@ -89,37 +89,20 @@ class JobEntry(models.Model):
         return self.job_title
     
 
-#for filtering 
-# class Visibility(models.Model):
-#     VISIBILITY_CHOICES = [
-#         ('public', 'Public'),
-#         ('program', 'Program Only'),
-#         ('batch', 'Batch Only'),
-#     ]
-
-#     visibility_type = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
-#     batch = models.CharField(max_length=10, blank=True, null=True)
-#     program = models.CharField(max_length=50, blank=True, null=True)
-
-#     def __str__(self):
-#         return f"{self.visibility_type} | {self.program or ''} | {self.batch or ''}"
-
-
-
-
 
 #ext functions
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     location = models.CharField(max_length=255)
-    date = models.DateField()
-    time = models.TimeField()
+    datetime = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+    done = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
     
+
 
 class Updates(models.Model):
     title = models.CharField(max_length=200)
@@ -137,23 +120,9 @@ class Forum(models.Model):
     content = models.TextField()
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_posted = models.DateTimeField(auto_now_add=True)
-   # visibility = models.ForeignKey(Visibility, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.title
-
-
-
-
-# User = get_user_model()
-# class Forum(VisibilityMixin):
-#     author = models.ForeignKey(User, on_delete=models.CASCADE)
-#     title = models.CharField(max_length=255)
-#     content = models.TextField()
-#     date_posted = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return self.title
 
 class Like(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

@@ -24,6 +24,7 @@ from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
 
 
 
+
 CustomUser = get_user_model()
 
 def is_admin(user):
@@ -306,8 +307,17 @@ def admin_delete_post(request, post_id):
 ## USER SIDE
 
 @login_required
-def home(request):
-    return render(request, 'core/home.html', {'user': request.user})
+def home(request): #kanan stats po in
+    stats = {
+        'total_alumni': CustomUser.objects.filter(is_active=True).count(),
+        'total_events': Event.objects.count(),
+        'total_posts': Forum.objects.count(),
+        'total_updates': Updates.objects.count(),
+        'total_comments': Comment.objects.count(),
+    }
+    return render(request, 'core/home.html', stats)
+
+
 
 JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
 @login_required

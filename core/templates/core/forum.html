@@ -1,19 +1,84 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum</title>
+    <link rel="stylesheet" href="{% static 'css/forum.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <button onclick="location.href='home.html'">HOME</button>
+            <button onclick="location.href='events.html'">EVENTS</button>
+            <button onclick="location.href='updates.html'">UPDATES</button>
+            <button class="active">FORUM</button>
+        </nav>
+    </header>
 
-{% block content %}
-  <h2 class="text-2xl font-bold mb-4">Forum</h2>
+    <div class="container">
+        <h1>FORUM POSTS</h1>
 
-  {% if posts %}
-    <ul>
-      {% for post in posts %}
-        <li class="mb-4 border p-4 rounded bg-white shadow">
-          <h3 class="text-xl font-semibold">{{ post.title }}</h3>
-          <p>{{ post.content }}</p>
-          <p class="text-sm text-gray-600"><strong>Posted by:</strong> {{ post.author.username }} on {{ post.date_posted }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No posts yet.</p>
-  {% endif %}
-{% endblock %}
+        <div class="top-bar">
+            <button id="createPostBtn">CREATE POST</button>
+            <select id="filterSelect">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+                <option value="batch">By Batch</option>
+            </select>
+        </div>
+
+        <!-- Posts Container -->
+        <div id="postsContainer">
+            {% for post in posts %}
+            <div class="post">
+                <h2>{{ post.title|upper }}</h2>
+                <p>{{ post.content }}</p>
+                <p><i>By <strong>{{ post.author.get_full_name }}</strong> • {{ post.created_at }}</i></p>
+                <p>Likes: {{ post.likes.count }}</p>
+
+                <div class="comments">
+                    <h4>Comments</h4>
+                    {% for comment in post.comments.all %}
+                        <div>
+                            <strong>{{ comment.author.get_full_name }}</strong>: {{ comment.text }}
+                        </div>
+                    {% endfor %}
+                    <form method="post" action="{% url 'add_comment' post.id %}">
+                        {% csrf_token %}
+                        <input type="text" name="comment" placeholder="Comment here...">
+                        <button type="submit">SEND</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <form method="post" action="{% url 'create_post' %}">
+                {% csrf_token %}
+                <h2>Create Post</h2>
+                <input type="text" name="title" placeholder="Post Title" required>
+                <textarea name="content" placeholder="Post Content" required></textarea>
+                <div class="modal-actions">
+                    <button type="submit">Save</button>
+                    <button type="button" id="cancelModal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("createPostBtn").onclick = () => {
+            document.getElementById("postModal").style.display = "block";
+        };
+        document.getElementById("cancelModal").onclick = () => {
+            document.getElementById("postModal").style.display = "none";
+        };
+
+    </script>
+</body>
+</html>

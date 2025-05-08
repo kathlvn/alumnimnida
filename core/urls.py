@@ -11,7 +11,9 @@ urlpatterns = [
     path('admin-panel/users/<int:user_id>/edit/', views.admin_user_edit, name='admin_user_edit'),
     path('admin-panel/users/<int:user_id>/delete/', views.admin_user_delete, name='admin_user_delete'),
     path('admin-panel/users/<int:user_id>/reset/', views.admin_user_reset_password, name='admin_user_reset_password'),
-    
+    path('admin-panel/users/batch-upload/', views.admin_user_batch_upload, name='admin_user_batch_upload'),
+
+
     path('admin-panel/events/', views.admin_event_list, name='admin_event_list'),
     path('admin-panel/events/add/', views.admin_event_create, name='admin_event_create'),
     path('admin-panel/events/<int:event_id>/edit/', views.admin_event_edit, name='admin_event_edit'),

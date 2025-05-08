@@ -89,7 +89,7 @@ class JobEntry(models.Model):
         return self.job_title
     
 
-
+    
 #ext functions
 class Event(models.Model):
     title = models.CharField(max_length=200)

@@ -1,4 +1,5 @@
 import json
+import csv
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -73,6 +74,54 @@ def admin_user_create(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': False})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_batch_upload(request):
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, 'This is not a CSV file.')
+            return redirect('admin_user_batch_upload')
+
+        decoded_file = csv_file.read().decode('utf-8').splitlines()
+        reader = csv.DictReader(decoded_file)
+
+        created_count = 0
+        for row in reader:
+            student_number = row.get('student_number')
+            first_name = row.get('first_name')
+            last_name = row.get('last_name')
+            email = row.get('email')
+            contact = row.get('contact')
+            birthday = row.get('birthday')
+            address =  row.get('address')
+            curr_location = row.get('curr_location')
+            degree = row.get('degree')
+            year_attended = row.get('year_attended')
+            year_graduated = row.get('year_graduated')
+
+            if not student_number:
+                continue
+
+            if CustomUser.objects.filter(student_number=student_number).exists():
+                continue  # Skip duplicates
+
+            user = CustomUser.objects.create_user(
+                student_number=student_number,
+                password=student_number,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                degree=degree,
+                year_graduated=year_graduated
+            )
+            created_count += 1
+
+        messages.success(request, f'{created_count} users created successfully.')
+        return redirect('admin_user_list')
+
+    return render(request, 'admin_panel/csv_upload.html')
 
 @login_required
 @user_passes_test(is_admin)

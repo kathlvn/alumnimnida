@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Batch Upload Users via CSV</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="csv_file">Upload CSV File:</label>
+        <input type="file" name="csv_file" accept=".csv" required class="form-control-file">
+    </div>
+    <button type="submit" class="btn btn-success">Upload</button>
+    <a href="{% url 'admin_user_list' %}" class="btn btn-secondary">Back to Users</a>
+</form>
+
+<hr>
+<h5>CSV Format</h5>
+<pre>
+student_number, first_name, last_name, email, contact, birthday, address, curr_location, degree, year_attended, year_graduated
+</pre>
+
+{% endblock %}

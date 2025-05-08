@@ -4,11 +4,29 @@ from . import views
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
+    path('redirect-after-login/', views.post_login_redirect, name='post-login-redirect'),
+    path('admin-panel/admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-panel/users/', views.admin_user_list, name='admin_user_list'),
     path('admin-panel/users/add/', views.admin_user_create, name='admin_user_create'),
     path('admin-panel/users/<int:user_id>/edit/', views.admin_user_edit, name='admin_user_edit'),
     path('admin-panel/users/<int:user_id>/delete/', views.admin_user_delete, name='admin_user_delete'),
     path('admin-panel/users/<int:user_id>/reset/', views.admin_user_reset_password, name='admin_user_reset_password'),
+    
+    path('admin-panel/events/', views.admin_event_list, name='admin_event_list'),
+    path('admin-panel/events/add/', views.admin_event_create, name='admin_event_create'),
+    path('admin-panel/events/<int:event_id>/edit/', views.admin_event_edit, name='admin_event_edit'),
+    path('admin-panel/events/<int:event_id>/delete/', views.admin_event_delete, name='admin_event_delete'),
+    path('admin-panel/events/done/<int:event_id>/', views.admin_event_mark_done, name='admin_event_mark_done'),
+  
+    path('admin-panel/updates/', views.admin_updates_list, name='admin_updates_list'),
+    path('admin-panel/updates/add/', views.admin_updates_create, name='admin_updates_create'),
+    path('admin-panel/updates/edit/<int:update_id>/', views.admin_updates_edit, name='admin_updates_edit'),
+    path('admin-panel/updates/delete/<int:update_id>/', views.admin_updates_delete, name='admin_updates_delete'),
+
+    path('admin-panel/forum/', views.admin_forum_list, name='admin_forum_list'),
+    path('admin-panel/forum/delete/<int:post_id>/', views.admin_delete_post, name='admin_delete_post'),
+
+
 
 
     path('', views.home, name='home'),

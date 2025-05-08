@@ -1,17 +1,25 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import get_user_model, authenticate, login, logout
-from django.views.decorators.http import require_POST
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.http import JsonResponse, HttpRequest, HttpResponse
 import json
-from django.forms import inlineformset_factory
-from django.urls import reverse
 from django.contrib import messages
-from .models import CustomUser, JobEntry, Event, Updates, Forum, Like, Comment
-from .forms import CustomUserCreationForm, ForumPostForm, UserProfileForm, JobEntryForm, CommentForm
-from django.utils.crypto import get_random_string
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.db.models import Q
+from django.forms import inlineformset_factory
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils.crypto import get_random_string
+from django.views.decorators.http import require_POST
+from .forms import (
+    CommentForm,
+    CustomUserCreationForm,
+    EventForm,
+    ForumPostForm,
+    JobEntryForm,
+    UpdatesForm,
+    UserProfileForm,
+)
+from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
 
 
 
@@ -21,6 +29,21 @@ CustomUser = get_user_model()
 def is_admin(user):
     return user.is_staff or user.is_superuser
 
+@login_required
+# @user_passes_test(is_admin)
+def post_login_redirect(request):
+    user = request.user
+    if user.is_staff:
+        return redirect('admin_dashboard')  
+    else:
+        return redirect('home')
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    return render(request, 'admin_panel/admin_dashboard.html')
+
+## ADMIN USER
 
 @login_required
 @user_passes_test(is_admin)
@@ -68,7 +91,7 @@ def admin_user_edit(request, user_id):
     return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(is_admin)
 def admin_user_delete(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     user.is_active = False
@@ -77,15 +100,162 @@ def admin_user_delete(request, user_id):
     return redirect('admin_user_list')
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(is_admin)
 def admin_user_reset_password(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    new_password = user.username  # Or use `get_random_string(8)` if you want random
+    new_password = user.username 
     user.set_password(new_password)
     user.save()
     messages.success(request, f"Password for {user.get_full_name() or user.username} has been reset to: {new_password}")
     return redirect('admin_user_list')
 
+
+## ADMIN EVENT
+
+@login_required
+@user_passes_test(is_admin)
+def admin_event_list(request):
+    query = request.GET.get('q', '')
+    sort_by = request.GET.get('sort', '-created_at')
+    events = Event.objects.all().order_by('done', sort_by)
+
+    if query:
+        events = events.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(datetime__icontains=query) |
+            Q(location__icontains=query)
+        )  
+
+    return render(request, 'admin_panel/event_list.html', {'events': events, query: query})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_event_create(request):
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Event created successfully.')
+            return redirect('admin_event_list')
+    else:
+        form = EventForm()
+    return render(request, 'admin_panel/event_form.html', {'form': form, 'is_edit': False})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_event_edit(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Event updated successfully.')
+            return redirect('admin_event_list')
+    else:
+        form = EventForm(instance=event)
+    return render(request, 'admin_panel/event_form.html', {'form': form, 'is_edit': True})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_event_delete(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    event.delete()
+    messages.success(request, f'Event "{event.title}" has been deleted.')
+    return redirect('admin_event_list')
+
+@login_required
+@user_passes_test(is_admin)
+def admin_event_mark_done(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    event.done = True
+    event.save()
+    return redirect('admin_event_list')
+
+
+## ADMIN UPDATES
+
+@login_required
+@user_passes_test(is_admin)
+def admin_updates_list(request):
+    query = request.GET.get('q', '')
+    sort_by = request.GET.get('sort', '-date_posted')
+    updates = Updates.objects.order_by(sort_by)
+
+    if query:
+        updates = updates.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(date_posted__icontains=query) |
+            Q(related_event__title__icontains=query)
+        )  
+
+    return render(request, 'admin_panel/updates_list.html', {'updates': updates})
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_updates_create(request):
+    if request.method == 'POST':
+        form = UpdatesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_updates_list')
+    else:
+        form = UpdatesForm()
+    return render(request, 'admin_panel/updates_form.html', {'form': form, 'is_edit': False})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_updates_edit(request, update_id):
+    update = get_object_or_404(Updates, pk=update_id)
+    if request.method == 'POST':
+        form = UpdatesForm(request.POST, instance=update)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_updates_list')
+    else:
+        form = UpdatesForm(instance=update)
+    return render(request, 'admin_panel/updates_form.html', {'form': form, 'is_edit': True})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_updates_delete(request, update_id):
+    update = get_object_or_404(Updates, pk=update_id)
+    update.delete()
+    return redirect('admin_updates_list')
+
+
+## ADMIN FORUM
+
+@login_required
+@user_passes_test(is_admin)
+def admin_forum_list(request):
+    query = request.GET.get('q', '')
+    posts = Forum.objects.select_related('author').prefetch_related('comments__user').order_by('-date_posted')
+
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(author__student_number__icontains=query) |
+            Q(author__first_name__icontains=query) |
+            Q(author__last_name__icontains=query) |
+            Q(date_posted__icontains=query) 
+        )
+
+    posts = posts.order_by('-date_posted')
+    return render(request, 'admin_panel/forum_list.html', {'posts': posts, 'query': query})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_delete_post(request, post_id):
+    post = get_object_or_404(Forum, id=post_id)
+    post.delete()
+    return redirect('admin_forum_list')
+
+
+## USER SIDE
 
 @login_required
 def home(request): #kanan stats po in
@@ -133,7 +303,7 @@ def add_job_entry(request):
             job = form.save(commit=False)
             job.user = request.user
             job.save()
-            return redirect('profile?edit=1')  # return to edit mode
+            return redirect('profile?edit=1') 
     return redirect('profile?edit=1')
 
 @login_required
@@ -157,13 +327,6 @@ def delete_job_entry(request, entry_id):
     return render(request, 'core/jobentry_confirm_delete.html', {'job': job})
 
 
-@login_required
-def events_view(request):
-    events = Event.objects.order_by('-date')
-    return render(request, 'core/events.html', {'events': events})
-
-
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -171,12 +334,15 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')
+            return redirect('post-login-redirect')
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     return render(request, 'login.html')
 
-
+@login_required
+def events_view(request):
+    events = Event.objects.order_by('-datetime')
+    return render(request, 'core/events.html', {'events': events})
 
 @login_required
 def updates_view(request):
@@ -184,14 +350,8 @@ def updates_view(request):
     return render(request, 'core/updates.html', {'updates': updates})
 
 @login_required
-def change_password_view(request):
-    return render(request, 'core/change_password.html')
-
-
-@login_required
 def forum_list(request):
     posts = Forum.objects.all().order_by('-date_posted')
-
 
     if request.method == 'POST':
         if 'like_post' in request.POST:
@@ -221,10 +381,8 @@ def forum_list(request):
     for post in posts:
         post.edit_form = ForumPostForm(instance=post)
 
-
     create_form = ForumPostForm()
     comment_form = CommentForm()
-
   
     liked_post_ids = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
 
@@ -288,12 +446,8 @@ def delete_comment(request, comment_id):
 
     return render(request, 'core/comment_delete_confirm.html', {'comment': comment})
 
-
-
 @login_required
 def forum_create(request):
-    # if request.user.is_staff:
-    #     return redirect('forum_list')  # Staff can't create
     if request.method == 'POST':
         print("submitted")
         form = ForumPostForm(request.POST)
@@ -311,7 +465,6 @@ def forum_create(request):
 def forum_update(request, post_id):
     post = get_object_or_404(Forum, id=post_id)
 
-    # Only author can update
     if post.author != request.user:
         return redirect('forum')
 
@@ -329,7 +482,6 @@ def forum_update(request, post_id):
 def forum_delete(request, post_id):
     post = get_object_or_404(Forum, id=post_id)
 
-    # Author or staff can delete
     if post.author != request.user and not request.user.is_staff:
         return redirect('forum')
 
@@ -339,8 +491,10 @@ def forum_delete(request, post_id):
     
     return render(request, 'core/forum_delete.html', {'post': post})
 
+@login_required
+def change_password_view(request):
+    return render(request, 'core/change_password.html')
+
 def logout_view(request):
     logout(request)
     return redirect('login')    
-
-

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Manage Updates</h2>
+
+<form method="get" class="mb-3 d-flex" role="search">
+    <input type="text" name="q" value="{{ query }}" class="form-control me-2" placeholder="Search updates...">
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+</form>
+
+<a href="{% url 'admin_updates_create' %}" class="btn btn-primary mb-3">Add New Update</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Related Event</th>
+            <th>Date Posted</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for update in updates %}
+        <tr>
+            <td>{{ update.title }}</td>
+            <td>{{ update.content|truncatewords:20 }}</td>
+            <td>{% if update.related_event %}
+                    {{ update.related_event.title }}
+                {% else %}
+                    No related event
+                {% endif %}
+            </td>
+            <td>{{ update.date_posted|date:"Y-m-d H:i" }}</td>
+            <td>
+                <a href="{% url 'admin_updates_edit' update.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'admin_updates_delete' update.id %}" class="btn btn-sm btn-danger" 
+                   onclick="return confirm('Are you sure you want to delete this update?');">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No updates available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

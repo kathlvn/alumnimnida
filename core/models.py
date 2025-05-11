@@ -93,10 +93,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.year_graduated
     
 class JobEntry(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='job_history')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='job_entries')
     job_title = models.CharField(max_length=100)
-    company = models.CharField(max_length=100)
     date_added = models.DateTimeField(auto_now_add=True)
+    is_current = models.BooleanField(default=False)
 
     def __str__(self):
         return self.job_title

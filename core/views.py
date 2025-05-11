@@ -17,6 +17,7 @@ from .forms import (
     EventForm,
     ForumPostForm,
     JobEntryForm,
+    JobEntryFormSet,
     UpdatesForm,
     UserProfileForm,
 )
@@ -351,13 +352,12 @@ def home(request): #kanan stats po in
     }
     return render(request, 'core/home.html', stats)
 
-
-
-JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
 @login_required
 def profile_view(request):
     user = request.user
     can_edit = request.GET.get('edit') == '1'
+
+    JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
 
     if request.method == 'POST' and can_edit:
         form = UserProfileForm(request.POST, instance=user)
@@ -365,49 +365,94 @@ def profile_view(request):
 
         if form.is_valid() and formset.is_valid():
             form.save()
-            formset.save()
+            job_entries = formset.save(commit=False)
+
+            # Reset all existing job entries' is_current to False
+            JobEntry.objects.filter(user=user).update(is_current=False)
+
+            # Mark the new job entries, with the latest one as current
+            for job in job_entries:
+                job.user = user
+                if not job.is_current:  # This ensures the first job becomes the current one if unchecked
+                    job.is_current = True
+                job.save()
+
+            formset.save_m2m()
             messages.success(request, 'Profile updated successfully.')
             return redirect('profile')
+
     else:
         form = UserProfileForm(instance=user)
         formset = JobEntryFormSet(instance=user)
+    
+    job_entries = user.job_entries.all().order_by('-date_added')
 
     return render(request, 'core/profile.html', {
         'form': form,
         'formset': formset,
-        'can_edit': can_edit
+        'can_edit': can_edit,
+        'user_profile': user,
+        job_entries: job_entries,
     })
 
-@login_required
-def add_job_entry(request):
-    if request.method == 'POST':
-        form = JobEntryForm(request.POST)
-        if form.is_valid():
-            job = form.save(commit=False)
-            job.user = request.user
-            job.save()
-            return redirect('profile?edit=1') 
-    return redirect('profile?edit=1')
 
-@login_required
-def edit_job_entry(request, entry_id):
-    job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
-    if request.method == 'POST':
-        form = JobEntryForm(request.POST, instance=job)
-        if form.is_valid():
-            form.save()
-            return redirect('profile?edit=1')
-    else:
-        form = JobEntryForm(instance=job)
-    return render(request, 'core/edit_job_entry.html', {'form': form, 'job': job})
 
-@login_required
-def delete_job_entry(request, entry_id):
-    job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
-    if request.method == 'POST':
-        job.delete()
-        return redirect('profile?edit=1')
-    return render(request, 'core/jobentry_confirm_delete.html', {'job': job})
+
+# JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
+# @login_required
+# def profile_view(request):
+#     user = request.user
+#     can_edit = request.GET.get('edit') == '1'
+
+#     if request.method == 'POST' and can_edit:
+#         form = UserProfileForm(request.POST, instance=user)
+#         formset = JobEntryFormSet(request.POST, instance=user)
+
+#         if form.is_valid() and formset.is_valid():
+#             form.save()
+#             formset.save()
+#             messages.success(request, 'Profile updated successfully.')
+#             return redirect('profile')
+#     else:
+#         form = UserProfileForm(instance=user)
+#         formset = JobEntryFormSet(instance=user)
+
+#     return render(request, 'core/profile.html', {
+#         'form': form,
+#         'formset': formset,
+#         'can_edit': can_edit
+#     })
+
+# @login_required
+# def add_job_entry(request):
+#     if request.method == 'POST':
+#         form = JobEntryForm(request.POST)
+#         if form.is_valid():
+#             job = form.save(commit=False)
+#             job.user = request.user
+#             job.save()
+#             return redirect('profile?edit=1') 
+#     return redirect('profile?edit=1')
+
+# @login_required
+# def edit_job_entry(request, entry_id):
+#     job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
+#     if request.method == 'POST':
+#         form = JobEntryForm(request.POST, instance=job)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('profile?edit=1')
+#     else:
+#         form = JobEntryForm(instance=job)
+#     return render(request, 'core/edit_job_entry.html', {'form': form, 'job': job})
+
+# @login_required
+# def delete_job_entry(request, entry_id):
+#     job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
+#     if request.method == 'POST':
+#         job.delete()
+#         return redirect('profile?edit=1')
+#     return render(request, 'core/jobentry_confirm_delete.html', {'job': job})
 
 
 def login_view(request):

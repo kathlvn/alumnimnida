@@ -9,12 +9,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
-<body>
+<body style="background: radial-gradient(circle, #5b1780, #000000); color: white;">
 
   <div class="login-box">
-    <img src="{% static 'img/logo.png' %}" alt="CCS Logo">
+    <img src="{% static 'img/ccs_logo.png' %}" alt="CCS Logo" class="logo-img">
     <h1>DEPARTMENT OF COMPUTER STUDIES</h1>
-    <h3>ALUMNI TRACKING AND ENGAGEMENT MANAGEMENT SYSTEM</h3>
+    <p>ALUMNI TRACKING AND ENGAGEMENT MANAGEMENT SYSTEM</p>
 
     {% if error %}
       <div class="error-message">{{ error }}</div>
@@ -33,10 +33,8 @@
       </div>
 
       <div class="form-group-buttons">
-        <!-- <button type="submit" class="login-admin">LOGIN AS ADMIN</button> -->
+        <button type="submit" class="register-admin">REGISTER AS ADMIN</button>
         <button type="submit" class="login-button">LOGIN</button>
-        <p><a href="{% url 'admin_register' %}">Register as an Admin</a></p>
-
       </div>
     </form>
   </div>

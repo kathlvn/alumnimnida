@@ -5,6 +5,9 @@ from . import views
 urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('redirect-after-login/', views.post_login_redirect, name='post-login-redirect'),
+
+    path('admin-register/', views.admin_register, name='admin_register'),
+
     path('admin-panel/admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-panel/users/', views.admin_user_list, name='admin_user_list'),
     path('admin-panel/users/add/', views.admin_user_create, name='admin_user_create'),

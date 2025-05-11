@@ -23,7 +23,41 @@ from .forms import (
 from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
 
 
+def admin_register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        verifier_username = request.POST.get('verifier_username')
+        verifier_password = request.POST.get('verifier_password')
 
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect('admin_register')
+
+        verifier = authenticate(username=verifier_username, password=verifier_password)
+        if verifier is None or not verifier.is_staff:
+            messages.error(request, "Verification failed. Invalid admin credentials.")
+            return redirect('admin_register')
+
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, "Username already taken.")
+            return redirect('admin_register')
+
+        CustomUser.objects.create_admin(
+            username=username,
+            password=password,
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'), 
+            email=request.POST.get('email', ''),
+            
+            is_staff=True,
+            is_superuser=False  # Optional: depends on access level
+        )
+        messages.success(request, "Admin account created successfully.")
+        return redirect('login')
+
+    return render(request, 'admin_register.html')
 
 CustomUser = get_user_model()
 

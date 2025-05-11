@@ -23,7 +23,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Student Number</th>
+                <th>Username</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Degree</th>
@@ -36,7 +36,7 @@
             {% for user in users %}
                 <tr>
                     <td>{{ user.id }}</td>
-                    <td>{{ user.student_number }}</td>
+                    <td>{{ user.student_number|default:user.username }}</td>
                     <td>{{ user.get_full_name|default:"(no name)" }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.degree }}</td>

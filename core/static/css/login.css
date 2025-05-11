@@ -1,144 +1,180 @@
-/* login form */
+/* General Reset and Box Sizing */
 * {
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
+/* Body Styling */
 body {
+    background: radial-gradient(circle, #5b1780, #000000); /* Purple to black gradient */
+    color: white;
     margin: 0;
     padding: 0;
-    background-color: #fff;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 
+/* Login Box Styling */
 .login-box {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
-    border: 3px solid #5b1780;
-    box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
-    padding: 5px 20px 30px;
-    width: 90%;
-    max-width: 570px;
-    text-align: center;
-    position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  border: 3px solid white;
+  box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
+  padding: 5px 15px 30px;
+  width: 90%;
+  max-width: 570px;
+  text-align: center;
+  position: relative;
 }
 
-.login-box img {
-    width: 125px;
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px;
+/* Image Itself */
+/* Apply glow directly to the logo */
+.logo-img {
+  width: 125px;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto;
+  position: absolute;
+  top: -60px;
+  left: 220px;
+  box-shadow:
+    0 0 20px #cd72f0,   /* Purple glow */
+    0 0 40px #cd72f0,
+    0 0 60px #cd72f0;
 }
 
+/* Optional: Add pulse effect for the glow */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px #cd72f0,
+      0 0 40px #cd72f0,
+      0 0 60px #cd72f0;
+  }
+  50% {
+    box-shadow:
+      0 0 30px #ffffff,  /* White glow in the middle */
+      0 0 60px #ffffff,
+      0 0 90px #ffffff;
+  }
+}
+
+.logo-img {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+
+/* Heading Styling */
 .login-box h1 {
-    margin: 70px 0 5px;
-    color: #5b1780;
-    font-size: 1.6rem;
-    font-weight: bold;
+  margin-top: 70px;
+  margin-bottom: 0rem;
+  color: white;
+  font-size: 1.6rem;
+  font-weight: bolder;
 }
 
-.login-box h3 {
-    margin: 5px 0 30px;
-    color: #5b1780;
-    font-size: 0.9rem;
-    letter-spacing: 0.5px;
+.login-box p {
+  margin: 0 0 30px;
+  color: rgb(214, 184, 211);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
 }
 
+/* Form Styling */
 .login-form {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .form-group {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .form-label {
-    font-weight: bold;
-    color: #5b1780;
-    font-size: 0.9rem;
-    width: 100px;
-    text-align: right;
-    margin-right: 10px;
+  font-weight: bold;
+  color: white;
+  font-size: 1rem;
+  width: 100px;
+  text-align: right;
+  margin-right: 10px;
 }
 
 .form-input {
-    width: 250px;
-    padding: 8px;
-    border: 2px solid #5b1780;
-    border-radius: 30px;
-    font-size: 0.9rem;
+  width: 250px;
+  padding: 8px;
+  border: 3px solid white;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  background-color: transparent;
 }
 
+/* Button Styling */
 .form-group-buttons {
-    display: flex;
-    min-width: 190px;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+  display: flex;
+  min-width: 190px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 .login-button,
-.login-admin {
-    background-color: #5b1780;
-    width: 100%;
-    min-width: 100px;
-    color: white;
-    border: none;
-    padding: 13px 30px;
-    border-radius: 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    font-weight: bold;
+.register-admin {
+  background-color: white;
+  width: 100%;
+  min-width: 100px;
+  color: #5b1780;
+  border: none;
+  padding: 13px 30px;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-weight: bold;
 }
 
 .login-button:hover,
-.login-admin:hover {
-    background-color: #044a19;
+.register-admin:hover {
+  background-color: #5b1780;
+  color: white
 }
 
+/* Error Message Styling */
 .error-message {
-color: red;
-margin-bottom: 15px;
-font-size: 0.9rem;
+  color: red;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
 }
 
+/* Media Queries */
 @media (max-width: 425px) {
-.form-group {
+  .form-group {
     flex-direction: column;
     align-items: flex-start;
-}
+  }
 
-.form-label {
+  .form-label {
     text-align: left;
     width: 100%;
     margin-bottom: 5px;
-}
+  }
 
-.form-input {
+  .form-input {
     width: 100%;
-}
+  }
 
-.form-group-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-}
+  .form-group-buttons {
+    flex-direction: column;
+  }
 
-.login-button,
-.login-admin {
+  .login-button,
+  .register-admin {
     max-width: 250px;
     width: 100%;
     margin-bottom: 10px;
+  }
 }
-}
-

@@ -20,7 +20,7 @@ body {
   border-radius: 30px;
   border: 3px solid white;
   box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
-  padding: 5px 15px 30px;
+  padding: 4px 10px 0px;
   width: 90%;
   max-width: 570px;
   text-align: center;
@@ -29,32 +29,32 @@ body {
 
 .logo-img {
   width: 125px;
+  height: 125px;
   border-radius: 50%;
   display: block;
   margin: 0 auto;
   position: absolute;
-  top: -60px;
-  left: 220px;
-  box-shadow:
-    0 0 20px #cd72f0,   /* Purple glow */
-    0 0 40px #cd72f0,
-    0 0 60px #cd72f0;
+  top: -62px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  animation: pulseGlow 2s infinite ease-in-out;
+  filter: drop-shadow(0 0 40px rgb(244, 215, 255));
 }
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow:
-      0 0 20px #cd72f0,
-      0 0 40px #cd72f0,
-      0 0 60px #cd72f0;
+    filter: drop-shadow(0 0 40px rgb(255, 255, 255));
   }
   50% {
-    box-shadow:
-      0 0 30px #ffffff, 
-      0 0 60px #ffffff,
-      0 0 90px #ffffff;
+    filter: drop-shadow(0 0 65px rgb(253, 222, 252));
+  }
+  100% {
+    filter: drop-shadow(0 0 100px rgba(254, 252, 254, 0.8));
   }
 }
+
+
 
 .logo-img {
   animation: pulseGlow 2s infinite ease-in-out;
@@ -71,7 +71,7 @@ body {
 }
 
 .login-box p {
-  margin: 0 0 30px;
+  margin: 0 0 10px;
   color: rgb(214, 184, 211);
   font-size: 0.9rem;
   letter-spacing: 1px;
@@ -108,8 +108,7 @@ body {
   background-color: transparent;
 }
 
-/* Button Styling */
-.form-group-buttons {
+.form-button {
   display: flex;
   min-width: 190px;
   width: 100%;
@@ -118,28 +117,42 @@ body {
   gap: 20px;
 }
 
-.login-button,
-.register-admin {
+.login-button {
   background-color: white;
-  width: 100%;
-  min-width: 100px;
   color: #5b1780;
   border: none;
-  padding: 13px 30px;
+  padding: 11px 30px;
   border-radius: 20px;
   font-size: 1rem;
   cursor: pointer;
   transition: box-shadow 0.3s ease-in-out;
   font-weight: bold;
+  width: 190px;
+  margin-left: 110px;
 }
 
-.login-button:hover,
-.register-admin:hover {
+.login-button:hover {
   background-color: #5b1780;
   color: white;
   box-shadow: 4px 4px 10px rgba(235, 206, 241, 0.4);
   border: 3px solid;
   border-color: #ffffff;
+}
+
+.register-admin {
+  margin-top: 20px;
+  margin-bottom: 0;
+  margin-left: 105px;
+}
+
+.register-admin a {
+  color: #f2caff;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.register-admin a:hover {
+  color: #ffffff;
 }
 
 /* Error Message Styling */
@@ -170,8 +183,7 @@ body {
     flex-direction: column;
   }
 
-  .login-button,
-  .register-admin {
+  .login-button {
     max-width: 250px;
     width: 100%;
     margin-bottom: 10px;

@@ -32,9 +32,12 @@
         <input type="password" id="password" name="password" class="form-input" required>
       </div>
 
-      <div class="form-group-buttons">
-        <button type="submit" class="register-admin">REGISTER AS ADMIN</button>
+      <div class="form-button">
         <button type="submit" class="login-button">LOGIN</button>
+      </div>
+
+      <div class="register-admin">
+        <p><a href="{% url 'admin_register' %}">REGISTER AS AN ADMIN</a></p>
       </div>
     </form>
   </div>

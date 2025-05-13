@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4 text-center">
+    <h2>Admin Profile</h2>
+
+    {% if edit_mode %}
+        <form method="post" enctype="multipart/form-data" class="text-start mx-auto" style="max-width: 400px;">
+            {% csrf_token %}
+            <div class="text-center">
+                <img src="{% if admin_user.profile_picture %}{{ admin_user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
+                     alt="Profile Picture"
+                     class="rounded-circle mb-3"
+                     style="width: 150px; height: 150px; object-fit: cover;">
+            </div>
+
+            {{ form.as_p }}
+
+            <div class="d-grid gap-2 mt-3">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <a href="{% url 'admin_profile' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+
+    {% else %}
+        <img src="{% if admin_user.profile_picture %}{{ admin_user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
+             alt="Profile Picture"
+             class="rounded-circle mb-3"
+             style="width: 150px; height: 150px; object-fit: cover;">
+
+        <p><strong>Name:</strong> {{ admin_user.first_name }} {{ admin_user.last_name }}</p>
+        <p><strong>Username:</strong> {{ admin_user.username }}</p>
+        <p><strong>Role:</strong> Administrator</p>
+
+        <a href="?edit=1" class="btn btn-primary mt-3">Edit Profile</a>
+    {% endif %}
+</div>
+{% endblock %}

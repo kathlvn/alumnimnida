@@ -4,6 +4,12 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 import datetime
+from PIL import Image
+
+
+
+def user_profile_pic_path(instance, filename):
+    return f"profile_pictures/user_{instance.id}/{filename}"
 
 class CustomUserManager(BaseUserManager):
     
@@ -66,6 +72,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
 
     username = models.CharField(max_length=150, unique=True, null=True, blank=True) #for registry
+
+    profile_picture = models.ImageField(
+        upload_to=user_profile_pic_path,
+        default='default/profile.png',  
+        blank=True,
+        null=True
+    )
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

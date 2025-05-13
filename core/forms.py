@@ -29,6 +29,7 @@ class UserProfileForm(forms.ModelForm):
             'contact',
             'employment_status',
             'bio',
+            'profile_picture',
         ]
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 3}),
@@ -51,6 +52,20 @@ JobEntryFormSet = inlineformset_factory(
     extra=1,
     can_delete=True
 )
+
+class AdminProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'first_name', 'last_name', 'profile_picture']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.student_number = user.username
+        
+        if commit:
+            user.save()
+        
+        return user
 
 class EventForm(forms.ModelForm):
     class Meta:

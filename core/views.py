@@ -21,6 +21,7 @@ from .forms import (
     ClubOrgForm,
     UpdatesForm,
     UserProfileForm,
+    AdminProfileForm,
 )
 from .models import Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates
 
@@ -81,6 +82,24 @@ def admin_dashboard(request):
     return render(request, 'admin_panel/admin_dashboard.html')
 
 ## ADMIN USER
+
+@login_required
+@user_passes_test(is_admin)
+def admin_profile_view(request):
+    form = AdminProfileForm(instance=request.user)
+
+    if request.method == 'POST':
+        form = AdminProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_profile')
+
+    edit_mode = request.method == 'POST' or request.GET.get('edit') == '1'
+    return render(request, 'admin_panel/admin_profile.html', {
+        'form': form,
+        'edit_mode': edit_mode,
+        'admin_user': request.user,
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -362,7 +381,7 @@ def profile_view(request):
     ClubOrgFormSet = inlineformset_factory(CustomUser, ClubOrg, form=ClubOrgForm, extra=1, can_delete=True)
 
     if request.method == 'POST' and can_edit:
-        form = UserProfileForm(request.POST, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         job_formset = JobEntryFormSet(request.POST, instance=user)
         club_formset = ClubOrgFormSet(request.POST, instance=user)
 

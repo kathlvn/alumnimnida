@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin-register/', views.admin_register, name='admin_register'),
 
     path('admin-panel/admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/profile/', views.admin_profile_view, name='admin_profile'),
     path('admin-panel/users/', views.admin_user_list, name='admin_user_list'),
     path('admin-panel/users/add/', views.admin_user_create, name='admin_user_create'),
     path('admin-panel/users/<int:user_id>/edit/', views.admin_user_edit, name='admin_user_edit'),

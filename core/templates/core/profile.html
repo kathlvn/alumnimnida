@@ -26,6 +26,19 @@
                 </div>
             {% endfor %}
 
+            <h4 class="mt-4">Clubs / Organizations</h4>
+            {{ club_formset.management_form }}
+            {% for club_form in club_formset %}
+                <div class="border rounded p-3 mb-3 bg-light">
+                    {{ club_form.as_p }}
+                    {% if club_form.instance.pk %}
+                        <div>
+                            <label>Delete: {{ club_form.DELETE }}</label>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
             <button type="submit" class="btn btn-success mt-3">Save Changes</button>
             <a href="{% url 'profile' %}" class="btn btn-secondary mt-3">Cancel</a>
         </form>
@@ -43,27 +56,34 @@
             <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
             <p><strong>Contact:</strong> {{ user.contact }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Clubs/Orgs:</strong> {{ user.club_orgs }}</p>
             <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
             <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
 
             <h4 class="mt-4">Professional Background</h4>
             {% for job in user.job_entries.all %}
                 <div class="border rounded p-3 mb-3">
-                    <strong>{{ job.job_title }}</strong>
-                    <br>
+                    <strong>{{ job.job_title }}</strong><br>
                     <small class="text-muted">
-                        {{ job.start_year }} - 
+                        {{ job.start_year }} -
                         {% if job.is_current %}
                             Present
                         {% else %}
-                            wara hin dapat dd nakabutang basta dapat mayda la indication nga inactive na sha
+                            Inactive
                         {% endif %}
                     </small>
                 </div>
             {% empty %}
                 <p>No job entries available.</p>
             {% endfor %}
+
+            <h4 class="mt-4">Clubs / Organizations</h4>
+            <ul>
+                {% for club in club_orgs %}
+                    <li>{{ club.org_name }}</li>
+                {% empty %}
+                    <li>No clubs or organizations listed.</li>
+                {% endfor %}
+            </ul>
         </div>
 
         <a href="{% url 'profile' %}?edit=1" class="btn btn-primary mt-3">Edit Profile</a>

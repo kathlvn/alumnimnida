@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import CustomUser, JobEntry, Event, Updates, Forum, Comment
+from .models import CustomUser, JobEntry, ClubOrg, Event, Updates, Forum, Comment
 
 class CustomUserCreationForm(forms.ModelForm):
     class Meta:
@@ -34,6 +34,24 @@ class UserProfileForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={'rows': 3}),
         }
 
+class ClubOrgForm(forms.ModelForm):
+    class Meta:
+        model = ClubOrg
+        fields = ['org_name']
+
+class JobEntryForm(forms.ModelForm):
+    class Meta:
+        model = JobEntry
+        fields = ['job_title', 'is_current']
+        
+JobEntryFormSet = inlineformset_factory(
+    CustomUser,
+    JobEntry,
+    form=JobEntryForm,
+    extra=1,
+    can_delete=True
+)
+
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
@@ -53,19 +71,6 @@ class UpdatesForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4}),
         }
-
-class JobEntryForm(forms.ModelForm):
-    class Meta:
-        model = JobEntry
-        fields = ['job_title', 'is_current']
-        
-JobEntryFormSet = inlineformset_factory(
-    CustomUser,
-    JobEntry,
-    form=JobEntryForm,
-    extra=1,
-    can_delete=True
-)
 
 class ForumPostForm(forms.ModelForm):
     class Meta:

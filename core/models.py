@@ -52,7 +52,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     year_graduated = models.IntegerField(choices=year_selection, null=True, blank=True)
     
     contact = models.CharField(max_length=11, blank=True)
-    club_orgs = models.TextField(blank=True)
     bio = models.TextField(blank=True)
 
     EMPLOYMENT_STATUS_CHOICES = [
@@ -91,6 +90,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def batch(self):
         return self.year_graduated
+    
+class ClubOrg(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='club_orgs')
+    org_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.org_name
     
 class JobEntry(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='job_entries')

@@ -4,11 +4,13 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 from .forms import (
@@ -52,7 +54,6 @@ def admin_register(request):
             password=password,
             first_name=request.POST.get('first_name'),
             last_name=request.POST.get('last_name'), 
-            email=request.POST.get('email', ''),
             
             is_staff=True,
             is_superuser=False 
@@ -207,10 +208,10 @@ def admin_user_delete(request, user_id):
 @user_passes_test(is_admin)
 def admin_user_reset_password(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    new_password = user.username 
+    new_password = user.student_number or user.username
     user.set_password(new_password)
     user.save()
-    messages.success(request, f"Password for {user.get_full_name() or user.username} has been reset to: {new_password}")
+    messages.success(request, f"Password for {user.get_full_name or user.username} has been reset to: {new_password}")
     return redirect('admin_user_list')
 
 
@@ -584,9 +585,66 @@ def forum_delete(request, post_id):
     
     return render(request, 'core/forum_delete.html', {'post': post})
 
-@login_required
-def change_password_view(request):
-    return render(request, 'core/change_password.html')
+
+
+def global_search_view(request):
+    query = request.GET.get('q')
+    users = admins = events = updates = forums = []
+
+    if query:
+        users = CustomUser.objects.filter(
+            Q(is_staff=False) &
+            (Q(student_number__icontains=query) |
+             Q(first_name__icontains=query) |
+             Q(last_name__icontains=query) |
+             Q(address__icontains=query) |
+             Q(degree__icontains=query) |
+             Q(year_graduated__icontains=query))
+            #  Q(org_name__icontains=query) |
+            #  Q(job_title__icontains=query))
+        )
+
+        admins = CustomUser.objects.filter(
+            Q(is_staff=True) &
+            (Q(first_name__icontains=query) |
+             Q(last_name__icontains=query) |
+             Q(username__icontains=query))
+        )
+
+        events = Event.objects.filter(
+            Q(title__icontains=query) |
+            Q(location__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+        updates = Updates.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(related_event__title__icontains=query)
+        )
+
+        forum = Forum.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(author__first_name__icontains=query) |
+            Q(author__last_name__icontains=query)
+        )
+
+    context = {
+        'query': query,
+        'users': users,
+        'admins': admins,
+        'events': events,
+        'updates': updates,
+        'forums': forums,  
+    }
+    return render(request, 'search_results.html', context)
+
+
+class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'change_password.html'
+    success_url = reverse_lazy('change_password')
+    success_message = "Your password was successfully updated."
 
 def logout_view(request):
     logout(request)

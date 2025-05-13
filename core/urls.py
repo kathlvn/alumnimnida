@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
+from .views import CustomPasswordChangeView
 from . import views
 
 urlpatterns = [
@@ -53,7 +54,7 @@ urlpatterns = [
     path('forum/delete/<int:post_id>/', views.forum_delete, name='forum_delete'),
     path('forum/comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
 
-    
-    path('change-password/', views.change_password_view, name='change_password'),
+    path('search/', views.global_search_view, name='global_search'),
+    path('change-password/', CustomPasswordChangeView.as_view(), name='change_password'),
     path('logout/', views.logout_view, name='logout'),
 ]

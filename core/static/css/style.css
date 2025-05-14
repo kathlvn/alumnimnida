@@ -1,190 +1,157 @@
-/* homepage */
-* {
+/* Reset and Base */
+body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-}
-
-body {
-  background-color: #ffffff;
-  color: #5b1780;
-  padding: 2rem;
+  background: radial-gradient(circle, #5b1780, #000000);
+  color: white;
 }
 
 .container {
-  max-width: 1200px;
-  margin: auto;
-  margin-top: 70px;
+  display: flex;
+  height: 100vh;
 }
 
-.header {
-  background-color: #ffffff;
-  border: 3px solid #5b1780;
-  border-radius: 20px;
-  padding: 2rem;
-  text-align: center;
-  position: relative;
+/* Sidebar Navigation */
+.sidebar {
+  width: 70px;
+  background-color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  border-right: 1px solid #333;
 }
 
-.header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
+.sidebar nav a {
+  margin: 20px 0;
+  display: block;
 }
 
-.header p {
-  margin-top: 0.3rem;
-  font-size: 1rem;
-  letter-spacing: 2px;
+.sidebar img {
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.2s ease;
 }
 
-.nav-bar {
+.sidebar img:hover {
+  transform: scale(1.1);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Header */
+.forum-header {
   display: flex;
   justify-content: space-between;
-  background-color: #ffffff;
   align-items: center;
-  margin-top: 2rem;
-  flex-wrap: wrap;
-  position: sticky;
-  top: 10px;
-  z-index: 1;
+  margin-bottom: 30px;
 }
 
-.search-box {
-  flex-grow: 1;
-  margin-right: 1rem;
-  position: relative;
+.forum-header h1 {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
 }
 
-.search-box input {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border: 3px solid #5b1780;
-  border-radius: 30px;
-  outline: none;
-  font-size: 1rem;
-}
-
-.nav-buttons button {
-  background: #5b1780;
-  border: 3px solid transparent;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 30px;
-  font-weight: 600;
-  margin: 0.3rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.nav-buttons button:hover {
-  background-color: white;
-  border: 3px solid #5b1780;
-  color: #5b1780;
-}
-
-.cards {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.card {
-  background-color: white;
-  border: 3px solid #5b1780;
+.search-bar {
+  padding: 8px 12px;
   border-radius: 20px;
-  text-align: center;
-  padding: 1rem 1rem;
-  min-width: 90px;
-  box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
-  transition: transform 0.3s ease;
-  margin-top: 30px;
-}
-
-.card:hover {
-  transform: scale(1.03);
-  background-color: #5b1780;
-  color: white;
-  
-}
-
-.card img {
-  width: 120px;
-  height: auto;
-  margin-bottom: 0.5rem;
-}
-
-.card h3 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.card p {
-  font-size: 0.9rem;
-  color: #5b1780;
-}
-
-.card:hover p {
+  border: none;
+  width: 220px;
+  background-color: #333;
   color: white;
 }
-  
-@media  (max-width: 425px) {
-  .cards {
-    display: flex;
+
+/* Card Section */
+.forum-post {
+  background-color: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.forum-post h3 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #e0e0e0;
+}
+
+/* Button */
+.attend-button {
+  background: linear-gradient(45deg, #5b1780, #000000);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.attend-button:hover {
+  background: linear-gradient(45deg, #6a1b9a, #1a1a1a);
+}
+
+/* Right Panel */
+.trending-posts {
+  width: 280px;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-left: 1px solid #333;
+  overflow-y: auto;
+}
+
+.trending-posts h3 {
+  margin-top: 0;
+  font-size: 18px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+
+/* Scrollbars */
+.main-content::-webkit-scrollbar,
+.trending-posts::-webkit-scrollbar {
+  width: 8px;
+}
+.main-content::-webkit-scrollbar-thumb,
+.trending-posts::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+.main-content::-webkit-scrollbar-thumb:hover,
+.trending-posts::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .container {
     flex-direction: column;
   }
-  .card {
+  .sidebar {
+    flex-direction: row;
+    height: 60px;
     width: 100%;
-  }
-  .header {
-    font-size: 16px;
-  }
-  .header h1 {
-    font-size: 1.5rem;
-  }
-
-  .quick-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    margin-top: 3rem;
+    border-right: none;
+    border-bottom: 1px solid #333;
     justify-content: center;
   }
-  
-  .stat {
-    background-color: white;
-    border: 3px solid #5b1780;
-    border-radius: 20px;
-    padding: 1.5rem;
-    text-align: center;
-    min-width: 150px;
-    box-shadow: 0 8px 32px rgba(105, 9, 102, 0.16);
-    transition: transform 0.3s ease;
+  .main-content {
+    padding: 20px;
   }
-  
-  .stat h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #5b1780;
+  .trending-posts {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #333;
   }
-  
-  .stat p {
-    font-size: 1rem;
-    color: #5b1780;
-  }
-  
-  .stat:hover {
-    background-color: #5b1780;
-    color: white;
-  }
-  
-  .stat:hover h2,
-  .stat:hover p {
-    color: white;
-  }
-  
-  
 }

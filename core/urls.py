@@ -45,13 +45,21 @@ urlpatterns = [
 
 
     path('events/', views.events_view, name='events'),
+<<<<<<< HEAD
     path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
+=======
+    path('events/attend/<int:event_id>/', views.mark_attended, name='mark_attended'),
+>>>>>>> 46511b3c2cfcf3a6b4f3aa77f2e80cd8f2333810
     path('updates/', views.updates_view, name='updates'),
     path('updates/<int:pk>/', UpdateDetailView.as_view(), name='update_detail'),
 
 
+<<<<<<< HEAD
     path('forum/', views.forum_list, name='forum'),
     path('forum/<int:pk>/', ForumPostDetailView.as_view(), name='forum_detail'),
+=======
+    path('forum/', views.forum, name='forum'),
+>>>>>>> 46511b3c2cfcf3a6b4f3aa77f2e80cd8f2333810
     path('like-post/', views.like_post_ajax, name='like_post_ajax'),
     path('forum/comment/', views.comment_post_ajax, name='comment_post'),
     path('forum/create/', views.forum_create, name='forum_create'),

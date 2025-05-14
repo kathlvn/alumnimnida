@@ -1,14 +1,13 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-  <div class="container mt-5">
-    <h2 class="text-xl font-bold mb-4">Delete Post</h2>
-    <p>Are you sure you want to delete the post titled "<strong>{{ post.title }}</strong>"?</p>
+  <h2>Delete Comment</h2>
+  <p>Are you sure you want to delete this comment?</p>
+  <p><em>{{ comment.content }}</em></p>
 
-    <form method="POST" class="mt-4">
-      {% csrf_token %}
-      <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Yes, delete</button>
-      <a href="{% url 'forum' %}" class="ml-4 text-gray-600">Cancel</a>
-    </form>
-  </div>
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'forum' %}">Cancel</a>
+  </form>
 {% endblock %}

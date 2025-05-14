@@ -1,0 +1,142 @@
+/* updates.css */
+
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle, #5b1780, #000000);
+  color: white;
+}
+
+/* Layout Container */
+.container {
+  display: flex;
+  padding: 30px;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  margin-top: 40px;
+  margin-left: 30px;
+  width: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px solid white;
+  border-radius: 30px;
+  padding: 20px 20px;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar nav img {
+  max-width: 50px;
+  display: block;
+  margin: 40px auto;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 0 8px #f4d7ff);
+}
+
+.sidebar nav img:hover {
+  transform: scale(1.2);
+}
+
+/* Main Content */
+.main-content {
+  flex: 2;
+  padding: 30px;
+  width: 100%;
+}
+
+/* Header and Search Bar */
+.header-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-bar {
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 250px;
+}
+
+/* Flex layout for updates and timeline */
+.content-wrapper {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+/* Updates Column */
+.updates-section {
+  flex: 1;
+}
+
+/* Update Box */
+.update-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.update-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(235, 206, 241, 0.3);
+}
+
+.update-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.update-desc {
+  margin: 10px 0;
+}
+
+.update-date {
+  font-size: 0.85rem;
+  color: #e5d4f3;
+}
+
+/* Timeline (Quick Stats) */
+.quick-stats {
+  width: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 30px 20px;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+}
+
+.quick-stats ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.quick-stats li {
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid white;
+  border-radius: 15px;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+}
+
+.timeline-title {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+}

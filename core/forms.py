@@ -68,14 +68,16 @@ class AdminProfileForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'datetime', 'location']
+        fields = ['title', 'description', 'date', 'time', 'location']
         labels = {
-            'datetime': 'Date and Time',
+            'date': 'Event Date',
+            'time': 'Event Time',
         }
         widgets = {
-            'datetime': forms.DateTimeInput(attrs={
-                'type': 'datetime-local'
-            }),}
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
+        }
+
         
 class UpdatesForm(forms.ModelForm):
     class Meta:
@@ -89,8 +91,15 @@ class ForumPostForm(forms.ModelForm):
     class Meta:
         model = Forum
         fields = ['title', 'content']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control'}),
+        }
 
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+        }

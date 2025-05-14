@@ -2,74 +2,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alumni Engagement System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
   <div class="container">
-    <div class="header">
-      <h1>DEPARTMENT OF COMPUTER STUDIES</h1>
-      <p>ALUMNI TRACKING AND ENGAGEMENT MANAGEMENT SYSTEM</p>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <nav>
+        <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
+        <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+        <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+        <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
+        <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+        <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+      </nav>
     </div>
 
-    <div class="nav-bar">
-      <div class="search-box">
-        <input type="text" placeholder="Search" />
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="forum-header">
+        <h1>Welcome back, {{ user.first_name }}!</h1>
+        <input type="text" class="search-bar" placeholder="Search...">
       </div>
-      <div class="nav-buttons">
-        <button onclick="location.href='home'">HOME</button>
-        <button onclick="location.href='home '">HOME</button>
-        <button onclick="location.href='events'">EVENTS</button>
-        <button onclick="location.href='updates'">UPDATES</button>
-        <button onclick="location.href='forum'">FORUM</button>
+
+      <!-- Upcoming Events -->
+      <div class="forum-post">
+        <h3>UPCOMING EVENTS</h3>
+        {% for event in upcoming_events %}
+        <div style="margin-bottom: 15px;">
+          <strong>{{ event.date|date:"F d" }}</strong> &nbsp; 
+          <span style="font-weight: bold;">{{ event.title }}</span><br>
+          <em>{{ event.location }}</em><br>
+          <a href="{% url 'event_detail' event.id %}">
+            <button class="attend-button">View Details</button>
+          </a>
+        </div>
+        {% empty %}
+        <p>No upcoming events.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Recent Updates -->
+      <div class="forum-post">
+        <h3>RECENT UPDATES</h3>
+        {% for update in recent_updates %}
+        <div style="margin-bottom: 10px;">
+          <strong>{{ update.title }}</strong><br>
+          <em>{{ update.posted_at|timesince }} ago</em><br>
+          <a href="{% url 'update_detail' update.id %}">
+            <button class="attend-button">View Details</button>
+          </a>
+        </div>
+        {% empty %}
+        <p>No recent updates.</p>
+        {% endfor %}
       </div>
     </div>
 
-    <div class="cards">
-      <div class="card">
-        <img src="{% static 'img/events.png' %}" alt="Events Icon">
-        <h3>EVENTS</h3>
-        <p>EXPLORE UPCOMING ALUMNI EVENTS.</p>
-      </div>
-      <div class="card">
-        <img src="{% static 'img/updates.png' %}" alt="Updates Icon">
-        <h3>UPDATES</h3>
-        <p>STAY UPDATED WITH THE LATEST NEWS.</p>
-      </div>
-      <div class="card">
-        <img src="{% static 'img/forum.png' %}" alt="Forum Icon">
-        <h3>FORUM</h3>
-        <p>CONNECT AND SHARE WITH ALUMNI.</p>
+    <!-- Right Panel -->
+    <div class="trending-posts">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="{% static 'img/user_icon.png' %}" alt="Profile" style="width: 60px;">
+        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+        <em>Class of {{ user.graduation_year }}</em><br>
+        <p>{{ user.occupation }}</p>
+        <a href="{% url 'profile' %}">
+          <button class="attend-button">Edit Profile</button>
+        </a>
       </div>
 
-      <div class="quick-stats">
-        <div class="stat">
-          <h2>{{ total_alumni }}</h2>
-          <p>Registered Alumni</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_events }}</h2>
-          <p>Total Events</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_posts }}</h2>
-          <p>Forum Posts</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_updates }}</h2>
-          <p>News Updates</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_comments }}</h2>
-          <p>Forum Comments</p>
-        </div>
-      </div>               
+      <h3>Your Engagements</h3>
+      <p><strong>Member since:</strong><br> {{ user.date_joined|date:"F Y" }}</p>
+      <p><strong>Batch:</strong> {{ user.batch }}</p>
+      <p><strong>Forum Posts:</strong> {{ forum_posts_count }}</p>
+      <p><strong>Comments made:</strong> {{ comments_count }}</p>
+      <p><strong>Events Attended:</strong> {{ events_attended_count }}</p>
     </div>
+
   </div>
-  
 </body>
 </html>

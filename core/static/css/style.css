@@ -102,7 +102,7 @@ body {
 }
 
 /* Right Panel */
-.trending-posts {
+.edit-profle {
   width: 280px;
   background-color: #1e1e1e;
   padding: 20px;
@@ -110,7 +110,7 @@ body {
   overflow-y: auto;
 }
 
-.trending-posts h3 {
+.edit-profile h3 {
   margin-top: 0;
   font-size: 18px;
   border-bottom: 1px solid #444;

@@ -1,22 +1,62 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Updates</title>
+  <link rel="stylesheet" href="{% static 'css/updates.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body>
 
-{% block content %}
-  <h2 class="text-2xl font-bold mb-4">Updates</h2>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <nav>
+        <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
+        <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+        <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+        <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
+        <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+        <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+      </nav>
+    </div>
 
-  {% if updates %}
-    <ul>
+    <!-- Main Content -->
+<div class="main-content">
+  <div class="header-search">
+    <h2>UPDATES</h2>
+    <input type="text" class="search-bar" placeholder="Search...">
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Updates Column -->
+    <div class="updates-section">
       {% for update in updates %}
-        <li class="mb-4 border p-4 rounded bg-white shadow">
-          <h3 class="text-xl font-semibold">{{ update.title }}</h3>
-          <p>{{ update.content }}</p>
-          <p class="text-sm text-gray-500">Posted on {{ update.date_posted|date:"F j, Y, g:i a" }}</p>
-          {% if update.related_event %}
-            <p><strong>Related to:</strong> {{ update.related_event.title }}</p>
-          {% endif %}
-        </li>
+        <div class="update-box">
+          <h3 class="update-title">{{ update.title }}</h3>
+          <p class="update-desc">{{ update.content }}</p>
+          <p class="update-date">
+            <em><strong>Posted on {{ update.date_posted|date:"F d, Y, g:i A" }}</strong></em>
+          </p>
+        </div>
+      {% empty %}
+        <p>No updates available.</p>
       {% endfor %}
-    </ul>
-  {% else %}
-    <p>No updates available.</p>
-  {% endif %}
-{% endblock %}
+    </div>
+
+    <!-- Timeline Column -->
+    <div class="quick-stats">
+      <h3 class="timeline-title">Recent Updates Timeline</h3>
+      <ul>
+        {% for recent in recent_updates %}
+          <li><strong>{{ recent.date_posted|date:"F d, Y" }}:</strong> {{ recent.title }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

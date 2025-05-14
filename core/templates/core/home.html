@@ -2,74 +2,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alumni Engagement System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta charset="UTF-8">
+    <title>Alumni Home</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>DEPARTMENT OF COMPUTER STUDIES</h1>
-      <p>ALUMNI TRACKING AND ENGAGEMENT MANAGEMENT SYSTEM</p>
-    </div>
+    <div class="container">
+        <aside class="sidebar">
+            <a href="{% url 'home' %}"><img src="{% static 'icons/home.png' %}" class="icon active" alt="Home"></a>
+            <a href="{% url 'events' %}"><img src="{% static 'icons/calendar.png' %}" class="icon" alt="Events"></a>
+            <a href="{% url 'forum' %}"><img src="{% static 'icons/chat.png' %}" class="icon" alt="Forum"></a>
+            <a href="{% url 'updates' %}"><img src="{% static 'icons/megaphone.png' %}" class="icon" alt="Updates"></a>
+            <a href="{% url 'logout' %}"><img src="{% static 'icons/logout.png' %}" class="icon" alt="Logout"></a>
+        </aside>
 
-    <div class="nav-bar">
-      <div class="search-box">
-        <input type="text" placeholder="Search" />
-      </div>
-      <div class="nav-buttons">
-        <button onclick="location.href='home'">HOME</button>
-        <button onclick="location.href='home '">HOME</button>
-        <button onclick="location.href='events'">EVENTS</button>
-        <button onclick="location.href='updates'">UPDATES</button>
-        <button onclick="location.href='forum'">FORUM</button>
-      </div>
-    </div>
+        <main class="main-content">
+            <header>
+                <h2>Welcome back, {{ user.first_name }}!</h2>
+                <input type="search" placeholder="Search..." class="search-box">
+            </header>
 
-    <div class="cards">
-      <div class="card">
-        <img src="{% static 'img/events.png' %}" alt="Events Icon">
-        <h3>EVENTS</h3>
-        <p>EXPLORE UPCOMING ALUMNI EVENTS.</p>
-      </div>
-      <div class="card">
-        <img src="{% static 'img/updates.png' %}" alt="Updates Icon">
-        <h3>UPDATES</h3>
-        <p>STAY UPDATED WITH THE LATEST NEWS.</p>
-      </div>
-      <div class="card">
-        <img src="{% static 'img/forum.png' %}" alt="Forum Icon">
-        <h3>FORUM</h3>
-        <p>CONNECT AND SHARE WITH ALUMNI.</p>
-      </div>
+            <section class="card events">
+                <h3>UPCOMING EVENTS</h3>
+                {% for event in events %}
+                    <div class="event-item">
+                        <div class="event-date">
+                            <p class="month">{{ event.date|date:"F" }}</p>
+                            <p class="day">{{ event.date|date:"d" }}</p>
+                        </div>
+                        <div class="event-info">
+                            <strong>{{ event.title }}</strong><br>
+                            <em>{{ event.venue }}</em>
+                        </div>
+                    </div>
+                {% endfor %}
+                <a href="{% url 'events' %}" class="btn">VIEW DETAILS</a>
+            </section>
 
-      <div class="quick-stats">
-        <div class="stat">
-          <h2>{{ total_alumni }}</h2>
-          <p>Registered Alumni</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_events }}</h2>
-          <p>Total Events</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_posts }}</h2>
-          <p>Forum Posts</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_updates }}</h2>
-          <p>News Updates</p>
-        </div>
-        <div class="stat">
-          <h2>{{ total_comments }}</h2>
-          <p>Forum Comments</p>
-        </div>
-      </div>               
+            <section class="card updates">
+                <h3>RECENT UPDATES</h3>
+                {% for update in updates %}
+                    <div class="update-item">
+                        <p>{{ update.text }}</p>
+                        <small><em>{{ update.timestamp|timesince }} ago</em></small>
+                    </div>
+                {% endfor %}
+                <a href="{% url 'updates' %}" class="btn">VIEW DETAILS</a>
+            </section>
+        </main>
+
+        <aside class="profile-section">
+            <div class="profile-card">
+                <img src="{% static 'icons/profile.png' %}" class="profile-icon" alt="Profile">
+                <h3>{{ user.get_full_name }}</h3>
+                <em>Class of {{ profile.batch }}</em>
+                <p>{{ profile.company }}</p>
+                <a href="{% url 'edit_profile' %}" class="btn">EDIT PROFILE</a>
+            </div>
+            <div class="engagement-card">
+                <h4>YOUR ENGAGEMENTS</h4>
+                <p>Member since: {{ user.date_joined|date:"F Y" }}</p>
+                <p>Batch: {{ profile.batch }}</p>
+                <p>Forum Posts: {{ stats.posts }}</p>
+                <p>Comments made: {{ stats.comments }}</p>
+            </div>
+        </aside>
     </div>
-  </div>
-  
 </body>
 </html>

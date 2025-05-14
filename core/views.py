@@ -9,6 +9,7 @@ from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 from .forms import (
@@ -21,7 +22,7 @@ from .forms import (
     UpdatesForm,
     UserProfileForm,
 )
-from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
+from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates, Attendance
 
 
 def admin_register(request):
@@ -342,15 +343,26 @@ def admin_delete_post(request, post_id):
 ## USER SIDE
 
 @login_required
-def home(request): #kanan stats po in
+def home(request):
+    user = request.user
+    profile = user  # Assuming CustomUser is your user model
+
+    events = Event.objects.filter(datetime__gte=timezone.now()).order_by('datetime')[:2]
+    updates = Updates.objects.order_by('-date_posted')[:2]
+
     stats = {
-        'total_alumni': CustomUser.objects.filter(is_active=True).count(),
-        'total_events': Event.objects.count(),
-        'total_posts': Forum.objects.count(),
-        'total_updates': Updates.objects.count(),
-        'total_comments': Comment.objects.count(),
+        'posts': Forum.objects.filter(author=user).count(),
+        'comments': Comment.objects.filter(user=user).count(),
     }
-    return render(request, 'core/home.html', stats)
+
+    return render(request, 'home.html', {
+        'user': user,
+        'profile': profile,
+        'events': events,
+        'updates': updates,
+        'stats': stats,
+    })
+
 
 @login_required
 def profile_view(request):
@@ -469,13 +481,39 @@ def login_view(request):
 
 @login_required
 def events_view(request):
-    events = Event.objects.order_by('-datetime')
-    return render(request, 'core/events.html', {'events': events})
+    events = Event.objects.all()
+
+    # Get Attendance entries for the logged-in user
+    attended_events = Attendance.objects.filter(user=request.user).select_related('event')
+    attended_event_ids = attended_events.values_list('event_id', flat=True)
+
+    context = {
+        'events': events,
+        'attended_event_ids': attended_event_ids,
+        'attended_events': [entry.event for entry in attended_events],  # for sidebar
+    }
+    return render(request, 'core/events.html', context)
+
+@login_required
+def mark_attended(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    Attendance.objects.get_or_create(user=request.user, event=event)
+    return redirect('events')
+
+@login_required
+def event_detail(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    attended = Attendance.objects.filter(user=request.user, event=event).exists()
+    return render(request, 'core/event_detail.html', {'event': event, 'attended': attended, 'now': timezone.now()})
 
 @login_required
 def updates_view(request):
     updates = Updates.objects.order_by('-date_posted')
-    return render(request, 'core/updates.html', {'updates': updates})
+    recent_updates = Updates.objects.order_by('-date_posted')[:5]
+    return render(request, 'core/updates.html', {
+        'updates': updates,
+        'recent_updates': recent_updates
+    })
 
 @login_required
 def forum_list(request):

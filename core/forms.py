@@ -37,14 +37,16 @@ class UserProfileForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'datetime', 'location']
+        fields = ['title', 'description', 'date', 'time', 'location']
         labels = {
-            'datetime': 'Date and Time',
+            'date': 'Event Date',
+            'time': 'Event Time',
         }
         widgets = {
-            'datetime': forms.DateTimeInput(attrs={
-                'type': 'datetime-local'
-            }),}
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
+        }
+
         
 class UpdatesForm(forms.ModelForm):
     class Meta:

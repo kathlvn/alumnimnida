@@ -1,21 +1,96 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Events</title>
+  <link rel="stylesheet" href="{% static 'css/events.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body>
 
-{% block content %}
-  <h2 class="text-2xl font-bold mb-4">Upcoming Events</h2>
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <nav>
+      <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
+      <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+      <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+      <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
+      <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+      <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+    </nav>
+  </div>
 
-  {% if events %}
-    <ul>
-      {% for event in events %}
-        <li class="mb-4 border p-4 rounded bg-white shadow">
-          <h3 class="text-xl font-semibold">{{ event.title }}</h3>
-          <p>{{ event.description }}</p>
-          <p><strong>Date:</strong> {{ event.datetime }}</p>
-          <!-- <p><strong>Time:</strong> {{ event.time }}</p> -->
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header-search">
+      <h2>EVENTS</h2>
+      <input type="text" class="search-bar" placeholder="Search...">
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Events List -->
+      <div class="events-section">
+        {% for event in events %}
+        <div class="event-box" onclick="openModal('{{ event.id }}')">
+          <h3 class="event-title">{{ event.title }}</h3>
+          <p class="event-desc">{{ event.description|truncatechars:100 }}</p>
+          <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
+          <p><strong>Time:</strong> {{ event.time }}</p>
           <p><strong>Location:</strong> {{ event.location }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No events available.</p>
-  {% endif %}
-{% endblock %}
+        </div>
+
+        <!-- Modal for full details -->
+        <div id="modal-{{ event.id }}" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal('{{ event.id }}')">&times;</span>
+            <h2>{{ event.title }}</h2>
+            <p>{{ event.description }}</p>
+            <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
+            <p><strong>Time:</strong> {{ event.time }}</p>
+            <p><strong>Location:</strong> {{ event.location }}</p>
+
+            {% if event.id in attended_event_ids %}
+                <p style="color: green;"><strong>Already Attended</strong></p>
+            {% else %}
+                <form method="post" action="{% url 'mark_attended' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="attend-button">Mark as Attended</button>
+                </form>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p>No events available.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Events Attended -->
+      <div class="quick-stats">
+        <h3 class="timeline-title">Events Attended</h3>
+        <ul>
+          {% for attended in attended_events %}
+          <li>
+            <strong>{{ attended.title }}</strong><br>
+            <em>{{ attended.date|date:"F d, Y" }}</em>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal JavaScript -->
+<script>
+  function openModal(id) {
+    document.getElementById("modal-" + id).style.display = "block";
+  }
+  function closeModal(id) {
+    document.getElementById("modal-" + id).style.display = "none";
+  }
+</script>
+
+</body>
+</html>

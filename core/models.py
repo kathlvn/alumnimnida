@@ -1,12 +1,11 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 import datetime
+from datetime import date
+
 
 class CustomUserManager(BaseUserManager):
-    
     def create_user(self, student_number=None, password=None, **extra_fields):
         if not student_number and not extra_fields.get('is_staff'):
             raise ValueError("Student number is required")
@@ -24,14 +23,20 @@ class CustomUserManager(BaseUserManager):
     def create_admin(self, username, password, first_name, last_name, email='', **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', False)
-        return self.create_user(username=username, password=password, student_number=username,
-                                 first_name=first_name, last_name=last_name, email=email, **extra_fields)
-
+        return self.create_user(
+            username=username,
+            password=password,
+            student_number=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            **extra_fields
+        )
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
-    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True) #nulled for admin registration
+    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     email = models.EmailField(blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -46,6 +51,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('ACT', 'Associate in Computer Technology'),
     ]
     degree = models.CharField(max_length=100, choices=degree_choices, blank=True)
+
     current_year = datetime.datetime.now().year
     year_selection = [(year, str(year)) for year in range(current_year, 2015, -1)]  
     year_attended = models.IntegerField(choices=year_selection, null=True, blank=True)
@@ -62,11 +68,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('studying', 'Studying'),
         ('other', 'Other'),
     ]
-
-
     employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
 
-    username = models.CharField(max_length=150, unique=True, null=True, blank=True) #for registry
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -79,11 +83,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.student_number or self.username or f"User {self.pk}"
 
-    
     @property
     def program(self):
         return self.degree
-    
+
     @property
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -91,7 +94,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def batch(self):
         return self.year_graduated
-    
+
+
 class JobEntry(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='job_entries')
     job_title = models.CharField(max_length=100)
@@ -100,32 +104,36 @@ class JobEntry(models.Model):
 
     def __str__(self):
         return self.job_title
-    
 
-    
-#ext functions
+
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    location = models.CharField(max_length=255)
-    datetime = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    done = models.BooleanField(default=False)
+    date = models.DateField(default=date.today)
+    time = models.TimeField()
+    location = models.CharField(max_length=200)
 
     def __str__(self):
         return self.title
-    
+
+
+class Attendance(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    attended_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} attended {self.event.title}"
 
 
 class Updates(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
-    related_event = models.ForeignKey('Event', on_delete=models.SET_NULL, null=True, blank=True)
+    related_event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.title
-    
 
 
 class Forum(models.Model):
@@ -137,16 +145,18 @@ class Forum(models.Model):
     def __str__(self):
         return self.title
 
+
 class Like(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    post = models.ForeignKey('Forum', on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='likes')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'post')
 
+
 class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    post = models.ForeignKey('Forum', on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

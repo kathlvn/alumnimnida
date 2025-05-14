@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Search Results for "{{ query }}"</h2>
+
+  {% if users or admins or events or updates or forums %}
+    {% if users %}
+      <h4>Users</h4>
+      <ul>
+        {% for user in users %}
+          <li>{{ user.get_full_name }} ({{ user.student_number }})</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if admins %}
+      <h4>Admins</h4>
+      <ul>
+        {% for admin in admins %}
+          <li>{{ admin.get_full_name }} ({{ admin.username }})</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if events %}
+      <h4>Events</h4>
+      <ul>
+        {% for event in events %}
+          <li>{{ event.title }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if updates %}
+      <h4>Updates</h4>
+      <ul>
+        {% for update in updates %}
+          <li>{{ update.title }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if forums %}
+      <h4>Forum Posts</h4>
+      <ul>
+        {% for post in forums %}
+          <li>{{ post.title }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% else %}
+    <p>No results found.</p>
+  {% endif %}
+{% endblock %}

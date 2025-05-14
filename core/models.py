@@ -3,7 +3,12 @@ from django.conf import settings
 from django.db import models
 import datetime
 from datetime import date
+from PIL import Image
 
+
+
+def user_profile_pic_path(instance, filename):
+    return f"profile_pictures/user_{instance.id}/{filename}"
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, student_number=None, password=None, **extra_fields):
@@ -20,7 +25,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(student_number, password, **extra_fields)
     
-    def create_admin(self, username, password, first_name, last_name, email='', **extra_fields):
+    def create_admin(self, username, password, first_name, last_name, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', False)
         return self.create_user(
@@ -32,6 +37,9 @@ class CustomUserManager(BaseUserManager):
             email=email,
             **extra_fields
         )
+        return self.create_user(username=username, password=password, student_number=username,
+                                 first_name=first_name, last_name=last_name, **extra_fields)
+
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -58,7 +66,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     year_graduated = models.IntegerField(choices=year_selection, null=True, blank=True)
     
     contact = models.CharField(max_length=11, blank=True)
-    club_orgs = models.TextField(blank=True)
     bio = models.TextField(blank=True)
 
     EMPLOYMENT_STATUS_CHOICES = [
@@ -71,6 +78,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     employment_status = models.CharField(max_length=20, choices=EMPLOYMENT_STATUS_CHOICES, blank=True, null=True)
 
     username = models.CharField(max_length=150, unique=True, null=True, blank=True)
+
+    profile_picture = models.ImageField(
+        upload_to=user_profile_pic_path,
+        default='default/profile.png',  
+        blank=True,
+        null=True
+    )
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -96,6 +110,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.year_graduated
 
 
+    
+class ClubOrg(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='club_orgs')
+    org_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.org_name
+    
 class JobEntry(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='job_entries')
     job_title = models.CharField(max_length=100)

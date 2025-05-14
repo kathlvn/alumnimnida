@@ -4,12 +4,13 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 from .forms import (
@@ -19,10 +20,12 @@ from .forms import (
     ForumPostForm,
     JobEntryForm,
     JobEntryFormSet,
+    ClubOrgForm,
     UpdatesForm,
     UserProfileForm,
+    AdminProfileForm,
 )
-from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates, Attendance
+from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
 
 
 def admin_register(request):
@@ -51,10 +54,9 @@ def admin_register(request):
             password=password,
             first_name=request.POST.get('first_name'),
             last_name=request.POST.get('last_name'), 
-            email=request.POST.get('email', ''),
             
             is_staff=True,
-            is_superuser=False  # Optional: depends on access level
+            is_superuser=False 
         )
         messages.success(request, "Admin account created successfully.")
         return redirect('login')
@@ -81,6 +83,24 @@ def admin_dashboard(request):
     return render(request, 'admin_panel/admin_dashboard.html')
 
 ## ADMIN USER
+
+@login_required
+@user_passes_test(is_admin)
+def admin_profile_view(request):
+    form = AdminProfileForm(instance=request.user)
+
+    if request.method == 'POST':
+        form = AdminProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_profile')
+
+    edit_mode = request.method == 'POST' or request.GET.get('edit') == '1'
+    return render(request, 'admin_panel/admin_profile.html', {
+        'form': form,
+        'edit_mode': edit_mode,
+        'admin_user': request.user,
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -188,10 +208,10 @@ def admin_user_delete(request, user_id):
 @user_passes_test(is_admin)
 def admin_user_reset_password(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    new_password = user.username 
+    new_password = user.student_number or user.username
     user.set_password(new_password)
     user.save()
-    messages.success(request, f"Password for {user.get_full_name() or user.username} has been reset to: {new_password}")
+    messages.success(request, f"Password for {user.get_full_name or user.username} has been reset to: {new_password}")
     return redirect('admin_user_list')
 
 
@@ -370,102 +390,47 @@ def profile_view(request):
     can_edit = request.GET.get('edit') == '1'
 
     JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
+    ClubOrgFormSet = inlineformset_factory(CustomUser, ClubOrg, form=ClubOrgForm, extra=1, can_delete=True)
 
     if request.method == 'POST' and can_edit:
-        form = UserProfileForm(request.POST, instance=user)
-        formset = JobEntryFormSet(request.POST, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        job_formset = JobEntryFormSet(request.POST, instance=user)
+        club_formset = ClubOrgFormSet(request.POST, instance=user)
 
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and job_formset.is_valid() and club_formset.is_valid():
             form.save()
-            job_entries = formset.save(commit=False)
+            job_entries = job_formset.save(commit=False)
 
-            # Reset all existing job entries' is_current to False
+            # Reset all job entries' is_current flags
             JobEntry.objects.filter(user=user).update(is_current=False)
 
-            # Mark the new job entries, with the latest one as current
             for job in job_entries:
                 job.user = user
-                if not job.is_current:  # This ensures the first job becomes the current one if unchecked
+                if not job.is_current:
                     job.is_current = True
                 job.save()
+            job_formset.save_m2m()
+            club_formset.save()
 
-            formset.save_m2m()
             messages.success(request, 'Profile updated successfully.')
             return redirect('profile')
-
     else:
         form = UserProfileForm(instance=user)
-        formset = JobEntryFormSet(instance=user)
-    
+        job_formset = JobEntryFormSet(instance=user)
+        club_formset = ClubOrgFormSet(instance=user)
+
     job_entries = user.job_entries.all().order_by('-date_added')
+    club_orgs = user.club_orgs.all()
 
     return render(request, 'core/profile.html', {
         'form': form,
-        'formset': formset,
+        'formset': job_formset,
+        'club_formset': club_formset,
         'can_edit': can_edit,
         'user_profile': user,
-        job_entries: job_entries,
+        'job_entries': job_entries,
+        'club_orgs': club_orgs,
     })
-
-
-
-
-# JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
-# @login_required
-# def profile_view(request):
-#     user = request.user
-#     can_edit = request.GET.get('edit') == '1'
-
-#     if request.method == 'POST' and can_edit:
-#         form = UserProfileForm(request.POST, instance=user)
-#         formset = JobEntryFormSet(request.POST, instance=user)
-
-#         if form.is_valid() and formset.is_valid():
-#             form.save()
-#             formset.save()
-#             messages.success(request, 'Profile updated successfully.')
-#             return redirect('profile')
-#     else:
-#         form = UserProfileForm(instance=user)
-#         formset = JobEntryFormSet(instance=user)
-
-#     return render(request, 'core/profile.html', {
-#         'form': form,
-#         'formset': formset,
-#         'can_edit': can_edit
-#     })
-
-# @login_required
-# def add_job_entry(request):
-#     if request.method == 'POST':
-#         form = JobEntryForm(request.POST)
-#         if form.is_valid():
-#             job = form.save(commit=False)
-#             job.user = request.user
-#             job.save()
-#             return redirect('profile?edit=1') 
-#     return redirect('profile?edit=1')
-
-# @login_required
-# def edit_job_entry(request, entry_id):
-#     job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
-#     if request.method == 'POST':
-#         form = JobEntryForm(request.POST, instance=job)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('profile?edit=1')
-#     else:
-#         form = JobEntryForm(instance=job)
-#     return render(request, 'core/edit_job_entry.html', {'form': form, 'job': job})
-
-# @login_required
-# def delete_job_entry(request, entry_id):
-#     job = get_object_or_404(JobEntry, id=entry_id, user=request.user)
-#     if request.method == 'POST':
-#         job.delete()
-#         return redirect('profile?edit=1')
-#     return render(request, 'core/jobentry_confirm_delete.html', {'job': job})
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -657,9 +622,66 @@ def forum_delete(request, post_id):
     
     return render(request, 'core/forum_delete.html', {'post': post})
 
-@login_required
-def change_password_view(request):
-    return render(request, 'core/change_password.html')
+
+
+def global_search_view(request):
+    query = request.GET.get('q')
+    users = admins = events = updates = forums = []
+
+    if query:
+        users = CustomUser.objects.filter(
+            Q(is_staff=False) &
+            (Q(student_number__icontains=query) |
+             Q(first_name__icontains=query) |
+             Q(last_name__icontains=query) |
+             Q(address__icontains=query) |
+             Q(degree__icontains=query) |
+             Q(year_graduated__icontains=query))
+            #  Q(org_name__icontains=query) |
+            #  Q(job_title__icontains=query))
+        )
+
+        admins = CustomUser.objects.filter(
+            Q(is_staff=True) &
+            (Q(first_name__icontains=query) |
+             Q(last_name__icontains=query) |
+             Q(username__icontains=query))
+        )
+
+        events = Event.objects.filter(
+            Q(title__icontains=query) |
+            Q(location__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+        updates = Updates.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(related_event__title__icontains=query)
+        )
+
+        forum = Forum.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(author__first_name__icontains=query) |
+            Q(author__last_name__icontains=query)
+        )
+
+    context = {
+        'query': query,
+        'users': users,
+        'admins': admins,
+        'events': events,
+        'updates': updates,
+        'forums': forums,  
+    }
+    return render(request, 'search_results.html', context)
+
+
+class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'change_password.html'
+    success_url = reverse_lazy('change_password')
+    success_message = "Your password was successfully updated."
 
 def logout_view(request):
     logout(request)

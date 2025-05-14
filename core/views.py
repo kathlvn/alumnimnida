@@ -7,6 +7,7 @@ from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
+from django.db.models import Count, F, ExpressionWrapper, IntegerField
 from django.forms import inlineformset_factory
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -25,7 +26,10 @@ from .forms import (
     UserProfileForm,
     AdminProfileForm,
 )
-from .models import Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
+from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
+from django.urls import reverse_lazy
+from django.utils import timezone
+
 
 
 def admin_register(request):
@@ -365,23 +369,21 @@ def admin_delete_post(request, post_id):
 @login_required
 def home(request):
     user = request.user
-    profile = user  # Assuming CustomUser is your user model
+    upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:5]
+    recent_updates = Updates.objects.all().order_by('-date_posted')
+    forum_posts_count = Forum.objects.filter(author=request.user)
+    comments_count = Comment.objects.filter(user=user).count()
+    events_attended_count = Attendance.objects.filter(user=user).count()
 
-    events = Event.objects.filter(datetime__gte=timezone.now()).order_by('datetime')[:2]
-    updates = Updates.objects.order_by('-date_posted')[:2]
-
-    stats = {
-        'posts': Forum.objects.filter(author=user).count(),
-        'comments': Comment.objects.filter(user=user).count(),
-    }
-
-    return render(request, 'home.html', {
+    return render(request, 'core/home.html', {
         'user': user,
-        'profile': profile,
-        'events': events,
-        'updates': updates,
-        'stats': stats,
+        'upcoming_events': upcoming_events,
+        'recent_updates': recent_updates,
+        'forum_posts_count': forum_posts_count,
+        'comments_count': comments_count,
+        'events_attended_count': events_attended_count,
     })
+
 
 
 @login_required
@@ -481,48 +483,71 @@ def updates_view(request):
     })
 
 @login_required
-def forum_list(request):
-    posts = Forum.objects.all().order_by('-date_posted')
+def forum(request):
+    posts = Forum.objects.annotate(like_count=Count('likes')).order_by('-date_posted')
 
     if request.method == 'POST':
-        if 'like_post' in request.POST:
+        if 'create_post' in request.POST:
+            form = ForumPostForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.save()
+                return redirect('forum')
+
+        elif 'like_post' in request.POST:
             post_id = request.POST.get('like_post')
             post = get_object_or_404(Forum, id=post_id)
-            like, created = Like.objects.get_or_create(user=request.user, post=post)
-            if not created:
-                like.delete()
+            existing = Like.objects.filter(user=request.user, post=post)
+            if existing.exists():
+                existing.delete()
+            else:
+                Like.objects.create(user=request.user, post=post)
             return redirect('forum')
 
         elif 'comment_post' in request.POST:
             post_id = request.POST.get('comment_post')
             comment_content = request.POST.get('comment_content')
             post = get_object_or_404(Forum, id=post_id)
-            if comment_content:
+            if comment_content.strip():
                 Comment.objects.create(user=request.user, post=post, content=comment_content)
             return redirect('forum')
 
-        elif 'create_post' in request.POST:
-            form = ForumPostForm(request.POST)
-            if form.is_valid():
-                forum = form.save(commit=False)
-                forum.author = request.user
-                forum.save()
+        elif 'delete_comment' in request.POST:
+            comment_id = request.POST.get('delete_comment')
+            comment = get_object_or_404(Comment, id=comment_id)
+            if comment.user == request.user or request.user.is_staff:
+                comment.delete()
             return redirect('forum')
         
-    for post in posts:
-        post.edit_form = ForumPostForm(instance=post)
+        elif 'delete_post' in request.POST:
+            post_id = request.POST.get('delete_post')
+            post = get_object_or_404(Forum, id=post_id)
+            if post.author == request.user or request.user.is_staff:
+                post.delete()
+            return redirect('forum')
 
-    create_form = ForumPostForm()
-    comment_form = CommentForm()
-  
-    liked_post_ids = Like.objects.filter(user=request.user).values_list('post_id', flat=True)
 
-    return render(request, 'core/forum_list.html', {
+    # Trending based on likes + comments
+    trending_posts = Forum.objects.annotate(
+        num_likes=Count('likes'),
+        num_comments=Count('comments'),
+        popularity=ExpressionWrapper(
+            Count('likes') + Count('comments'),
+            output_field=IntegerField()
+        )
+    ).order_by('-popularity')[:5]
+
+    context = {
         'posts': posts,
-        'create_form': create_form,
-        'comment_form': comment_form,
-        'liked_post_ids': liked_post_ids,
-    })
+        'create_form': ForumPostForm(),
+        'comment_form': CommentForm(),
+        'liked_post_ids': Like.objects.filter(user=request.user).values_list('post_id', flat=True),
+        'trending_posts': trending_posts
+    }
+
+    return render(request, 'core/forum.html', context)
+
 
 @require_POST
 @login_required

@@ -1,196 +1,113 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div class="max-w-4xl mx-auto px-4 py-6 text-[#5b1780]">
-
-  <!-- Search and Navigation -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-    <div class="flex items-center gap-3 w-full md:w-1/2">
-      <input type="text" placeholder="Search posts..." class="w-full px-4 py-2 rounded-full border border-[#5b1780] focus:outline-none focus:ring-2 focus:ring-[#5b1780]">
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum</title>
+    <link rel="stylesheet" href="{% static 'css/forum.css' %}">
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav>
+            <a href="#"><img src="{% static 'icons/user.png' %}"></a>
+            <a href="#"><img src="{% static 'icons/home.png' %}"></a>
+            <a href="{% url 'events' %}"><img src="{% static 'icons/calendar.png' %}"></a>
+            <a href="#"><img src="{% static 'icons/forum.png' %}"></a>
+            <a href="{% url 'logout' %}"><img src="{% static 'icons/logout.png' %}"></a>
+        </nav>
     </div>
-    <div class="flex gap-4 justify-between md:justify-end">
-      {% if request.user.is_authenticated and not request.user.is_staff %}
-      <button onclick="toggleModal('createPostModal')" class="bg-[#5b1780] text-white font-semibold px-6 py-2 rounded-full hover:bg-purple-900 transition">Create Post</button>
-      {% endif %}
-      <select class="border rounded-full px-4 py-2 text-[#5b1780] border-[#5b1780]">
-        <option>Filter by</option>
-        <option value="public">Public</option>
-        <option value="private">Private</option>
-        <option value="batch">My Batch</option>
-      </select>
-    </div>
-  </div>
 
-  <!-- CREATE POST MODAL -->
-  <div id="createPostModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
-      <h3 class="text-xl font-bold text-[#5b1780] mb-4">Create New Post</h3>
-      <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="create_post" value="1">
-        {{ create_form.as_p }}
-        <div class="flex justify-end mt-4 gap-2">
-          <button type="submit" class="bg-[#5b1780] text-white px-4 py-2 rounded-full hover:bg-purple-900">Publish</button>
-          <button type="button" onclick="toggleModal('createPostModal')" class="bg-gray-300 text-[#5b1780] px-4 py-2 rounded-full hover:bg-gray-400">Cancel</button>
+    <!-- Main content -->
+    <div class="main-content" style="width: 60%;">
+        <div class="forum-header">
+            <h1>FORUM</h1>
+            <input type="text" class="search-bar" placeholder="Search...">
         </div>
-      </form>
-    </div>
-  </div>
+        <button class="create-btn" onclick="openModal()">Create a Post</button>
 
-  <!-- POSTS -->
-  <div class="space-y-6">
-    {% for post in posts %}
-    <div class="border-2 border-[#5b1780] rounded-2xl p-5 bg-white shadow-md">
-      <h4 class="text-lg font-extrabold">{{ post.title }}</h4>
-      <p class="text-sm mt-1">{{ post.content }}</p>
-      <p class="text-xs italic mt-2">By <strong>{{ post.author.get_full_name }}</strong> • {{ post.date_posted|date:"F j, Y g:i A" }}</p>
+        <!-- Forum posts -->
+        {% for post in posts %}
+            <div class="forum-post">
+                <h3><strong>{{ post.title|upper }}</strong></h3>
+                <p>{{ post.content }}</p>
+                <p><em>By {{ post.author.get_full_name }} • {{ post.date_posted|date:"F j, Y g:i A" }}</em></p>
 
-      <!-- Likes -->
-      <div class="flex items-center gap-3 mt-3">
-        <button class="like-btn text-sm font-semibold text-[#5b1780] hover:underline" data-post-id="{{ post.id }}" id="like-btn-{{ post.id }}">
-          {% if post.id in liked_post_ids %} Unlike {% else %} Like {% endif %}
-        </button>
-        <span class="text-xs cursor-pointer hover:text-purple-700" onclick="toggleModal('likesModal-{{ post.id }}')" id="like-count-{{ post.id }}">
-          {{ post.likes.count }} Like{{ post.likes.count|pluralize }}
-        </span>
-      </div>
+                <!-- Likes -->
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="like_post" value="{{ post.id }}">
+                    <button class="like-button" type="submit">
+                        Like ({{ post.likes.count }})
+                    </button>
+                </form>
 
-      <!-- Comments -->
-      <div class="mt-4">
-        <h5 class="font-bold text-sm mb-1">Comments</h5>
-        <ul class="space-y-2 comment-list-{{ post.id }}">
-          {% for comment in post.comments.all %}
-          <li class="text-sm flex justify-between">
-            <span><strong>{{ comment.user.get_full_name }}:</strong> {{ comment.content }}</span>
-            {% if comment.user == user or user.is_staff %}
-            <form action="{% url 'delete_comment' comment.id %}" method="post">
-              {% csrf_token %}
-              <button type="submit" class="text-red-500 text-xs hover:underline">Delete</button>
-            </form>
-            {% endif %}
-          </li>
-          {% empty %}
-          <li class="text-sm text-gray-400">No comments yet.</li>
-          {% endfor %}
-        </ul>
+                <!-- Comments -->
+                <div class="comment-section">
+                    <strong>Comments</strong>
+                    {% for comment in post.comment_set.all %}
+                        <p>You: {{ comment.content }}
+                            {% if comment.user == request.user %}
+                                <a class="delete-link" href="{% url 'delete_comment' comment.id %}">Delete</a>
+                            {% endif %}
+                        </p>
+                    {% empty %}
+                        <p>No comments yet.</p>
+                    {% endfor %}
 
-        <!-- Add Comment -->
-        <form class="comment-form mt-2" data-post-id="{{ post.id }}">
-          {% csrf_token %}
-          <textarea name="comment_content" rows="2" class="w-full border rounded-lg p-2 text-sm comment-input" placeholder="Write a comment..."></textarea>
-          <button type="submit" class="mt-1 bg-[#5b1780] text-white px-3 py-1 rounded-full text-sm hover:bg-purple-900">Send</button>
-        </form>
-      </div>
-
-      <!-- Edit/Delete -->
-      {% if post.author == request.user %}
-      <div class="mt-4 flex gap-3 text-sm">
-        <button onclick="toggleModal('editModal-{{ post.id }}')" class="text-[#5b1780] hover:underline">Edit</button>
-        <form method="POST" action="{% url 'forum_delete' post.id %}">
-          {% csrf_token %}
-          <button type="submit" class="text-red-600 hover:underline">Delete</button>
-        </form>
-      </div>
-
-      <!-- Edit Modal -->
-      <div id="editModal-{{ post.id }}" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
-          <h3 class="text-xl font-bold text-[#5b1780] mb-4">Edit Post</h3>
-          <form method="POST" action="{% url 'forum_update' post.id %}">
-            {% csrf_token %}
-            {{ post.edit_form.as_p }}
-            <div class="flex justify-end mt-4 gap-2">
-              <button type="submit" class="bg-[#5b1780] text-white px-4 py-2 rounded-full hover:bg-purple-900">Update</button>
-              <button type="button" onclick="toggleModal('editModal-{{ post.id }}')" class="bg-gray-300 text-[#5b1780] px-4 py-2 rounded-full hover:bg-gray-400">Cancel</button>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="comment_post" value="{{ post.id }}">
+                        <textarea name="comment_content" rows="2" class="comment-box" placeholder="Write a comment.."></textarea>
+                        <button class="send-btn" type="submit">Send</button>
+                    </form>
+                </div>
             </div>
-          </form>
-        </div>
-      </div>
-      {% endif %}
-
-      <!-- Likes Modal (View Who Liked) -->
-      <div id="likesModal-{{ post.id }}" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-xl w-full max-w-sm text-sm">
-          <h4 class="font-bold mb-2 text-[#5b1780]">Liked by:</h4>
-          <ul class="list-disc pl-5">
-            {% for like in post.likes.all %}
-              <li>{{ like.user.get_full_name }}</li>
-            {% empty %}
-              <li class="text-gray-400">No likes yet.</li>
-            {% endfor %}
-          </ul>
-          <div class="flex justify-end mt-4">
-            <button onclick="toggleModal('likesModal-{{ post.id }}')" class="text-[#5b1780] font-semibold hover:underline">Close</button>
-          </div>
-        </div>
-      </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-  </div>
 
+    <!-- Trending posts -->
+    <div class="trending-posts">
+        <h3>Trending Posts</h3>
+        <ul>
+            <li><a href="#">• Tips for landing a tech job</a></li>
+            <li><a href="#">• Batch 2024 Reunion Plans</a></li>
+            <li><a href="#">• Unpopular Opinion: Making System...</a></li>
+        </ul>
+    </div>
 </div>
 
-<!-- JavaScript for Modals -->
-<script>
-function toggleModal(id) {
-  const el = document.getElementById(id);
-  el.classList.toggle('hidden');
-  el.classList.toggle('flex');
-}
-</script>
+<!-- Create Post Modal -->
+<div id="postModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Create Post</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="create_post" value="1">
+            <input type="text" name="title" placeholder="Title" class="modal-input"><br>
+            <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input"></textarea>
+            <button type="submit" class="attend-button">Publish</button>
+        </form>
+    </div>
+</div>
 
-<!-- Like AJAX -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const postId = btn.dataset.postId;
-      fetch("{% url 'like_post_ajax' %}", {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `post_id=${postId}`
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById(`like-btn-${postId}`).textContent = data.liked ? "Unlike" : "Like";
-        document.getElementById(`like-count-${postId}`).textContent = `${data.like_count} Like${data.like_count !== 1 ? 's' : ''}`;
-      });
-    });
-  });
-});
-</script>
+    function openModal() {
+        document.getElementById('postModal').style.display = 'block';
+    }
 
-<!-- Comment AJAX -->
-<script>
-document.querySelectorAll('.comment-form').forEach(form => {
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const postId = form.dataset.postId;
-    const input = form.querySelector('.comment-input');
-    const content = input.value.trim();
-    if (!content) return;
-    fetch("{% url 'comment_post' %}", {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": "{{ csrf_token }}",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ post_id: postId, comment_content: content })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        const newComment = document.createElement('li');
-        newComment.className = "text-sm";
-        newComment.innerHTML = `<strong>${data.user_name}:</strong> ${data.comment_content}`;
-        document.querySelector(`.comment-list-${postId}`).appendChild(newComment);
-        input.value = '';
-      }
-    });
-  });
-});
+    function closeModal() {
+        document.getElementById('postModal').style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        const modal = document.getElementById('postModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
 </script>
-{% endblock %}
+</body>
+</html>

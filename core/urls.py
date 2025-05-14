@@ -47,7 +47,7 @@ urlpatterns = [
     path('events/attend/<int:event_id>/', views.mark_attended, name='mark_attended'),
     path('updates/', views.updates_view, name='updates'),
 
-    path('forum/', views.forum_list, name='forum'),
+    path('forum/', views.forum, name='forum'),
     path('like-post/', views.like_post_ajax, name='like_post_ajax'),
     path('forum/comment/', views.comment_post_ajax, name='comment_post'),
     path('forum/create/', views.forum_create, name='forum_create'),

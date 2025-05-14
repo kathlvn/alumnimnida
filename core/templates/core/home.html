@@ -3,70 +3,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alumni Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <a href="{% url 'home' %}"><img src="{% static 'icons/home.png' %}" class="icon active" alt="Home"></a>
-            <a href="{% url 'events' %}"><img src="{% static 'icons/calendar.png' %}" class="icon" alt="Events"></a>
-            <a href="{% url 'forum' %}"><img src="{% static 'icons/chat.png' %}" class="icon" alt="Forum"></a>
-            <a href="{% url 'updates' %}"><img src="{% static 'icons/megaphone.png' %}" class="icon" alt="Updates"></a>
-            <a href="{% url 'logout' %}"><img src="{% static 'icons/logout.png' %}" class="icon" alt="Logout"></a>
-        </aside>
-
-        <main class="main-content">
-            <header>
-                <h2>Welcome back, {{ user.first_name }}!</h2>
-                <input type="search" placeholder="Search..." class="search-box">
-            </header>
-
-            <section class="card events">
-                <h3>UPCOMING EVENTS</h3>
-                {% for event in events %}
-                    <div class="event-item">
-                        <div class="event-date">
-                            <p class="month">{{ event.date|date:"F" }}</p>
-                            <p class="day">{{ event.date|date:"d" }}</p>
-                        </div>
-                        <div class="event-info">
-                            <strong>{{ event.title }}</strong><br>
-                            <em>{{ event.venue }}</em>
-                        </div>
-                    </div>
-                {% endfor %}
-                <a href="{% url 'events' %}" class="btn">VIEW DETAILS</a>
-            </section>
-
-            <section class="card updates">
-                <h3>RECENT UPDATES</h3>
-                {% for update in updates %}
-                    <div class="update-item">
-                        <p>{{ update.text }}</p>
-                        <small><em>{{ update.timestamp|timesince }} ago</em></small>
-                    </div>
-                {% endfor %}
-                <a href="{% url 'updates' %}" class="btn">VIEW DETAILS</a>
-            </section>
-        </main>
-
-        <aside class="profile-section">
-            <div class="profile-card">
-                <img src="{% static 'icons/profile.png' %}" class="profile-icon" alt="Profile">
-                <h3>{{ user.get_full_name }}</h3>
-                <em>Class of {{ profile.batch }}</em>
-                <p>{{ profile.company }}</p>
-                <a href="{% url 'edit_profile' %}" class="btn">EDIT PROFILE</a>
-            </div>
-            <div class="engagement-card">
-                <h4>YOUR ENGAGEMENTS</h4>
-                <p>Member since: {{ user.date_joined|date:"F Y" }}</p>
-                <p>Batch: {{ profile.batch }}</p>
-                <p>Forum Posts: {{ stats.posts }}</p>
-                <p>Comments made: {{ stats.comments }}</p>
-            </div>
-        </aside>
+  <div class="container">
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <nav>
+        <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
+        <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+        <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+        <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
+        <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+        <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+      </nav>
     </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="forum-header">
+        <h1>Welcome back, {{ user.first_name }}!</h1>
+        <input type="text" class="search-bar" placeholder="Search...">
+      </div>
+
+      <!-- Upcoming Events -->
+      <div class="forum-post">
+        <h3>UPCOMING EVENTS</h3>
+        {% for event in upcoming_events %}
+        <div style="margin-bottom: 15px;">
+          <strong>{{ event.date|date:"F d" }}</strong> &nbsp; 
+          <span style="font-weight: bold;">{{ event.title }}</span><br>
+          <em>{{ event.location }}</em><br>
+          <a href="{% url 'event_detail' event.id %}">
+            <button class="attend-button">View Details</button>
+          </a>
+        </div>
+        {% empty %}
+        <p>No upcoming events.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Recent Updates -->
+      <div class="forum-post">
+        <h3>RECENT UPDATES</h3>
+        {% for update in recent_updates %}
+        <div style="margin-bottom: 10px;">
+          <strong>{{ update.title }}</strong><br>
+          <em>{{ update.posted_at|timesince }} ago</em><br>
+          <a href="{% url 'update_detail' update.id %}">
+            <button class="attend-button">View Details</button>
+          </a>
+        </div>
+        {% empty %}
+        <p>No recent updates.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="trending-posts">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="{% static 'img/user_icon.png' %}" alt="Profile" style="width: 60px;">
+        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+        <em>Class of {{ user.graduation_year }}</em><br>
+        <p>{{ user.occupation }}</p>
+        <a href="{% url 'profile' %}">
+          <button class="attend-button">Edit Profile</button>
+        </a>
+      </div>
+
+      <h3>Your Engagements</h3>
+      <p><strong>Member since:</strong><br> {{ user.date_joined|date:"F Y" }}</p>
+      <p><strong>Batch:</strong> {{ user.batch }}</p>
+      <p><strong>Forum Posts:</strong> {{ forum_posts_count }}</p>
+      <p><strong>Comments made:</strong> {{ comments_count }}</p>
+      <p><strong>Events Attended:</strong> {{ events_attended_count }}</p>
+    </div>
+
+  </div>
 </body>
 </html>

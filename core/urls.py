@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
-from .views import CustomPasswordChangeView
+from .views import CustomPasswordChangeView, EventDetailView, UserProfileDetailView, UpdateDetailView, ForumPostDetailView
 from . import views
 
 urlpatterns = [
@@ -38,15 +38,20 @@ urlpatterns = [
 
     path('', views.home, name='home'),
     path('profile/', views.profile_view, name='profile'),
+    path('users/<int:pk>/', UserProfileDetailView.as_view(), name='user_profile'),
     # path('profile/job/add/', views.add_job_entry, name='add_job_entry'),
     # path('edit-job/<int:entry_id>/', views.edit_job_entry, name='edit_job_entry'),
     # path('profile/job/delete/<int:job_id>/', views.delete_job_entry, name='delete_job_entry'),
 
 
     path('events/', views.events_view, name='events'),
+    path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
     path('updates/', views.updates_view, name='updates'),
+    path('updates/<int:pk>/', UpdateDetailView.as_view(), name='update_detail'),
+
 
     path('forum/', views.forum_list, name='forum'),
+    path('forum/<int:pk>/', ForumPostDetailView.as_view(), name='forum_detail'),
     path('like-post/', views.like_post_ajax, name='like_post_ajax'),
     path('forum/comment/', views.comment_post_ajax, name='comment_post'),
     path('forum/create/', views.forum_create, name='forum_create'),

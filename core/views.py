@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
+from django.views.generic import DetailView
 from .forms import (
     CommentForm,
     CustomUserCreationForm,
@@ -101,6 +102,7 @@ def admin_profile_view(request):
         'admin_user': request.user,
     })
 
+
 @login_required
 @user_passes_test(is_admin)
 def admin_user_list(request):
@@ -154,7 +156,7 @@ def admin_user_batch_upload(request):
                 continue
 
             if CustomUser.objects.filter(student_number=student_number).exists():
-                continue  # Skip duplicates
+                continue  # skip dupes
 
             user = CustomUser.objects.create_user(
                 student_number=student_number,
@@ -411,6 +413,11 @@ def profile_view(request):
         'club_orgs': club_orgs,
     })
 
+class UserProfileDetailView(DetailView):
+    model = CustomUser
+    template_name = 'core/user_profile_detail.html'
+    context_object_name = 'user_profile'
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -428,10 +435,20 @@ def events_view(request):
     events = Event.objects.order_by('-datetime')
     return render(request, 'core/events.html', {'events': events})
 
+class EventDetailView(DetailView):
+    model = Event
+    template_name = 'core/event_detail.html'
+    context_object_name = 'event'
+
 @login_required
 def updates_view(request):
     updates = Updates.objects.order_by('-date_posted')
     return render(request, 'core/updates.html', {'updates': updates})
+
+class UpdateDetailView(DetailView):
+    model = Updates
+    template_name = 'core/update_detail.html'
+    context_object_name = 'updates'
 
 @login_required
 def forum_list(request):
@@ -575,6 +592,10 @@ def forum_delete(request, post_id):
     
     return render(request, 'core/forum_delete.html', {'post': post})
 
+class ForumPostDetailView(DetailView):
+    model = Forum
+    template_name = 'core/forum_detail.html'
+    context_object_name = 'forum'
 
 
 def global_search_view(request):
@@ -611,7 +632,7 @@ def global_search_view(request):
             Q(related_event__title__icontains=query)
         )
 
-        forum = Forum.objects.filter(
+        forums = Forum.objects.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(author__full_name__icontains=query)

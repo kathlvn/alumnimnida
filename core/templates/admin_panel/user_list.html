@@ -25,7 +25,7 @@
                 <th>ID</th>
                 <th>Username</th>
                 <th>Name</th>
-                <th>Email</th>
+                <th>Address</th>
                 <th>Degree</th>
                 <th>Is Active</th>
                 <th>Is Staff</th>
@@ -37,8 +37,8 @@
                 <tr>
                     <td>{{ user.id }}</td>
                     <td>{{ user.student_number|default:user.username }}</td>
-                    <td>{{ user.get_full_name|default:"(no name)" }}</td>
-                    <td>{{ user.email }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.address }}</td>
                     <td>{{ user.degree }}</td>
                     <td>{{ user.is_active }}</td>
                     <td>{{ user.is_staff }}</td>

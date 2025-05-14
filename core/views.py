@@ -52,8 +52,7 @@ def admin_register(request):
         CustomUser.objects.create_admin(
             username=username,
             password=password,
-            first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'), 
+            full_name=request.POST.get('full_name'),
             
             is_staff=True,
             is_superuser=False 
@@ -110,8 +109,7 @@ def admin_user_list(request):
 
     if query:
         users = users.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
+            Q(full_name__icontains=query) |
             Q(email__icontains=query) |
             Q(student_number__icontains=query) |
             Q(year_graduated__icontains=query) |
@@ -147,15 +145,9 @@ def admin_user_batch_upload(request):
         created_count = 0
         for row in reader:
             student_number = row.get('student_number')
-            first_name = row.get('first_name')
-            last_name = row.get('last_name')
-            email = row.get('email')
-            contact = row.get('contact')
-            birthday = row.get('birthday')
+            full_name = row.get('full_name')
             address =  row.get('address')
-            curr_location = row.get('curr_location')
             degree = row.get('degree')
-            year_attended = row.get('year_attended')
             year_graduated = row.get('year_graduated')
 
             if not student_number:
@@ -167,9 +159,8 @@ def admin_user_batch_upload(request):
             user = CustomUser.objects.create_user(
                 student_number=student_number,
                 password=student_number,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
+                full_name=full_name,
+                address=address,
                 degree=degree,
                 year_graduated=year_graduated
             )
@@ -344,8 +335,7 @@ def admin_forum_list(request):
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(author__student_number__icontains=query) |
-            Q(author__first_name__icontains=query) |
-            Q(author__last_name__icontains=query) |
+            Q(author__full_name__icontains=query) |
             Q(date_posted__icontains=query) 
         )
 
@@ -521,7 +511,7 @@ def comment_post_ajax(request):
         )
         return JsonResponse({
             'success': True,
-            'user_name': request.user.first_name,
+            'user_name': request.user.full_name,
             'comment_content': comment.content
         })
 
@@ -595,8 +585,7 @@ def global_search_view(request):
         users = CustomUser.objects.filter(
             Q(is_staff=False) &
             (Q(student_number__icontains=query) |
-             Q(first_name__icontains=query) |
-             Q(last_name__icontains=query) |
+             Q(full_name__icontains=query) |
              Q(address__icontains=query) |
              Q(degree__icontains=query) |
              Q(year_graduated__icontains=query))
@@ -606,8 +595,7 @@ def global_search_view(request):
 
         admins = CustomUser.objects.filter(
             Q(is_staff=True) &
-            (Q(first_name__icontains=query) |
-             Q(last_name__icontains=query) |
+            (Q(full_name__icontains=query) |
              Q(username__icontains=query))
         )
 
@@ -626,8 +614,7 @@ def global_search_view(request):
         forum = Forum.objects.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
-            Q(author__first_name__icontains=query) |
-            Q(author__last_name__icontains=query)
+            Q(author__full_name__icontains=query)
         )
 
     context = {

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>{{ forum.title }}</h2>
+  <p>{{ forum.content }}</p>
+  <p>Posted by: {{ forum.author.full_name }}</p>
+  <p>Created at: {{ forum.created_at }}</p>
+  <p>Likes: {{ forum.likes.count }}</p>
+
+  <h4>Comments:</h4>
+  <ul>
+    {% for comment in forum.comments.all %}
+      <li>{{ comment.author.full_name }}: {{ comment.content }}</li>
+    {% empty %}
+      <li>No comments yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

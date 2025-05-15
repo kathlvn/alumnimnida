@@ -5,12 +5,12 @@ from .models import CustomUser, JobEntry, ClubOrg, Event, Updates, Forum, Commen
 class CustomUserCreationForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['student_number', 'first_name', 'last_name', 'email', 'contact', 'birthday', 'address', 'curr_location', 'degree', 'year_attended', 'year_graduated', 'is_active', 'is_staff', 'is_superuser']
+        fields = ['student_number', 'full_name','address', 'degree', 'year_graduated', 'is_active', 'is_staff', 'is_superuser']
         # fields = '__all__'
-        labels = {
-            'curr_location': 'Current Location',
-        }
-        widgets = {'birthday': forms.DateInput(attrs={'type':'date'})}
+        # labels = {
+        #     'curr_location': 'Current Location',
+        # }
+        # widgets = {'birthday': forms.DateInput(attrs={'type':'date'})}
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -25,8 +25,6 @@ class UserProfileForm(forms.ModelForm):
         model = CustomUser
         fields = [
             'address',
-            'curr_location',
-            'contact',
             'employment_status',
             'bio',
             'profile_picture',
@@ -56,7 +54,7 @@ JobEntryFormSet = inlineformset_factory(
 class AdminProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'profile_picture']
+        fields = ['username', 'full_name', 'profile_picture']
 
     def save(self, commit=True):
         user = super().save(commit=False)

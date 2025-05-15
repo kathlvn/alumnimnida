@@ -6,14 +6,13 @@ from .forms import CustomUserCreationForm
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     model = CustomUser
-    list_display = ('student_number', 'first_name', 'last_name', 'email', 'degree')
+    list_display = ('student_number', 'full_name', 'degree')
     ordering = ('student_number',)
 
     fieldsets = (
-        (None, {'fields': ('student_number', 'email', 'first_name', 'last_name', 'password')}),
+        (None, {'fields': ('student_number', 'full_name', 'password')}),
         ('Personal Info', {'fields': (
-            'birthday', 'address', 'curr_location', 'degree', 'year_attended', 'year_graduated',
-            'contact'
+            'address', 'degree', 'year_graduated'
         )}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
     )
@@ -22,8 +21,7 @@ class CustomUserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': (
-                'student_number', 'first_name', 'last_name', 'email', 'birthday', 'address',
-                'curr_location', 'degree', 'year_attended', 'year_graduated', 'contact', 'is_staff', 'is_active'
+                'student_number', 'full_name', 'address', 'degree', 'year_graduated', 'is_staff', 'is_active'
             ),
         }),
     )

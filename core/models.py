@@ -25,32 +25,26 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(student_number, password, **extra_fields)
     
-    def create_admin(self, username, password, first_name, last_name, **extra_fields):
+    def create_admin(self, username, password, full_name, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', False)
         return self.create_user(
             username=username,
             password=password,
             student_number=username,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
+            full_name=full_name,
             **extra_fields
         )
         return self.create_user(username=username, password=password, student_number=username,
-                                 first_name=first_name, last_name=last_name, **extra_fields)
+                                 full_name=full_name, **extra_fields)
 
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
-    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    email = models.EmailField(blank=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    birthday = models.DateField(null=True, blank=True)
+    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True) #nulled for admin registration
+    full_name = models.CharField(max_length=200)
     address = models.CharField(max_length=255, blank=True)
-    curr_location = models.CharField(max_length=100, blank=True)
 
     degree_choices = [
         ('BSCS', 'BS Computer Science'),
@@ -62,10 +56,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     current_year = datetime.datetime.now().year
     year_selection = [(year, str(year)) for year in range(current_year, 2015, -1)]  
-    year_attended = models.IntegerField(choices=year_selection, null=True, blank=True)
     year_graduated = models.IntegerField(choices=year_selection, null=True, blank=True)
     
-    contact = models.CharField(max_length=11, blank=True)
     bio = models.TextField(blank=True)
 
     EMPLOYMENT_STATUS_CHOICES = [
@@ -90,7 +82,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'student_number'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['full_name']
 
     objects = CustomUserManager()
 
@@ -101,10 +93,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def program(self):
         return self.degree
 
-    @property
-    def get_full_name(self):
-        return f"{self.first_name} {self.last_name}"
-    
     @property
     def batch(self):
         return self.year_graduated

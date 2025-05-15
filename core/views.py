@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
+from django.views.generic import DetailView
 from .forms import (
     CommentForm,
     CustomUserCreationForm,
@@ -56,8 +57,7 @@ def admin_register(request):
         CustomUser.objects.create_admin(
             username=username,
             password=password,
-            first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'), 
+            full_name=request.POST.get('full_name'),
             
             is_staff=True,
             is_superuser=False 
@@ -106,6 +106,7 @@ def admin_profile_view(request):
         'admin_user': request.user,
     })
 
+
 @login_required
 @user_passes_test(is_admin)
 def admin_user_list(request):
@@ -114,8 +115,7 @@ def admin_user_list(request):
 
     if query:
         users = users.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
+            Q(full_name__icontains=query) |
             Q(email__icontains=query) |
             Q(student_number__icontains=query) |
             Q(year_graduated__icontains=query) |
@@ -151,29 +151,22 @@ def admin_user_batch_upload(request):
         created_count = 0
         for row in reader:
             student_number = row.get('student_number')
-            first_name = row.get('first_name')
-            last_name = row.get('last_name')
-            email = row.get('email')
-            contact = row.get('contact')
-            birthday = row.get('birthday')
+            full_name = row.get('full_name')
             address =  row.get('address')
-            curr_location = row.get('curr_location')
             degree = row.get('degree')
-            year_attended = row.get('year_attended')
             year_graduated = row.get('year_graduated')
 
             if not student_number:
                 continue
 
             if CustomUser.objects.filter(student_number=student_number).exists():
-                continue  # Skip duplicates
+                continue  # skip dupes
 
             user = CustomUser.objects.create_user(
                 student_number=student_number,
                 password=student_number,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
+                full_name=full_name,
+                address=address,
                 degree=degree,
                 year_graduated=year_graduated
             )
@@ -348,8 +341,7 @@ def admin_forum_list(request):
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(author__student_number__icontains=query) |
-            Q(author__first_name__icontains=query) |
-            Q(author__last_name__icontains=query) |
+            Q(author__full_name__icontains=query) |
             Q(date_posted__icontains=query) 
         )
 
@@ -434,6 +426,11 @@ def profile_view(request):
         'club_orgs': club_orgs,
     })
 
+class UserProfileDetailView(DetailView):
+    model = CustomUser
+    template_name = 'core/user_profile_detail.html'
+    context_object_name = 'user_profile'
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -473,6 +470,11 @@ def event_detail(request, event_id):
     attended = Attendance.objects.filter(user=request.user, event=event).exists()
     return render(request, 'core/event_detail.html', {'event': event, 'attended': attended, 'now': timezone.now()})
 
+class EventDetailView(DetailView):
+    model = Event
+    template_name = 'core/event_detail.html'
+    context_object_name = 'event'
+
 @login_required
 def updates_view(request):
     updates = Updates.objects.order_by('-date_posted')
@@ -481,6 +483,11 @@ def updates_view(request):
         'updates': updates,
         'recent_updates': recent_updates
     })
+
+class UpdateDetailView(DetailView):
+    model = Updates
+    template_name = 'core/update_detail.html'
+    context_object_name = 'updates'
 
 @login_required
 def forum(request):
@@ -583,7 +590,7 @@ def comment_post_ajax(request):
         )
         return JsonResponse({
             'success': True,
-            'user_name': request.user.first_name,
+            'user_name': request.user.full_name,
             'comment_content': comment.content
         })
 
@@ -647,6 +654,10 @@ def forum_delete(request, post_id):
     
     return render(request, 'core/forum_delete.html', {'post': post})
 
+class ForumPostDetailView(DetailView):
+    model = Forum
+    template_name = 'core/forum_detail.html'
+    context_object_name = 'forum'
 
 
 def global_search_view(request):
@@ -657,8 +668,7 @@ def global_search_view(request):
         users = CustomUser.objects.filter(
             Q(is_staff=False) &
             (Q(student_number__icontains=query) |
-             Q(first_name__icontains=query) |
-             Q(last_name__icontains=query) |
+             Q(full_name__icontains=query) |
              Q(address__icontains=query) |
              Q(degree__icontains=query) |
              Q(year_graduated__icontains=query))
@@ -668,8 +678,7 @@ def global_search_view(request):
 
         admins = CustomUser.objects.filter(
             Q(is_staff=True) &
-            (Q(first_name__icontains=query) |
-             Q(last_name__icontains=query) |
+            (Q(full_name__icontains=query) |
              Q(username__icontains=query))
         )
 
@@ -685,11 +694,10 @@ def global_search_view(request):
             Q(related_event__title__icontains=query)
         )
 
-        forum = Forum.objects.filter(
+        forums = Forum.objects.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
-            Q(author__first_name__icontains=query) |
-            Q(author__last_name__icontains=query)
+            Q(author__full_name__icontains=query)
         )
 
     context = {

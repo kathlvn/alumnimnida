@@ -66,24 +66,39 @@
     </div>
 
     <!-- Right Panel -->
-    <div class="trending-posts">
+    <div class="edit-profile">
       <div style="text-align: center; margin-bottom: 20px;">
         <img src="{% static 'img/user_icon.png' %}" alt="Profile" style="width: 60px;">
         <h3>{{ user.first_name }} {{ user.last_name }}</h3>
-        <em>Class of {{ user.graduation_year }}</em><br>
-        <p>{{ user.occupation }}</p>
-        <a href="{% url 'profile' %}">
-          <button class="attend-button">Edit Profile</button>
-        </a>
-      </div>
+<em>Class of {{ user.graduation_year }}</em>
+<p style="text-align: center;">{{ user.occupation }}</p>
+<a href="{% url 'profile' %}">
+  <button class="attend-button">Edit Profile</button>
+</a>
 
-      <h3>Your Engagements</h3>
-      <p><strong>Member since:</strong><br> {{ user.date_joined|date:"F Y" }}</p>
-      <p><strong>Batch:</strong> {{ user.batch }}</p>
-      <p><strong>Forum Posts:</strong> {{ forum_posts_count }}</p>
-      <p><strong>Comments made:</strong> {{ comments_count }}</p>
-      <p><strong>Events Attended:</strong> {{ events_attended_count }}</p>
-    </div>
+<h3>Your Engagements</h3>
+
+<div class="info-row">
+  <span class="label">Member since:</span>
+  <span class="value">{{ user.date_joined|date:"F Y" }}</span>
+</div>
+<div class="info-row">
+  <span class="label">Batch:</span>
+  <span class="value">{{ user.batch }}</span>
+</div>
+<div class="info-row">
+  <span class="label">Forum Posts:</span>
+  <span class="value">{{ forum_posts_count }}</span>
+</div>
+<div class="info-row">
+  <span class="label">Comments made:</span>
+  <span class="value">{{ comments_count }}</span>
+</div>
+<div class="info-row">
+  <span class="label">Events Attended:</span>
+  <span class="value">{{ events_attended_count }}</span>
+</div>
+
 
   </div>
 </body>

@@ -44,7 +44,7 @@
                             <strong>{{ comment.author.get_full_name }}</strong>: {{ comment.text }}
                         </div>
                     {% endfor %}
-                    <form method="post" action="{% url 'add_comment' post.id %}">
+                    <form method="post" action="{% url 'comment_post' post.id %}">
                         {% csrf_token %}
                         <input type="text" name="comment" placeholder="Comment here...">
                         <button type="submit">SEND</button>
@@ -58,7 +58,7 @@
     <!-- Modal -->
     <div id="postModal" class="modal">
         <div class="modal-content">
-            <form method="post" action="{% url 'create_post' %}">
+            <form method="post" action="{% url 'forum_create' %}">
                 {% csrf_token %}
                 <h2>Create Post</h2>
                 <input type="text" name="title" placeholder="Post Title" required>

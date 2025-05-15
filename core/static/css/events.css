@@ -1,4 +1,4 @@
-/* ===== Base Styles ===== */
+/* ===== Base styles ===== */
 * {
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
@@ -34,59 +34,142 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .sidebar nav a {
   margin: 20px 0;
-  display: block;
 }
 
 .sidebar nav img {
   max-width: 50px;
-  margin: 40px auto;
-  display: block;
-  transition: transform 0.3s ease;
+  margin: 30px auto;
   filter: drop-shadow(0 0 8px #f4d7ff);
+  transition: transform 0.3s ease;
 }
 
 .sidebar nav img:hover {
   transform: scale(1.2);
 }
 
-/* ===== Main Content ===== */
+/* ===== Main content ===== */
 .main-content {
-  flex: 1;
+  flex: 2;
   padding: 30px;
   overflow-y: auto;
 }
 
-.event-preview {
+.header-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header-search h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.search-bar {
+  width: 250px;
+  padding: 10px 15px;
+  border: 2px solid white;
+  background: transparent;
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* ===== Content wrapper ===== */
+.content-wrapper {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
+
+/* ===== Events section ===== */
+.events-section {
+  flex: 2;
+}
+
+.event-box {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid white;
   border-radius: 20px;
   padding: 20px 25px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
-.event-preview:hover {
+.event-box:hover {
   transform: scale(1.02);
   box-shadow: 0 8px 25px rgba(235, 206, 241, 0.3);
 }
 
-/* ===== Quick Stats ===== */
-.quick-stats {
-  width: 20%;
-  padding: 30px 20px;
-  background: rgba(255, 255, 255, 0.08);
+.event-box h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.event-box p {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+/* ===== Modal Styles ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+  background-color: #2a003f;
+  margin: 10% auto;
+  padding: 30px;
   border: 2px solid white;
-  border-radius: 15px;
-  margin-left: 20px;
-  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
-  overflow-y: auto;
+  width: 60%;
+  color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: white;
+}
+
+/* ===== Events Attended (right section) ===== */
+.quick-stats {
+  width: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 20px 25px;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+  align-self: flex-start;
+}
+
+.timeline-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
 }
 
 .quick-stats ul {
@@ -96,97 +179,31 @@ a {
 
 .quick-stats li {
   margin-bottom: 15px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid white;
-  border-radius: 15px;
-  padding: 10px 15px;
-  font-size: 0.9rem;
+  font-size: 14px;
 }
 
-/* ===== Modal ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-  padding-top: 60px;
-}
-
-.modal::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(4px);
-  background: rgba(0, 0, 0, 0.3);
-  z-index: -1;
-}
-
-.modal-content {
-  background-color: #391652;
-  padding: 30px;
-  border: 2px solid white;
-  border-radius: 20px;
-  width: 60%;
-  color: white;
-  box-shadow: 0 8px 55px rgba(255, 255, 255, 0.2);
-  position: relative;
-}
-
-.modal-content h2 {
-  margin-top: 0;
-}
-
-.modal-content .close {
-  position: absolute;
-  top: 12px;
-  right: 18px;
-  font-size: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  color: white;
-}
-
-.modal-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  background: transparent;
-  border: 2px solid white;
-  border-radius: 15px;
-  color: white;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* ===== Buttons ===== */
+/* ===== Attend Button ===== */
 .attend-button {
-  padding: 12px 30px;
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 14px;
   background-color: white;
   color: #5b1780;
   border: none;
-  border-radius: 25px;
+  border-radius: 20px;
   font-weight: bold;
-  font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 15px rgba(160, 136, 166, 0.336);
-  margin-top: 10px;
 }
 
 .attend-button:hover {
   background-color: #a34fff;
   color: white;
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
-/* ===== Scrollbar Customization ===== */
+/* ===== Scrollbar customization ===== */
 .main-content::-webkit-scrollbar,
 .quick-stats::-webkit-scrollbar {
   width: 8px;

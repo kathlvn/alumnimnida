@@ -26,7 +26,7 @@ from .forms import (
     UserProfileForm,
     AdminProfileForm,
 )
-from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, Like, Updates
+from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates
 from django.urls import reverse_lazy
 from django.utils import timezone
 

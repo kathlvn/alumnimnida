@@ -32,9 +32,7 @@ class CustomUserManager(BaseUserManager):
             username=username,
             password=password,
             student_number=username,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
+            full_name=full_name,
             **extra_fields
         )
         return self.create_user(username=username, password=password, student_number=username,
@@ -44,16 +42,8 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
-<<<<<<< HEAD
     student_number = models.CharField(max_length=20, unique=True, null=True, blank=True) #nulled for admin registration
     full_name = models.CharField(max_length=200)
-=======
-    student_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    email = models.EmailField(blank=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    birthday = models.DateField(null=True, blank=True)
->>>>>>> 46511b3c2cfcf3a6b4f3aa77f2e80cd8f2333810
     address = models.CharField(max_length=255, blank=True)
 
     degree_choices = [

@@ -23,6 +23,7 @@ a {
 
 /* ===== Sidebar ===== */
 .sidebar {
+  position: fixed;
   margin-top: 40px;
   margin-left: 30px;
   width: 100px;
@@ -55,13 +56,16 @@ a {
 
 /* ===== Main content ===== */
 .main-content {
+  margin-left: 130px;   /* gintry ko la */
   flex: 2;
   padding: 30px;
   overflow-y: auto;
+  position: relative;
 }
 
 /* ===== Global Header for All Pages ===== */
 .global-header {
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -1,92 +1,10 @@
-/* updates.css */
-
-* {
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-
-body {
-  margin: 0;
-  background: radial-gradient(circle, #5b1780, #000000);
-  color: white;
-}
-
-/* Layout Container */
-.container {
-  display: flex;
-  padding: 30px;
-}
-
-/* Sidebar Navigation */
-.sidebar {
-  margin-top: 40px;
-  margin-left: 30px;
-  width: 100px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 3px solid white;
-  border-radius: 30px;
-  padding: 20px 20px;
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
-  justify-content: center;
-  flex-direction: column;
-  display: flex;
-  align-items: center;
-}
-
-.sidebar nav img {
-  max-width: 50px;
-  display: block;
-  margin: 40px auto;
-  transition: transform 0.3s ease;
-  filter: drop-shadow(0 0 8px #f4d7ff);
-}
-
-.sidebar nav img:hover {
-  transform: scale(1.2);
-}
-
-/* Main Content */
-.main-content {
-  flex: 2;
-  padding: 30px;
-  width: 100%;
-}
-
-/* Header and Search Bar */
-.header-search {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.search-bar {
-  padding: 10px 20px;
-  border-radius: 25px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  width: 250px;
-}
-
-/* Flex layout for updates and timeline */
-.content-wrapper {
-  display: flex;
-  gap: 30px;
-  margin-top: 30px;
-}
-
-/* Updates Column */
-.updates-section {
-  flex: 1;
-}
-
-/* Update Box */
+/* ==== Updates Section ==== */
 .update-box {
   background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
+  border: 2px solid #fff;
   border-radius: 20px;
-  padding: 20px;
-  margin: 20px 0;
+  padding: 20px 25px;
+  margin-bottom: 30px;
   box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -97,46 +15,84 @@ body {
 }
 
 .update-title {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .update-desc {
-  margin: 10px 0;
+  font-size: 16px;
+  color: #eaeaea;
+  margin-bottom: 10px;
 }
 
 .update-date {
-  font-size: 0.85rem;
-  color: #e5d4f3;
+  font-size: 13px;
+  color: #ccc;
 }
 
-/* Timeline (Quick Stats) */
+
+/* ==== Search Bar (Header) ==== */
+.global-header .search-bar {
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 250px;
+}
+
+
+/* ==== Right Panel: Timeline Style ==== */
 .quick-stats {
-  width: 300px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
-  border-radius: 20px;
-  padding: 30px 20px;
-  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-top: 20px;
+}
+
+.timeline-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #2e003e;
+  font-weight: 600;
 }
 
 .quick-stats ul {
   list-style: none;
-  padding: 0;
-  margin-top: 20px;
+  padding-left: 0;
 }
 
 .quick-stats li {
-  margin-bottom: 15px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid white;
-  border-radius: 15px;
-  padding: 10px 15px;
-  font-size: 0.9rem;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #2d3436;
 }
 
-.timeline-title {
-  margin-bottom: 10px;
-  font-size: 1.1rem;
-  font-weight: bold;
+.quick-stats li strong {
+  color: #6c5ce7;
+}
+
+
+/* ==== Utility Classes ==== */
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.updates-section {
+  width: 100%;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .global-header .search-bar {
+    width: 100%;
+  }
+
+  .quick-stats {
+    margin-top: 40px;
+  }
 }

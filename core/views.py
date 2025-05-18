@@ -455,6 +455,7 @@ def events_view(request):
         'events': events,
         'attended_event_ids': attended_event_ids,
         'attended_events': [entry.event for entry in attended_events],  # for sidebar
+        'now': timezone.now(),
     }
     return render(request, 'core/events.html', context)
 

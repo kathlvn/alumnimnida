@@ -1,98 +1,17 @@
-/* ===== Base styles ===== */
-* {
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
 
-body {
-  margin: 0;
-  padding: 0;
-  background: radial-gradient(circle, #5b1780, #000000);
-  color: white;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.container {
-  display: flex;
-  padding: 30px;
-}
-
-/* ===== Sidebar ===== */
-.sidebar {
-  margin-top: 40px;
-  margin-left: 30px;
-  width: 100px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 3px solid white;
-  border-radius: 30px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.sidebar nav a {
-  margin: 20px 0;
-}
-
-.sidebar nav img {
-  max-width: 50px;
-  margin: 30px auto;
-  filter: drop-shadow(0 0 8px #f4d7ff);
-  transition: transform 0.3s ease;
-}
-
-.sidebar nav img:hover {
-  transform: scale(1.2);
-}
-
-/* ===== Main content ===== */
-.main-content {
-  flex: 2;
-  padding: 30px;
-  overflow-y: auto;
-}
-
-.header-search {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.header-search h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.search-bar {
-  width: 250px;
-  padding: 10px 15px;
-  border: 2px solid white;
-  background: transparent;
-  color: white;
-  border-radius: 20px;
-  font-size: 14px;
-}
-
-/* ===== Content wrapper ===== */
+/* Wrapper for events and right panel */
 .content-wrapper {
   display: flex;
   gap: 25px;
   align-items: flex-start;
 }
 
-/* ===== Events section ===== */
+/* Events Section */
 .events-section {
   flex: 2;
 }
 
+/* Individual Event Box */
 .event-box {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid white;
@@ -119,7 +38,28 @@ a {
   margin: 5px 0;
 }
 
-/* ===== Modal Styles ===== */
+/* Attend Button */
+.attend-button {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: white;
+  color: #5b1780;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.attend-button:hover {
+  background-color: #a34fff;
+  color: white;
+  transform: scale(1.03);
+}
+
+/* Modal Styles */
 .modal {
   display: none;
   position: fixed;
@@ -153,69 +93,4 @@ a {
 
 .close:hover {
   color: white;
-}
-
-/* ===== Events Attended (right section) ===== */
-.quick-stats {
-  width: 300px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
-  border-radius: 20px;
-  padding: 20px 25px;
-  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
-  align-self: flex-start;
-}
-
-.timeline-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-
-.quick-stats ul {
-  list-style: none;
-  padding: 0;
-}
-
-.quick-stats li {
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-/* ===== Attend Button ===== */
-.attend-button {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 10px 20px;
-  font-size: 14px;
-  background-color: white;
-  color: #5b1780;
-  border: none;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.attend-button:hover {
-  background-color: #a34fff;
-  color: white;
-  transform: scale(1.03);
-}
-
-/* ===== Scrollbar customization ===== */
-.main-content::-webkit-scrollbar,
-.quick-stats::-webkit-scrollbar {
-  width: 8px;
-}
-
-.main-content::-webkit-scrollbar-track,
-.quick-stats::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.main-content::-webkit-scrollbar-thumb,
-.quick-stats::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
 }

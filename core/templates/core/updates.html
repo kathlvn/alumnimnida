@@ -1,36 +1,17 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Updates</title>
-  <link rel="stylesheet" href="{% static 'css/updates.css' %}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-</head>
-<body>
 
-  <div class="container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <nav>
-        <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
-        <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
-        <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
-        <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
-        <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
-        <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
-      </nav>
-    </div>
+{% block title %}Updates - Alumni System{% endblock %}
 
-    <!-- Main Content -->
-<div class="main-content">
-  <div class="header-search">
-    <h2>UPDATES</h2>
-    <input type="text" class="search-bar" placeholder="Search...">
-  </div>
+{% block page_title %}UPDATES{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/updates.css' %}">
+{% endblock %}
+
+{% block content %}
   <div class="content-wrapper">
-    <!-- Updates Column -->
+    <!-- Updates Section -->
     <div class="updates-section">
       {% for update in updates %}
         <div class="update-box">
@@ -44,19 +25,16 @@
         <p>No updates available.</p>
       {% endfor %}
     </div>
+{% endblock %}
 
-    <!-- Timeline Column -->
-    <div class="quick-stats">
-      <h3 class="timeline-title">Recent Updates Timeline</h3>
-      <ul>
-        {% for recent in recent_updates %}
-          <li><strong>{{ recent.date_posted|date:"F d, Y" }}:</strong> {{ recent.title }}</li>
-        {% endfor %}
-      </ul>
-    </div>
+{% block right_panel %}
+  <!-- Timeline Column -->
+  <div class="quick-stats">
+    <h3 class="timeline-title">Recent Updates Timeline</h3>
+    <ul>
+      {% for recent in recent_updates %}
+        <li><strong>{{ recent.date_posted|date:"F d, Y" }}:</strong> {{ recent.title }}</li>
+      {% endfor %}
+    </ul>
   </div>
-</div>
-
-
-</body>
-</html>
+{% endblock %}

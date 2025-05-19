@@ -1,28 +1,39 @@
-{% extends "base.html" %}
+{% load static%}
 
-{% block content %}
-<h2>Batch Upload Users via CSV</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Batch Upload Users via CSV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/csv_upload.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>Batch Upload Users via CSV</h2>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="csv_file">Upload CSV File:</label>
-        <input type="file" name="csv_file" accept=".csv" required class="form-control-file">
-    </div>
-    <button type="submit" class="btn btn-success">Upload</button>
-    <a href="{% url 'admin_user_list' %}" class="btn btn-secondary">Back to Users</a>
-</form>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="csv_file">Upload CSV File:</label>
+                <input type="file" name="csv_file" accept=".csv" required class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-success">Upload</button>
+            <a href="{% url 'admin_user_list' %}" class="btn btn-secondary">Back to Users</a>
+        </form>
 
-<hr>
-<h5>CSV Format</h5>
-<pre>
+        <hr>
+        <h5>CSV Format</h5>
+        <pre>
 student_number, full_name, address, degree, year_graduated
-</pre>
-
-{% endblock %}
+        </pre>
+    </div>
+</body>
+</html>

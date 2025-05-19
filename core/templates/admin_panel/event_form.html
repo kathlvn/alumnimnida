@@ -1,24 +1,33 @@
-{% extends "base.html" %}
+{% load static %}
 
-{% block content %}
-    {% if is_edit %}
-        <h1>Edit Event</h1>
-    {% else %}
-        <h1>Add Event</h1>
-    {% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if is_edit %}Edit Event{% else %}Add Event{% endif %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/event_form.css' %}">
+</head>
+<body>
 
-    <form method="post">
-        {% csrf_token %}
-        <table>
-            {{ form.as_table }}
-        </table>
+    <div class="container">
+        <h1>{% if is_edit %}Edit Event{% else %}Add Event{% endif %}</h1>
 
-        {% if is_edit %}
-            <button type="submit">Update</button>
-        {% else %}
-            <button type="submit">Create</button>
-        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <table>
+                {{ form.as_table }}
+            </table>
 
-        <a href="{% url 'admin_event_list' %}">Cancel</a>
-    </form>
-{% endblock %}
+            <div class="button-group">
+                <button type="submit">
+                    {% if is_edit %}Update{% else %}Create{% endif %}
+                </button>
+                <a class="cancel-link" href="{% url 'admin_event_list' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

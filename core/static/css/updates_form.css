@@ -1,0 +1,139 @@
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at center, #5b1780, #000000);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  overflow-x: hidden;
+}
+
+/* Container */
+.container {
+  background: rgba(255, 255, 255, 0.07);
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Header */
+h1 {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 35px;
+  font-weight: 600;
+}
+
+/* Grid Form Layout */
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px 40px;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+input,
+textarea,
+select {
+  padding: 10px 15px;
+  font-size: 15px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #5b1780;
+  outline: none;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Help & Error Text */
+.form-text,
+.errorlist {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.form-text {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.errorlist {
+  color: #ff6b6b;
+}
+
+/* Button Group */
+.button-group {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.button-group button,
+.button-group .cancel-link {
+  display: inline-block;
+  padding: 10px 24px;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.button-group button:hover,
+.button-group .cancel-link:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Mobile Tweaks */
+@media screen and (max-width: 768px) {
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

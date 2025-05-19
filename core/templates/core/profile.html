@@ -27,6 +27,12 @@
             {% if not can_edit %}
                 <a href="{% url 'profile' %}?edit=1" class="btn-edit-profile">Edit Profile</a>
             {% endif %}
+
+            {% if user.bio %}
+                <div class="profile-bio-box">
+                    <p>{{ user.bio }}</p>
+                </div>
+            {% endif %}
         </div>
 
         <div class="profile-details">

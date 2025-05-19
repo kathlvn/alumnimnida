@@ -1,0 +1,107 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.profile-card-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.profile-overview, .profile-details {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
+}
+
+.profile-overview {
+  max-width: 350px;
+  text-align: center;
+}
+
+.profile-picture img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.profile-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 10px 0 5px;
+  color: #e0caff;
+}
+
+.profile-class, .profile-work {
+  font-size: 14px;
+  margin: 5px 0;
+  color: #ddd;
+}
+
+.btn-edit-profile {
+  display: inline-block;
+  margin-top: 15px;
+  background-color: white;
+  color: #5b1780;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.btn-edit-profile:hover {
+  background-color: #5b1780;
+  color: white;
+}
+
+.profile-bio-box {
+  margin-top: 15px;
+  border: 2px solid white;
+  padding: 10px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.profile-details h4 {
+  margin-top: 15px;
+  color: #e0caff;
+  font-size: 0.9rem;
+  border-bottom: 1px solid white;
+  padding-bottom: 5px;
+}
+
+.read-only-info p {
+  margin: 10px 0;
+  color: #f5f5f5;
+  font-size: 14px;
+}
+
+.job-entry {
+  margin-top: 10px;
+}
+
+ul {
+  padding-left: 20px;
+  font-size: 14px
+}

@@ -157,6 +157,78 @@ body {
   font-size: 0.9rem;
 }
 
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background-color: #5b1780;
+  color: white;
+  margin: 5% auto;
+  padding: 30px;
+  border: 2px solid white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-content label,
+.modal-content input,
+.modal-content button {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.modal-content input {
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+}
+
+.modal-content button {
+  background-color: white;
+  color: #5b1780;
+  font-weight: bold;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-content h2,
+.modal-content h4 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.register-admin p a {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.register-admin p a:hover {
+  text-decoration: none;
+}
+
 /* Media Queries */
 @media (max-width: 425px) {
   .form-group {

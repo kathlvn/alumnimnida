@@ -1,10 +1,9 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Alumni Tracking and Engagement Management System</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
@@ -37,10 +36,52 @@
       </div>
 
       <div class="register-admin">
-        <p><a href="{% url 'admin_register' %}">REGISTER AS AN ADMIN</a></p>
+        <p><a id="openModal">REGISTER AS AN ADMIN</a></p>
       </div>
     </form>
   </div>
+
+  <!-- Modal -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>Register as an Admin</h2>
+      <form method="POST" action="{% url 'admin_register' %}">
+        {% csrf_token %}
+        <label>Full Name:</label>
+        <input type="text" name="full_name" required>
+
+        <label>New Username:</label>
+        <input type="text" name="username" required>
+
+        <label>New Password:</label>
+        <input type="password" name="password" required>
+
+        <label>Confirm Password:</label>
+        <input type="password" name="confirm_password" required>
+
+        <h4>Verify Existing Admin</h4>
+
+        <label>Existing Admin Username:</label>
+        <input type="text" name="verifier_username" required>
+
+        <label>Existing Admin Password:</label>
+        <input type="password" name="verifier_password" required>
+
+        <button type="submit">Create Admin</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById("adminModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.getElementById("closeModal");
+
+    openBtn.onclick = () => modal.style.display = "block";
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+  </script>
 
 </body>
 </html>

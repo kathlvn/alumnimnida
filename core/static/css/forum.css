@@ -1,7 +1,7 @@
 
 .create-btn {
-  background-color: #e0caff;
-  color: #2e003e;
+  background-color: white;
+  color: #5b1780;
   border: none;
   padding: 12px 20px;
   border-radius: 25px;
@@ -14,8 +14,8 @@
 }
 
 .create-btn:hover {
-  background-color: #f4d7ff;
-  color: #000;
+  background-color: #5b1780;
+  color: white++;
 }
 
 /* ===== Content Sections ===== */
@@ -88,8 +88,8 @@
 
 .send-btn {
     margin-top: 0.5rem;
-    background-color: #27ae60;
-    color: #fff;
+    background-color: white;
+    color: #5b1780;
     border: none;
     padding: 0.4rem 0.9rem;
     border-radius: 6px;
@@ -97,12 +97,12 @@
 }
 
 .send-btn:hover {
-    background-color: #219653;
+    background-color: #5b1780;
+    color: white;
 }
 
 /* Trending Posts */
 .trending-posts {
-    background-color: #fff;
     padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -111,7 +111,7 @@
 .trending-posts h3 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: #2d3436;
+    color: white;
 }
 
 .trending-posts ul {
@@ -124,7 +124,7 @@
 }
 
 .trending-posts a {
-    color: #0984e3;
+    color: #b776da;
     text-decoration: none;
 }
 

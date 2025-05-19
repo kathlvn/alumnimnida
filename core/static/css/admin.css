@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #5b1780, #000000);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 20px 25px;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(255, 255, 255, 0.15);
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.btn-outline,
+.btn-outline-success,
+.btn-primary {
+  display: inline-block;
+  text-align: center;
+  padding: 8px 14px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-outline {
+  color: white;
+  border: 1px solid white;
+}
+
+.btn-outline:hover {
+  background-color: white;
+  color: #5b1780;
+}
+
+.btn-outline-success {
+  color: white;
+  border: 1px solid white;
+}
+
+.btn-outline-success:hover {
+  background-color: white;
+  color: #1c7e4f;
+}
+
+.btn-primary {
+  background-color: white;
+  color: #5b1780;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #e0b9ff;
+  color: #3c1059;
+}
+
+canvas {
+  margin-top: 10px;
+}

@@ -33,29 +33,18 @@
 }
 
 
-/* ==== Search Bar (Header) ==== */
-.global-header .search-bar {
-  padding: 10px 15px;
-  border-radius: 25px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  width: 250px;
-}
-
 
 /* ==== Right Panel: Timeline Style ==== */
 .quick-stats {
-  background-color: #fff;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  margin-top: 20px;
 }
 
 .timeline-title {
   font-size: 20px;
   margin-bottom: 15px;
-  color: #2e003e;
+  color: white;
   font-weight: 600;
 }
 
@@ -67,19 +56,19 @@
 .quick-stats li {
   margin-bottom: 10px;
   font-size: 15px;
-  color: #2d3436;
+  color: white;
 }
 
 .quick-stats li strong {
-  color: #6c5ce7;
+  color: white;
 }
 
 
 /* ==== Utility Classes ==== */
 .content-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 30px;
+  align-items: flex-start;
+  gap: 25px;
 }
 
 .updates-section {

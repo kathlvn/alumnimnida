@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Updates - Alumni System{% endblock %}
-
-{% block page_title %}UPDATES{% endblock %}
+{% block title %}Updates{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/updates.css' %}">
 {% endblock %}
+
+{% block page_title %}UPDATES{% endblock %}
 
 {% block content %}
   <div class="content-wrapper">
@@ -25,6 +25,7 @@
         <p>No updates available.</p>
       {% endfor %}
     </div>
+  </div>
 {% endblock %}
 
 {% block right_panel %}

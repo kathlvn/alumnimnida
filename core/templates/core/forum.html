@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_title %}Forum{% endblock %}
+{% block page_title %}FORUM{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum.css' %}">
@@ -12,11 +12,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="forum-header">
-  <h1>FORUM</h1>
-  <input type="text" class="search-bar" placeholder="Search...">
-</div>
-
 <!-- Create Post Button -->
 <button class="create-btn" onclick="openModal()">CREATE A POST</button>
 

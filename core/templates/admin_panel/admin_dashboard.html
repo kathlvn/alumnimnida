@@ -1,68 +1,110 @@
-{% extends 'base.html' %}
 {% load static %}
-{% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4">Admin Dashboard</h2>
-  <div class="row row-cols-1 row-cols-md-2 g-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome back, Admin!</h2>
 
-    <!-- Admin Profile Card -->
-    <div class="col">
-      <div class="card h-100 text-center">
+    <div class="dashboard-grid">
+      <!-- Profile Card -->
+      <div class="card">
+        <div class="card-body center-text">
+          <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" alt="Profile Picture"
+               class="profile-picture">
+          <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+          <p>Username: {{ user.username }}</p>
+          <p class="muted">Administrator</p>
+          <a href="{% url 'admin_profile' %}" class="btn-outline">View Profile</a>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div class="card">
         <div class="card-body">
-          <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
-               alt="Profile Picture"
-               class="rounded-circle mb-3"
-               style="width: 100px; height: 100px; object-fit: cover;">
+          <h5>Manage Users</h5>
+          <p>Create, edit, and delete users.</p>
+          <div class="button-group">
+            <a href="{% url 'admin_user_create' %}" class="btn-outline-success">+ Add</a>
+            <a href="{% url 'admin_user_list' %}" class="btn-primary">Manage Users</a>
+          </div>
+        </div>
+      </div>
 
-          <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
-          <p class="card-text">Username: {{ user.username }}</p>
-          <p class="text-muted">Administrator</p>
-          <a href="{% url 'admin_profile' %}" class="btn btn-outline-primary">View Profile</a>
+      <!-- Events -->
+      <div class="card">
+        <div class="card-body">
+          <h5>Manage Events</h5>
+          <p>Create, edit, and delete events.</p>
+          <div class="button-group">
+            <a href="{% url 'admin_event_create' %}" class="btn-outline-success">+ Add</a>
+            <a href="{% url 'admin_event_list' %}" class="btn-primary">Manage Events</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Updates -->
+      <div class="card">
+        <div class="card-body">
+          <h5>Manage Updates</h5>
+          <p>Create, edit, and delete updates.</p>
+          <div class="button-group">
+            <a href="{% url 'admin_updates_create' %}" class="btn-outline-success">+ Add</a>
+            <a href="{% url 'admin_updates_list' %}" class="btn-primary">Manage Updates</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forum -->
+      <div class="card">
+        <div class="card-body">
+          <h5>Manage Forum</h5>
+          <p>Post to forum and delete posts.</p>
+          <div class="button-group">
+            <a href="{% url 'admin_forum_list' %}" class="btn-primary">Manage Posts</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card">
+        <div class="card-body center-text">
+          <h5>Alumni Distribution</h5>
+          <canvas id="alumniPieChart" width="300" height="300"></canvas>
         </div>
       </div>
     </div>
-
-    <!-- Existing Cards -->
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Manage Users</h5>
-          <p class="card-text">Add, update, or remove user accounts and batch upload students.</p>
-          <a href="{% url 'admin_user_list' %}" class="btn btn-primary">Go to Users</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Manage Events</h5>
-          <p class="card-text">Create and edit alumni events. Mark them as done when finished.</p>
-          <a href="{% url 'admin_event_list' %}" class="btn btn-primary">Go to Events</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Manage Updates</h5>
-          <p class="card-text">Post updates and announcements. Optionally link them to events.</p>
-          <a href="{% url 'admin_updates_list' %}" class="btn btn-primary">Go to Updates</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">Manage Forum</h5>
-          <p class="card-text">Read and delete user forum posts and view comments.</p>
-          <a href="{% url 'admin_forum_list' %}" class="btn btn-primary">Go to Forum</a>
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
-{% endblock %}
+
+  <!-- Chart.js only -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('alumniPieChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['IT Alumni', 'CS Alumni', 'ACT Alumni', 'EMC Alumni'],
+        datasets: [{
+          label: 'Alumni Breakdown',
+          data: [58.8, 23.5, 11.8, 5.9],
+          backgroundColor: ['#F4EAFE', '#B99DF3', '#D6AEF7', '#7E55CC'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

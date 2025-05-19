@@ -15,7 +15,7 @@
 <!-- Create Post Button -->
 <button class="create-btn" onclick="openModal()">CREATE A POST</button>
 
-<!-- Modal for creating a post -->
+{% comment %} <!-- Modal for creating a post -->
 <div id="postModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -28,7 +28,7 @@
       <button type="submit" class="attend-button">Publish</button>
     </form>
   </div>
-</div>
+</div> {% endcomment %}
 
 
 
@@ -125,3 +125,21 @@
   </div>
 </div>
 {% endblock %} {% endcomment %}
+
+{% block modal %}
+<!-- Modal for creating a post -->
+<div id="postModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Create Post</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="create_post" value="1">
+      <input type="text" name="title" placeholder="Title" class="modal-input" required><br>
+      <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input" required></textarea>
+      <button type="submit" class="attend-button">Publish</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

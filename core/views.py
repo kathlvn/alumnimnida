@@ -361,11 +361,23 @@ def admin_delete_post(request, post_id):
 @login_required
 def home(request):
     user = request.user
+    current_datetime = timezone.now()
     upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:5]
     recent_updates = Updates.objects.all().order_by('-date_posted')
     forum_posts_count = Forum.objects.filter(author=request.user)
     comments_count = Comment.objects.filter(user=user).count()
     events_attended_count = Attendance.objects.filter(user=user).count()
+    
+    attended = Attendance.objects.filter(
+        user=user,
+        event__date__lt=current_datetime.date()
+    ) | Attendance.objects.filter(
+        user=user,
+        event__date=current_datetime.date(),
+        event__time__lt=current_datetime.time()
+    )
+    
+    events_attended_count = attended.count()
 
     return render(request, 'core/home.html', {
         'user': user,
@@ -446,22 +458,42 @@ def login_view(request):
 @login_required
 def events_view(request):
     events = Event.objects.order_by('-created_at')
+    now = timezone.now()
 
     # Get Attendance entries for the logged-in user
-    attended_events = Attendance.objects.filter(user=request.user).select_related('event')
-    attended_event_ids = attended_events.values_list('event_id', flat=True)
+    attendance = Attendance.objects.filter(user=request.user).select_related('event')
+    
+    # Upcoming planned events
+    upcoming_events = [
+        entry.event for entry in attendance
+        if entry.event.date > now.date() or
+           (entry.event.date == now.date() and entry.event.time > now.time())
+    ]
+
+    # Past attended (based on marked events that have already occurred)
+    past_events = [
+        entry.event for entry in attendance
+        if entry.event.date < now.date() or
+           (entry.event.date == now.date() and entry.event.time <= now.time())
+    ]
 
     context = {
         'events': events,
-        'attended_event_ids': attended_event_ids,
-        'attended_events': [entry.event for entry in attended_events],  # for sidebar
-        'now': timezone.now(),
+        'planned_event_ids': [e.id for e in upcoming_events],
+        'upcoming_events': upcoming_events,
+        'now': now,
     }
     return render(request, 'core/events.html', context)
 
 @login_required
-def mark_attended(request, event_id):
+def mark_attending(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    now = timezone.now()
+
+    # Prevent marking if event is already in the past
+    if event.date < now.date() or (event.date == now.date() and event.time <= now.time()):
+        return redirect('events')
+
     Attendance.objects.get_or_create(user=request.user, event=event)
     return redirect('events')
 

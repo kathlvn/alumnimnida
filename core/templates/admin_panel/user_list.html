@@ -19,7 +19,7 @@
         {% endif %}
 
         <form method="get" action="{% url 'admin_user_list' %}" style="margin-bottom: 20px;">
-            <input type="text" name="q" value="{{ request.GET.q|default:'' }}">
+            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search users...">
             <button type="submit">Search</button>
         </form>
 

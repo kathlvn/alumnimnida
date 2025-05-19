@@ -445,7 +445,7 @@ def login_view(request):
 
 @login_required
 def events_view(request):
-    events = Event.objects.all()
+    events = Event.objects.order_by('-created_at')
 
     # Get Attendance entries for the logged-in user
     attended_events = Attendance.objects.filter(user=request.user).select_related('event')

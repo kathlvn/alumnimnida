@@ -1,0 +1,158 @@
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom right, #5b1780, #000000);
+    color: #ffffff;
+    margin: 0;
+    padding: 40px;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Headings */
+h1 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+/* Container Styling (optional if needed around content) */
+.container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(91, 23, 128, 0.3);
+}
+
+/* Form Styles */
+form {
+    margin-bottom: 25px;
+}
+
+form input[type="text"] {
+    padding: 12px;
+    width: 280px;
+    border-radius: 12px;
+    border: 1px solid #5b1780;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    margin-right: 12px;
+    transition: all 0.2s ease;
+}
+
+form input[type="text"]::placeholder {
+    color: #bbb;
+}
+
+form input[type="text"]:focus {
+    outline: none;
+    border-color: #7d2ed6;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+form button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background-color: #5b1780;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+form button:hover {
+    background-color: #7d2ed6;
+    transform: scale(1.03);
+}
+
+/* Add Event Button */
+.btn-success {
+    display: inline-block;
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #6d1fb5, #4e126d);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(91, 23, 128, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #7d2ed6, #5b1780);
+    box-shadow: 0 6px 16px rgba(91, 23, 128, 0.5);
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(91, 23, 128, 0.4);
+}
+
+table thead th {
+    background: rgba(91, 23, 128, 0.6);
+    color: #fff;
+    font-weight: 600;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+}
+
+table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+table td a {
+    color: #9ad6ff;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+table td a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Alerts (if messages are used) */
+.alert {
+    padding: 14px 22px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.08);
+    border-left: 5px solid #5b1780;
+}
+
+.alert-success {
+    background: rgba(39, 174, 96, 0.8);
+    color: white;
+}
+
+.alert-error {
+    background: rgba(192, 57, 43, 0.8);
+    color: white;
+}
+
+.alert-warning {
+    background: rgba(243, 156, 18, 0.85);
+    color: white;
+}

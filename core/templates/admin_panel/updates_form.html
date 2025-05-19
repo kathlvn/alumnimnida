@@ -1,27 +1,52 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>{{ is_edit|yesno:"Edit Update,Add New Update" }}</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ is_edit|yesno:"Edit Update,Add New Update" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/updates_form.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ is_edit|yesno:"Edit Update,Add New Update" }}</h1>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    
-    <div class="form-group mb-3">
-        <label for="id_title">Title</label>
-        {{ form.title }}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="form-group">
+                <label for="id_title">Title</label>
+                {{ form.title }}
+                {% for error in form.title.errors %}
+                    <div class="errorlist">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_content">Content</label>
+                {{ form.content }}
+                {% for error in form.content.errors %}
+                    <div class="errorlist">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_related_event">Related Event (optional)</label>
+                {{ form.related_event }}
+                {% for error in form.related_event.errors %}
+                    <div class="errorlist">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="button-group">
+                <button type="submit">
+                    {{ is_edit|yesno:"Update,Create" }}
+                </button>
+                <a href="{% url 'admin_updates_list' %}" class="cancel-link">Cancel</a>
+            </div>
+        </form>
     </div>
-
-    <div class="form-group mb-3">
-        <label for="id_content">Content</label>
-        {{ form.content }}
-    </div>
-
-    <div class="form-group mb-3">
-        <label for="id_related_event">Related Event (optional)</label>
-        {{ form.related_event }}
-    </div>
-
-    <button type="submit" class="btn btn-success">{{ is_edit|yesno:"Update,Create" }}</button>
-    <a href="{% url 'admin_updates_list' %}" class="btn btn-secondary">Cancel</a>
-</form>
-{% endblock %}
+</body>
+</html>

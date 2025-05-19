@@ -1,47 +1,63 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>Manage Updates</h2>
+{% load static %}
 
-<form method="get" class="mb-3 d-flex" role="search">
-    <input type="text" name="q" value="{{ query }}" class="form-control me-2" placeholder="Search updates...">
-    <button type="submit" class="btn btn-outline-primary">Search</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Updates</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/updates_list.css' %}">
+</head>
+<body class="p-4 bg-light text-dark">
+    <div class="container">
+        <h1 class="mb-4">Manage Updates</h1>
 
-<a href="{% url 'admin_updates_create' %}" class="btn btn-primary mb-3">Add New Update</a>
+        <form method="get" class="mb-3 d-flex" role="search">
+            <input type="text" name="q" value="{{ query }}" class="form-control me-2">
+            <button type="submit" class="btn btn-outline-primary">Search</button>
+        </form>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Content</th>
-            <th>Related Event</th>
-            <th>Date Posted</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for update in updates %}
-        <tr>
-            <td>{{ update.title }}</td>
-            <td>{{ update.content|truncatewords:20 }}</td>
-            <td>{% if update.related_event %}
-                    {{ update.related_event.title }}
-                {% else %}
-                    No related event
-                {% endif %}
-            </td>
-            <td>{{ update.date_posted|date:"Y-m-d H:i" }}</td>
-            <td>
-                <a href="{% url 'admin_updates_edit' update.id %}" class="btn btn-sm btn-warning">Edit</a>
-                <a href="{% url 'admin_updates_delete' update.id %}" class="btn btn-sm btn-danger" 
-                   onclick="return confirm('Are you sure you want to delete this update?');">Delete</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5">No updates available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+        <a href="{% url 'admin_updates_create' %}" class="btn btn-primary mb-3">Add New Update</a>
+
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Related Event</th>
+                    <th>Date Posted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for update in updates %}
+                <tr>
+                    <td>{{ update.title }}</td>
+                    <td>{{ update.content|truncatewords:20 }}</td>
+                    <td>
+                        {% if update.related_event %}
+                            {{ update.related_event.title }}
+                        {% else %}
+                            <em>No related event</em>
+                        {% endif %}
+                    </td>
+                    <td>{{ update.date_posted|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'admin_updates_edit' update.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'admin_updates_delete' update.id %}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('Are you sure you want to delete this update?');">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No updates available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

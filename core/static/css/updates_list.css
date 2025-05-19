@@ -1,0 +1,165 @@
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom right, #5b1780, #000000);
+    color: #ffffff;
+    margin: 0;
+    padding: 30px;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Headings */
+h1 {
+    color: #ffffff;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+/* Card container (main box) */
+.container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(91, 23, 128, 0.3);
+}
+
+form[role="search"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+    max-width: 600px;
+}
+
+form[role="search"] input[type="text"] {
+    flex: 1;
+    max-width: 280px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #5b1780;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+
+form[role="search"] input[type="text"]::placeholder {
+    color: #bbb;
+}
+
+form[role="search"] input[type="text"]:focus {
+    outline: none;
+    border-color: #7d2ed6;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+form[role="search"] button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background-color: #5b1780;
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+form[role="search"] button:hover {
+    background-color: #7d2ed6;
+    transform: scale(1.03);
+}
+
+/* Add New Update Button */
+a.btn-primary {
+    display: inline-block;
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #6d1fb5, #4e126d);
+    border: none;
+    color: white;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(91, 23, 128, 0.4);
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+}
+
+a.btn-primary:hover {
+    background: linear-gradient(135deg, #7d2ed6, #5b1780);
+    box-shadow: 0 6px 16px rgba(91, 23, 128, 0.5);
+}
+
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(91, 23, 128, 0.4);
+}
+
+thead th {
+    background: rgba(91, 23, 128, 0.6);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 14px 16px;
+    text-align: left;
+}
+
+tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Button group in table */
+td .btn-sm {
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    border: none;
+    transition: all 0.3s ease;
+    margin-right: 6px;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #5b1780, #6d1fb5);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: white;
+    color: #5b1780;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #5b1780, #6d1fb5);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: white;
+    color: #5b1780;
+}
+
+td .btn-sm:hover {
+    transform: scale(1.05);
+}
+
+/* Empty row styling */
+.table .text-muted {
+    color: #aaa !important;
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+}

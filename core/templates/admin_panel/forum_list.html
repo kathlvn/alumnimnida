@@ -1,40 +1,54 @@
-{% extends 'base.html' %}
-{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel: Forum Posts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/forum_list.css' %}">
+</head>
+<body>
 
-<h2>Forum Posts</h2>
+<div class="container">
+    <h1>Forum Posts</h1>
 
-<form method="get" style="margin-bottom: 20px;">
-    <input type="text" name="q" placeholder="Search posts or authors" value="{{ query }}" />
-    <button type="submit">Search</button>
-</form>
-
-{% for post in posts %}
-<div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
-    <strong>{{ post.author.get_full_name }}</strong> |
-    {{ post.date_posted|date:"M d, Y H:i" }}
-    <p>{{ post.title }}</p>
-    <p>{{ post.content }}</p>
-
-    <form method="post" action="{% url 'admin_delete_post' post.id %}" onsubmit="return confirm('Are you sure you want to delete this post? This cannot be undone.');" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" style="color:red;">Delete</button>
+    <form method="get" style="margin-bottom: 30px;">
+        <input type="text" name="q" placeholder="Search posts or authors" value="{{ query }}" />
+        <button type="submit">Search</button>
     </form>
 
-    <div style="margin-top:10px; padding-left: 15px;">
-        <strong>Comments:</strong>
-        {% for comment in post.comments.all %}
-            <div style="margin-top: 5px; border-left: 2px solid #ccc; padding-left: 10px;">
-                <small><strong>{{ comment.user.get_full_name }}</strong> |
-                {{ comment.date_posted|date:"M d, Y H:i" }}</small>
-                <p>{{ comment.content }}</p>
-            </div>
-        {% empty %}
-            <p><i>No comments yet.</i></p>
-        {% endfor %}
-    </div>
-</div>
-{% empty %}
-<p>No forum posts available.</p>
-{% endfor %}
+    {% for post in posts %}
+    <div class="post">
+        <strong>{{ post.author.get_full_name }}</strong> |
+        {{ post.date_posted|date:"M d, Y H:i" }}
 
-{% endblock %}
+        <p><strong>{{ post.title }}</strong></p>
+        <p>{{ post.content }}</p>
+
+        <form method="post" action="{% url 'admin_delete_post' post.id %}"
+              onsubmit="return confirm('Are you sure you want to delete this post? This cannot be undone.');">
+            {% csrf_token %}
+            <button type="submit" class="delete-button">🗑 Delete</button>
+        </form>
+
+        <div class="comments">
+            <strong>Comments:</strong>
+            {% for comment in post.comments.all %}
+                <div class="comment">
+                    <small><strong>{{ comment.user.get_full_name }}</strong> |
+                    {{ comment.date_posted|date:"M d, Y H:i" }}</small>
+                    <p>{{ comment.content }}</p>
+                </div>
+            {% empty %}
+                <p><i>No comments yet.</i></p>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+    <p>No forum posts available.</p>
+    {% endfor %}
+</div>
+
+</body>
+</html>

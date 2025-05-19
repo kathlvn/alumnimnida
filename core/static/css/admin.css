@@ -1,9 +1,13 @@
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #5b1780, #000000);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top left, #5b1780, #000000);
   color: white;
 }
 
@@ -13,29 +17,44 @@ body {
   padding: 40px 20px;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 40px;
+.welcome-heading {
+  text-align: left;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
 }
 
+/* Card Styles */
 .card {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
-  padding: 20px 25px;
-  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+  padding: 25px;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(255, 255, 255, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.15);
+}
+
+.card h5 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.card p {
+  font-size: 0.95rem;
+  color: #e0d7f7;
+  margin: 0;
 }
 
 .card-body {
@@ -49,36 +68,39 @@ h2 {
 }
 
 .profile-picture {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   object-fit: cover;
   border-radius: 50%;
   margin: 0 auto 10px auto;
+  border: 2px solid white;
 }
 
+/* Button Styles */
 .button-group {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: wrap;
   margin-top: 10px;
 }
 
 .btn-outline,
 .btn-outline-success,
 .btn-primary {
-  display: inline-block;
+  display: block;
   text-align: center;
-  padding: 8px 14px;
-  font-weight: bold;
-  border-radius: 10px;
-  cursor: pointer;
+  padding: 10px 0;
+  font-weight: 700;
+  border-radius: 50px;
   text-decoration: none;
   transition: all 0.3s ease;
+  font-size: 0.95rem;
 }
 
 .btn-outline {
+  background: transparent;
   color: white;
-  border: 1px solid white;
+  border: 2px solid white;
 }
 
 .btn-outline:hover {
@@ -87,8 +109,9 @@ h2 {
 }
 
 .btn-outline-success {
+  background: transparent;
   color: white;
-  border: 1px solid white;
+  border: 2px solid white;
 }
 
 .btn-outline-success:hover {
@@ -103,10 +126,21 @@ h2 {
 }
 
 .btn-primary:hover {
-  background-color: #e0b9ff;
+  background-color: #e0c4ff;
   color: #3c1059;
 }
 
+/* Chart Canvas */
 canvas {
-  margin-top: 10px;
+  margin-top: 15px;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Adjust heading inside card */
+.card-body h5 {
+  text-align: center;
 }

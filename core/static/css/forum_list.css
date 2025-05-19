@@ -1,0 +1,132 @@
+/* General layout */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom right, #5b1780, #000000);
+    color: #ffffff;
+    margin: 0;
+    padding: 30px;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1 {
+    color: #ffffff;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+/* Container wrapping all content */
+.container {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(91, 23, 128, 0.3);
+}
+
+/* Search bar */
+form[method="get"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+    max-width: 600px;
+}
+
+form[method="get"] input[type="text"] {
+    flex: 1;
+    max-width: 280px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #5b1780;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+form[method="get"] input[type="text"]::placeholder {
+    color: #bbb;
+}
+
+form[method="get"] input[type="text"]:focus {
+    outline: none;
+    border-color: #7d2ed6;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+form[method="get"] button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background-color: #5b1780;
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+form[method="get"] button:hover {
+    background-color: #7d2ed6;
+    transform: scale(1.03);
+}
+
+/* Forum post card */
+.post {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 20px rgba(91, 23, 128, 0.3);
+}
+
+.post p {
+    margin: 10px 0;
+}
+
+/* Delete button */
+.delete-button {
+    background: transparent;
+    color: #ff4c4c;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 8px 0;
+    margin-top: 10px;
+    transition: color 0.3s ease;
+}
+
+.delete-button:hover {
+    color: #ff7f7f;
+}
+
+/* Comments */
+.comments {
+    margin-top: 20px;
+    padding-left: 15px;
+}
+
+.comments strong {
+    font-size: 16px;
+}
+
+.comment {
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    padding-left: 12px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+.comment small {
+    display: block;
+    margin-bottom: 6px;
+    color: #aaa;
+}
+
+/* Empty message */
+p i {
+    color: #aaa;
+    font-style: italic;
+}

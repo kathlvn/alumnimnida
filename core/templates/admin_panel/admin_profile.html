@@ -1,5 +1,10 @@
-{% extends 'base.html' %}
+
 {% load static %}
+
+{% block extra_css%}
+<link rel="stylesheet" href="{% static 'css/admin_profile.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4 text-center">

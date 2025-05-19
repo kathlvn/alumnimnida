@@ -364,7 +364,7 @@ def home(request):
     current_datetime = timezone.now()
     upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:5]
     recent_updates = Updates.objects.all().order_by('-date_posted')
-    forum_posts_count = Forum.objects.filter(author=request.user)
+    forum_posts_count = Forum.objects.filter(author=request.user).count()
     comments_count = Comment.objects.filter(user=user).count()
     events_attended_count = Attendance.objects.filter(user=user).count()
     

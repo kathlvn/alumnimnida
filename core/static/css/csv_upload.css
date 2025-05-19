@@ -1,149 +1,186 @@
-/* ========== Reset & Base Setup ========== */
+/* Reset & Base */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
-    height: 100%;
-    font-family: 'Poppins', sans-serif;
-    background: radial-gradient(circle at center, #5b1780, #000000);
-    color: white;
-    overflow-x: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+  height: 100%;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at center, #5b1780, #000000);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  overflow-x: hidden;
 }
 
-/* ========== Container Styling ========== */
+/* Container */
 .container {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 30px 40px;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.07);
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* ========== Header ========== */
-h2 {
-    text-align: center;
-    font-size: 26px;
-    margin-bottom: 25px;
-    font-weight: 600;
+.container h2 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
 }
 
-/* ========== Alerts ========== */
+/* Alert Messages */
 .alert {
-    padding: 12px 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .alert-success {
-    background-color: rgba(40, 167, 69, 0.15);
-    border: 1px solid rgba(40, 167, 69, 0.4);
-    color: #d4f7dc;
+  background-color: rgba(72, 201, 176, 0.2);
+  color: #48c9b0;
 }
 
-.alert-error, .alert-danger {
-    background-color: rgba(220, 53, 69, 0.15);
-    border: 1px solid rgba(220, 53, 69, 0.4);
-    color: #f7c5c5;
+.alert-error,
+.alert-danger {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
 }
 
-/* ========== Form Group & Inputs ========== */
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .form-group {
-    margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
 }
 
 label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 15px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
-.form-control-file {
-    width: 100%;
-    padding: 12px 15px;
-    background-color: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    color: white;
-    font-size: 15px;
-    outline: none;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+input[type="file"] {
+  font-size: 14px;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
 }
 
-.form-control-file:focus {
-    background-color: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.3);
+input[type="file"]::file-selector-button {
+  background-color: rgba(255, 255, 255, 0.25);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
 }
 
-/* ========== Buttons ========== */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-block;
-    margin-right: 10px;
+input[type="file"]::file-selector-button:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.button-row {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.button-row .btn {
+  flex: none; /* prevent growing */
+}
+
+/* Buttons */
+button,
+a.btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
 }
 
 .btn-success {
-    background-color: rgba(40, 167, 69, 0.2);
-    color: #b9f5c4;
-    border: 1px solid rgba(40, 167, 69, 0.4);
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
 }
 
 .btn-success:hover {
-    background-color: rgba(40, 167, 69, 0.3);
-    transform: scale(1.05);
+  background-color: rgba(46, 204, 113, 0.4);
 }
 
 .btn-secondary {
-    background-color: rgba(108, 117, 125, 0.2);
-    color: #e3e3e3;
-    border: 1px solid rgba(108, 117, 125, 0.4);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  margin-left: 10px;
 }
 
 .btn-secondary:hover {
-    background-color: rgba(108, 117, 125, 0.3);
-    transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
-/* ========== Divider ========== */
+/* CSV Format Box */
 hr {
-    border: none;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.2);
-    margin: 30px 0;
+  margin: 30px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ========== CSV Format ========== */
 h5 {
-    font-size: 16px;
-    margin-bottom: 10px;
-    font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-weight: 500;
 }
 
 pre {
-    background-color: rgba(255, 255, 255, 0.08);
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 14px;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  button,
+  a.btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .btn-secondary {
+    margin-left: 0;
+  }
 }

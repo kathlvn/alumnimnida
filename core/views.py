@@ -30,6 +30,7 @@ from .forms import (
 from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.timezone import now
 
 
 

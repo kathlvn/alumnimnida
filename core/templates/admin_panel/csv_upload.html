@@ -25,8 +25,12 @@
                 <label for="csv_file">Upload CSV File:</label>
                 <input type="file" name="csv_file" accept=".csv" required class="form-control-file">
             </div>
-            <button type="submit" class="btn btn-success">Upload</button>
-            <a href="{% url 'admin_user_list' %}" class="btn btn-secondary">Back to Users</a>
+
+        <!-- Button row starts here -->
+            <div class="button-row">
+                <button type="submit" class="btn btn-success">Upload</button>
+                <a href="{% url 'admin_user_list' %}" class="btn btn-secondary">Back to Users</a>
+            </div>
         </form>
 
         <hr>

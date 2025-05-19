@@ -117,7 +117,6 @@ def admin_user_list(request):
     if query:
         users = users.filter(
             Q(full_name__icontains=query) |
-            Q(email__icontains=query) |
             Q(student_number__icontains=query) |
             Q(year_graduated__icontains=query) |
             Q(degree__icontains=query)
@@ -197,9 +196,9 @@ def admin_user_edit(request, user_id):
 @user_passes_test(is_admin)
 def admin_user_delete(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    user.is_active = False
-    user.save()
-    messages.success(request, f"{user.get_full_name or user.username} has been deactivated.")
+    user_name = user.full_name or user.username
+    user.delete()
+    messages.success(request, f"{user_name} has been deactivated.")
     return redirect('admin_user_list')
 
 @login_required
@@ -209,7 +208,7 @@ def admin_user_reset_password(request, user_id):
     new_password = user.student_number or user.username
     user.set_password(new_password)
     user.save()
-    messages.success(request, f"Password for {user.get_full_name or user.username} has been reset to: {new_password}")
+    messages.success(request, f"Password for {user.full_name or user.username} has been reset to: {new_password}")
     return redirect('admin_user_list')
 
 
@@ -226,7 +225,8 @@ def admin_event_list(request):
         events = events.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(datetime__icontains=query) |
+            Q(date__icontains=query) |
+            Q(date__icontains=query) |
             Q(location__icontains=query)
         )  
 
@@ -365,7 +365,7 @@ def home(request):
     current_datetime = timezone.now()
     upcoming_events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:5]
     recent_updates = Updates.objects.all().order_by('-date_posted')
-    forum_posts_count = Forum.objects.filter(author=request.user)
+    forum_posts_count = Forum.objects.filter(author=request.user).count()
     comments_count = Comment.objects.filter(user=user).count()
     events_attended_count = Attendance.objects.filter(user=user).count()
     

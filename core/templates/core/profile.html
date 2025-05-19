@@ -20,9 +20,8 @@
                     <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture">
                 {% endif %}
             </div>
-            <h3 class="profile-name">{{ full_name }}</h3>
+            <h3 class="profile-name">{{ user.full_name }}</h3>
             <p class="profile-class">Class of {{ user.year_graduated }}</p>
-            <p class="profile-work">Works at {{ user.job_entries.first.company_name|default:"Not specified" }}</p>
 
             {% if not can_edit %}
                 <a href="{% url 'profile' %}?edit=1" class="btn-edit-profile">Edit Profile</a>
@@ -70,16 +69,11 @@
                 </form>
             {% else %}
                 <div class="read-only-info">
-                    <p><strong>Name:</strong> {{ full_name }}</p>
+                    <p><strong>Name:</strong> {{ user.full_name }}</p>
                     <p><strong>Student Number:</strong> {{ user.student_number }}</p>
-                    <p><strong>Birthday:</strong> {{ user.birthday }}</p>
                     <p><strong>Address:</strong> {{ user.address }}</p>
-                    <p><strong>Current Address:</strong> {{ user.curr_location }}</p>
                     <p><strong>Degree:</strong> {{ user.get_degree_display }}</p>
-                    <p><strong>Year Attended:</strong> {{ user.year_attended }}</p>
                     <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
-                    <p><strong>Contact:</strong> {{ user.contact }}</p>
-                    <p><strong>Email:</strong> {{ user.email }}</p>
                     <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
                     <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
 

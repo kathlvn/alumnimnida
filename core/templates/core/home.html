@@ -27,7 +27,7 @@
     <!-- Main Content -->
     <div class="main-content">
       <div class="forum-header">
-        <h1>Welcome back, {{ user.first_name }}!</h1>
+        <h1>Welcome back, {{ user.full_name }}!</h1>
         <input type="text" class="search-bar" placeholder="Search...">
       </div>
 
@@ -69,23 +69,23 @@
     <div class="edit-profile">
       <div style="text-align: center; margin-bottom: 20px;">
         <img src="{% static 'img/user_icon.png' %}" alt="Profile" style="width: 60px;">
-        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
-<em>Class of {{ user.graduation_year }}</em>
-<p style="text-align: center;">{{ user.occupation }}</p>
+        <h3>{{ user.full_name }}</h3>
+<em>Class of {{ user.year_graduated }}</em>
+{% comment %} <p style="text-align: center;">{{ user.occupation }}</p> {% endcomment %}
 <a href="{% url 'profile' %}">
   <button class="attend-button">Edit Profile</button>
 </a>
 
 <h3>Your Engagements</h3>
 
-<div class="info-row">
+{% comment %} <div class="info-row">
   <span class="label">Member since:</span>
   <span class="value">{{ user.date_joined|date:"F Y" }}</span>
-</div>
-<div class="info-row">
+</div> {% endcomment %}
+{% comment %} <div class="info-row">
   <span class="label">Batch:</span>
   <span class="value">{{ user.batch }}</span>
-</div>
+</div> {% endcomment %}
 <div class="info-row">
   <span class="label">Forum Posts:</span>
   <span class="value">{{ forum_posts_count }}</span>

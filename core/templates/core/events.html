@@ -34,13 +34,24 @@ EVENTS
         <p><strong>Time:</strong> {{ event.time }}</p>
         <p><strong>Location:</strong> {{ event.location }}</p>
 
-        {% if event.id in attended_event_ids %}
-          <p style="color: green;"><strong>Already Attended</strong></p>
-        {% else %}
-          <form method="post" action="{% url 'mark_attended' event.id %}">
+        {% if event.id in planned_event_ids %}
+          <p style="color: green;"><strong>Marked to Attend</strong></p>
+        {% elif event.date > now.date %}
+          <form method="post" action="{% url 'mark_attending' event.id %}">
             {% csrf_token %}
-            <button type="submit" class="attend-button">Mark as Attended</button>
+            <button type="submit" class="attend-button">I Will Attend</button>
           </form>
+        {% elif event.date == now.date %}
+          {% if event.time > now.time %}
+            <form method="post" action="{% url 'mark_attending' event.id %}">
+              {% csrf_token %}
+              <button type="submit" class="attend-button">I Will Attend</button>
+            </form>
+          {% else %}
+            <p style="color: gray;"><strong>This event has passed</strong></p>
+          {% endif %}
+        {% else %}
+          <p style="color: gray;"><strong>This event has passed</strong></p>
         {% endif %}
       </div>
     </div>
@@ -54,13 +65,15 @@ EVENTS
 {% block right_panel %}
 <!-- Events Attended Panel -->
 <div class="quick-stats">
-  <h3 class="timeline-title">Events Attended</h3>
+  <h3 class="timeline-title">Upcoming Events You Will Attend</h3>
   <ul>
-    {% for attended in attended_events %}
+    {% for upcoming in upcoming_events %}
     <li>
-      <strong>{{ attended.title }}</strong><br>
-      <em>{{ attended.date|date:"F d, Y" }}</em>
+      <strong>{{ upcoming.title }}</strong><br>
+      <em>{{ upcoming.date|date:"F d, Y" }}</em>
     </li>
+    {% empty %}
+    <li>No upcoming events marked.</li>
     {% endfor %}
   </ul>
 </div>

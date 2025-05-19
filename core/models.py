@@ -134,10 +134,8 @@ class Event(models.Model):
 class Attendance(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    attended_on = models.DateTimeField(auto_now_add=True)
+    marked_on = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user} attended {self.event.title}"
 
 
 class Updates(models.Model):

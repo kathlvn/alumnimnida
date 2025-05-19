@@ -116,7 +116,6 @@ def admin_user_list(request):
     if query:
         users = users.filter(
             Q(full_name__icontains=query) |
-            Q(email__icontains=query) |
             Q(student_number__icontains=query) |
             Q(year_graduated__icontains=query) |
             Q(degree__icontains=query)
@@ -225,7 +224,8 @@ def admin_event_list(request):
         events = events.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(datetime__icontains=query) |
+            Q(date__icontains=query) |
+            Q(date__icontains=query) |
             Q(location__icontains=query)
         )  
 

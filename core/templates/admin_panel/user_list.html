@@ -12,6 +12,7 @@
 
     <div class="container">
         <h1>Manage Users</h1>
+
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
@@ -23,10 +24,20 @@
             <button type="submit">Search</button>
         </form>
 
-        <p>
-            <a href="{% url 'admin_user_create' %}" class="btn btn-primary">➕ Add New User</a>
-            <a href="{% url 'admin_user_batch_upload' %}" class="btn btn-secondary">📁 Batch Upload via CSV</a>
-        </p>
+        <!-- Action buttons row -->
+        <div class="action-row">
+            <div class="left-actions">
+                <a href="{% url 'admin_user_create' %}" class="btn btn-primary">➕ Add New User</a>
+                <a href="{% url 'admin_user_batch_upload' %}" class="btn btn-secondary">📁 Batch Upload via CSV</a>
+            </div>
+            <div class="right-actions">
+                <a href="{% url 'admin_user_list' %}" class="icon-btn" title="Manage Users">👥</a>
+                <a href="{% url 'admin_event_list' %}" class="icon-btn" title="Manage Events">📅</a>
+                <a href="{% url 'admin_updates_list' %}" class="icon-btn" title="Manage Updates">📰</a>
+                <a href="{% url 'admin_forum_list' %}" class="icon-btn" title="Manage Forum">💬</a>
+                <a href="{% url 'admin_dashboard' %}" class="go-back-btn">⬅️ Go Back</a>
+            </div>
+        </div>
 
         <table>
             <thead>
@@ -69,5 +80,6 @@
             </tbody>
         </table>
     </div>
+
 </body>
 </html>

@@ -37,6 +37,50 @@ h1 {
   font-weight: 600;
 }
 
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.left-actions a,
+.right-actions a {
+    margin-right: 10px;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.left-actions .btn-primary {
+    background-color: #5b1780;
+    color: white;
+}
+
+.left-actions .btn-secondary {
+    background-color: #3d0f5a;
+    color: white;
+}
+
+.icon-btn,
+.go-back-btn {
+    background-color: #5b1780;
+    color: white;
+}
+
+.icon-btn:hover,
+.go-back-btn:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+    background-color: #2e0843;
+}
+
+
+
 /* Grid Form Layout */
 form {
   display: grid;

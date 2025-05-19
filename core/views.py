@@ -196,9 +196,9 @@ def admin_user_edit(request, user_id):
 @user_passes_test(is_admin)
 def admin_user_delete(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    user.is_active = False
-    user.save()
-    messages.success(request, f"{user.get_full_name or user.username} has been deactivated.")
+    user_name = user.full_name or user.username
+    user.delete()
+    messages.success(request, f"{user_name} has been deactivated.")
     return redirect('admin_user_list')
 
 @login_required
@@ -208,7 +208,7 @@ def admin_user_reset_password(request, user_id):
     new_password = user.student_number or user.username
     user.set_password(new_password)
     user.save()
-    messages.success(request, f"Password for {user.get_full_name or user.username} has been reset to: {new_password}")
+    messages.success(request, f"Password for {user.full_name or user.username} has been reset to: {new_password}")
     return redirect('admin_user_list')
 
 

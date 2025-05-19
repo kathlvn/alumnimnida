@@ -11,7 +11,7 @@
 <!-- Optional: Sidebar links or navs -->
 {% endblock %}
 
-{% block main %}
+{% block content %}
 <div class="forum-header">
   <h1>FORUM</h1>
   <input type="text" class="search-bar" placeholder="Search...">
@@ -19,6 +19,24 @@
 
 <!-- Create Post Button -->
 <button class="create-btn" onclick="openModal()">CREATE A POST</button>
+
+<!-- Modal for creating a post -->
+<div id="postModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Create Post</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="create_post" value="1">
+      <input type="text" name="title" placeholder="Title" class="modal-input" required><br>
+      <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input" required></textarea>
+      <button type="submit" class="attend-button">Publish</button>
+    </form>
+  </div>
+</div>
+
+
+
 
 <!-- Forum Posts -->
 {% for post in posts %}
@@ -80,7 +98,7 @@
 {% block extra_js %}
 <script>
   function openModal() {
-    document.getElementById('postModal').style.display = 'block';
+    document.getElementById('postModal').style.display = 'flex';
   }
 
   function closeModal() {
@@ -96,7 +114,7 @@
 </script>
 {% endblock %}
 
-{% block modal %}
+{% comment %} {% block modal %}
 <!-- Modal for creating a post -->
 <div id="postModal" class="modal" style="display:none;">
   <div class="modal-content">
@@ -111,4 +129,4 @@
     </form>
   </div>
 </div>
-{% endblock %}
+{% endblock %} {% endcomment %}

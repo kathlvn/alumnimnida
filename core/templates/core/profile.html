@@ -1,106 +1,105 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block page_title %}
+    MY PROFILE
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>My Profile</h2>
+<div class="profile-container">
+    <div class="profile-card-wrapper">
+        <div class="profile-overview">
+            <div class="profile-picture">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+                {% else %}
+                    <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture">
+                {% endif %}
+            </div>
+            <h3 class="profile-name">{{ full_name }}</h3>
+            <p class="profile-class">Class of {{ user.year_graduated }}</p>
+            <p class="profile-work">Works at {{ user.job_entries.first.company_name|default:"Not specified" }}</p>
 
-    <!-- Profile Picture Section (top of page) -->
-    <div class="text-center mb-4">
-        {% if user.profile_picture %}
-            <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="150">
-        {% else %}
-            <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture" class="rounded-circle" width="150">
-        {% endif %}
-    </div>
-
-    {% if can_edit %}
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <!-- Profile Picture Upload -->
-            <!-- <div class="mb-3">
-                <label for="id_profile_picture" class="form-label"><strong>Profile Picture</strong></label>
-                {{ form.profile_picture }}
-            </div> -->
-
-            <!-- Editable Fields -->
-            <h4 class="mt-3">Basic Info</h4>
-            {{ form.as_p }}
-
-            <h4 class="mt-4">Professional Background</h4>
-            {{ formset.management_form }}
-            {% for job_form in formset %}
-                <div class="border rounded p-3 mb-3 bg-light">
-                    {{ job_form.as_p }}
-                    {% if job_form.instance.pk %}
-                        <div>
-                            <label>Delete: {{ job_form.DELETE }}</label>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-
-            <h4 class="mt-4">Clubs / Organizations</h4>
-            {{ club_formset.management_form }}
-            {% for club_form in club_formset %}
-                <div class="border rounded p-3 mb-3 bg-light">
-                    {{ club_form.as_p }}
-                    {% if club_form.instance.pk %}
-                        <div>
-                            <label>Delete: {{ club_form.DELETE }}</label>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-
-            <button type="submit" class="btn btn-success mt-3">Save Changes</button>
-            <a href="{% url 'profile' %}" class="btn btn-secondary mt-3">Cancel</a>
-        </form>
-
-    {% else %}
-        <!-- Read-Only Profile -->
-        <div class="mt-3">
-            <p><strong>Name:</strong> {{ full_name }}</p>
-            <p><strong>Student Number:</strong> {{ user.student_number }}</p>
-            <p><strong>Birthday:</strong> {{ user.birthday }}</p>
-            <p><strong>Address:</strong> {{ user.address }}</p>
-            <p><strong>Current Address:</strong> {{ user.curr_location }}</p>
-            <p><strong>Degree:</strong> {{ user.get_degree_display }}</p>
-            <p><strong>Year Attended:</strong> {{ user.year_attended }}</p>
-            <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
-            <p><strong>Contact:</strong> {{ user.contact }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
-            <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
-
-            <h4 class="mt-4">Professional Background</h4>
-            {% for job in user.job_entries.all %}
-                <div class="border rounded p-3 mb-3">
-                    <strong>{{ job.job_title }}</strong><br>
-                    <small class="text-muted">
-                        {{ job.start_year }} -
-                        {% if job.is_current %}
-                            Present
-                        {% else %}
-                            Inactive
-                        {% endif %}
-                    </small>
-                </div>
-            {% empty %}
-                <p>No job entries available.</p>
-            {% endfor %}
-
-            <h4 class="mt-4">Clubs / Organizations</h4>
-            <ul>
-                {% for club in club_orgs %}
-                    <li>{{ club.org_name }}</li>
-                {% empty %}
-                    <li>No clubs or organizations listed.</li>
-                {% endfor %}
-            </ul>
+            {% if not can_edit %}
+                <a href="{% url 'profile' %}?edit=1" class="btn-edit-profile">Edit Profile</a>
+            {% endif %}
         </div>
 
-        <a href="{% url 'profile' %}?edit=1" class="btn btn-primary mt-3">Edit Profile</a>
-    {% endif %}
+        <div class="profile-details">
+            {% if can_edit %}
+                <form method="post" enctype="multipart/form-data" class="edit-form">
+                    {% csrf_token %}
+
+                    <h4>Basic Info</h4>
+                    {{ form.as_p }}
+
+                    <h4 class="mt-4">Professional Background</h4>
+                    {{ formset.management_form }}
+                    {% for job_form in formset %}
+                        <div class="form-section">
+                            {{ job_form.as_p }}
+                            {% if job_form.instance.pk %}
+                                <label>Delete: {{ job_form.DELETE }}</label>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <h4 class="mt-4">Clubs / Organizations</h4>
+                    {{ club_formset.management_form }}
+                    {% for club_form in club_formset %}
+                        <div class="form-section">
+                            {{ club_form.as_p }}
+                            {% if club_form.instance.pk %}
+                                <label>Delete: {{ club_form.DELETE }}</label>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn-save">Save Changes</button>
+                    <a href="{% url 'profile' %}" class="btn-cancel">Cancel</a>
+                </form>
+            {% else %}
+                <div class="read-only-info">
+                    <p><strong>Name:</strong> {{ full_name }}</p>
+                    <p><strong>Student Number:</strong> {{ user.student_number }}</p>
+                    <p><strong>Birthday:</strong> {{ user.birthday }}</p>
+                    <p><strong>Address:</strong> {{ user.address }}</p>
+                    <p><strong>Current Address:</strong> {{ user.curr_location }}</p>
+                    <p><strong>Degree:</strong> {{ user.get_degree_display }}</p>
+                    <p><strong>Year Attended:</strong> {{ user.year_attended }}</p>
+                    <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
+                    <p><strong>Contact:</strong> {{ user.contact }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
+                    <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
+
+                    <h4 class="mt-4">Professional Background</h4>
+                    {% for job in user.job_entries.all %}
+                        <div class="job-entry">
+                            <strong>{{ job.job_title }}</strong><br>
+                            <small>{{ job.start_year }} -
+                                {% if job.is_current %}Present{% else %}Inactive{% endif %}
+                            </small>
+                        </div>
+                    {% empty %}
+                        <p>No job entries available.</p>
+                    {% endfor %}
+
+                    <h4 class="mt-4">Clubs / Organizations</h4>
+                    <ul>
+                        {% for club in club_orgs %}
+                            <li>{{ club.org_name }}</li>
+                        {% empty %}
+                            <li>No clubs or organizations listed.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

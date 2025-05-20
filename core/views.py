@@ -1,6 +1,8 @@
 import json
 import csv
 from django.contrib import messages
+from django.utils.safestring import mark_safe
+from collections import Counter
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
@@ -85,7 +87,20 @@ def post_login_redirect(request):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    return render(request, 'admin_panel/admin_dashboard.html')
+    degrees = CustomUser.objects.values_list('degree', flat=True)
+    count = Counter(degrees)
+
+    course_data = {
+        "IT": count.get("IT", 0),
+        "CS": count.get("CS", 0),
+        "ACT": count.get("ACT", 0),
+        "EMC": count.get("EMC", 0)
+    }
+
+    return render(request, 'admin_panel/admin_dashboard.html', {
+        'course_data': course_data,
+        'user': request.user
+    })
 
 ## ADMIN USER
 

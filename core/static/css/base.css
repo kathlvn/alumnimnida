@@ -56,7 +56,7 @@ a {
 
 /* ===== Main content ===== */
 .main-content {
-  margin-left: 130px;   /* gintry ko la */
+  margin-left: 130px;
   flex: 2;
   padding: 30px;
   overflow-y: auto;

@@ -1,39 +1,32 @@
-/* ===== Base styles ===== */
-* {
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
 
-body {
-  margin: 0;
-  padding: 0;
-  background: radial-gradient(circle, #5b1780, #000000);
-  color: white;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
+/* Layout Containers */
 .container {
   display: flex;
   padding: 30px;
 }
 
-/* ===== Sidebar ===== */
+.main-content {
+  margin-left: 130px;
+  flex: 2;
+  padding: 30px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Sidebar */
 .sidebar {
-  margin-top: 40px;
-  margin-left: 30px;
+  position: fixed;
+  top: 40px;
+  left: 30px;
   width: 100px;
   background: rgba(255, 255, 255, 0.1);
   border: 3px solid white;
   border-radius: 30px;
   padding: 20px;
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
 }
 
 .sidebar nav a {
@@ -43,7 +36,6 @@ a {
 
 .sidebar nav img {
   max-width: 50px;
-  display: block;
   margin: 30px auto;
   transition: transform 0.3s ease;
   filter: drop-shadow(0 0 8px #f4d7ff);
@@ -53,24 +45,36 @@ a {
   transform: scale(1.2);
 }
 
-/* ===== Main content ===== */
-.main-content {
-  flex: 2;
-  padding: 30px;
-  overflow-y: auto;
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
 }
 
-.forum-header {
+.label, .value {
+  min-width: 100px;
+}
+
+/* Global Header */
+.global-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  padding: 25px 30px 10px;
 }
 
-.forum-header h1 {
+.page-title {
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
 }
 
 .search-bar {
@@ -81,129 +85,52 @@ a {
   color: white;
   border-radius: 20px;
   font-size: 14px;
+  transition: width 0.3s ease;
 }
 
-/* ===== Content Sections ===== */
-.forum-post {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
-  border-radius: 20px;
-  padding: 20px 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.search-bar:focus {
+  width: 300px;
+  outline: none;
 }
 
-.forum-post:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 25px rgba(235, 206, 241, 0.3);
-}
-
-.forum-post h3 {
-  font-size: 22px;
-  margin-bottom: 20px;
-  color: #ffffff;
-}
-
-.forum-post strong {
-  font-size: 16px;
-}
-
-.forum-post em {
-  font-size: 13px;
-  color: #ccc;
-}
-
-/* ===== User Profile (Right Panel) Improved Layout ===== */
-.edit-profile {
+/* Right Panel */
+.right-panel {
   width: 300px;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid white;
   border-radius: 20px;
   padding: 20px 25px;
   margin-left: 25px;
+  margin-top: 2%;
   box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
   color: white;
   font-size: 14px;
-  align-self: flex-start;
-  margin-top: 2%;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
-.edit-profile img {
-  width: 60px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.2));
-}
-
-.edit-profile h3 {
-  margin: 8px 0 5px;
-  font-size: 18px;
+.right-panel h2 {
+  font-size: 20px;
   font-weight: 600;
-  text-align: center;
-}
-
-.edit-profile em {
-  display: block;
-  font-size: 13px;
-  color: #ccc;
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.edit-profile .info-row {
-  display: flex;
-  justify-content: space-between;
-  margin: 6px 0;
-  font-size: 14px;
-}
-
-.edit-profile .info-row .label {
+  margin-bottom: 15px;
   color: #e0caff;
-  font-weight: 500;
 }
 
-.edit-profile .info-row .value {
-  color: white;
-  text-align: right;
-  max-width: 120px;
-}
-
-.edit-profile .attend-button {
-  display: block;
-  width: 100%;
-  margin-top: 15px;
-  padding: 10px;
+.right-panel p {
   font-size: 14px;
-  background-color: white;
-  color: #5b1780;
-  border: none;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  color: #f8f8f8;
+  margin-bottom: 10px;
 }
 
-.edit-profile .attend-button:hover {
-  background-color: #a34fff;
-  color: white;
-  transform: scale(1.03);
+.right-panel section {
+  margin-bottom: 20px;
 }
 
-
-
-/* ===== Scrollbar customization ===== */
-.main-content::-webkit-scrollbar,
-.edit-profile::-webkit-scrollbar {
+.right-panel::-webkit-scrollbar {
   width: 8px;
 }
 
-.main-content::-webkit-scrollbar-track,
-.edit-profile::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.main-content::-webkit-scrollbar-thumb,
-.edit-profile::-webkit-scrollbar-thumb {
+.right-panel::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }

@@ -96,6 +96,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def batch(self):
         return self.year_graduated
+    
+    degree = models.CharField(max_length=50, choices=[
+        ('IT', 'Information Technology'),
+        ('CS', 'Computer Science'),
+        ('ACT', 'Associate in Computer Technology'),
+        ('EMC', 'Entertainment and Multimedia Computing'),
+    ])
 
 
     

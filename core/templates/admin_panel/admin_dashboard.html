@@ -79,17 +79,23 @@
     </div>
   </div>
 
-  <!-- Chart.js only -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
+ <!-- Chart.js only -->
+{{ course_data|json_script:"course-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Wait until DOM is loaded before accessing elements
+  document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById('alumniPieChart').getContext('2d');
+    const chartData = JSON.parse(document.getElementById('course-data').textContent);
+
     new Chart(ctx, {
       type: 'pie',
       data: {
         labels: ['IT Alumni', 'CS Alumni', 'ACT Alumni', 'EMC Alumni'],
         datasets: [{
           label: 'Alumni Breakdown',
-          data: [58.8, 23.5, 11.8, 5.9],
+          data: [chartData.IT, chartData.CS, chartData.ACT, chartData.EMC],
           backgroundColor: ['#F4EAFE', '#B99DF3', '#D6AEF7', '#7E55CC'],
           borderWidth: 1
         }]
@@ -103,6 +109,8 @@
         }
       }
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>

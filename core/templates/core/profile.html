@@ -27,6 +27,10 @@
                 <a href="{% url 'profile' %}?edit=1" class="btn-edit-profile">Edit Profile</a>
             {% endif %}
 
+            <div class="change-password-link">
+                <a href="{% url 'change_password' %}" class="btn-change-password">Change Password</a>
+            </div>
+
             {% if user.bio %}
                 <div class="profile-bio-box">
                     <p>{{ user.bio }}</p>
@@ -76,6 +80,7 @@
                     <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
                     <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
                     <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
+
 
                     <h4 class="mt-4">Professional Background</h4>
                     {% for job in user.job_entries.all %}

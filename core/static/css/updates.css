@@ -64,24 +64,43 @@
 }
 
 
-/* ==== Utility Classes ==== */
-.content-wrapper {
-  display: flex;
-  align-items: flex-start;
-  gap: 25px;
-}
-
 .updates-section {
   width: 100%;
 }
 
-/* Responsive */
-@media screen and (max-width: 768px) {
-  .global-header .search-bar {
-    width: 100%;
-  }
 
-  .quick-stats {
-    margin-top: 40px;
-  }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
 }
+
+.modal-content {
+  background-color: #2a003f;
+  margin: 10% auto;
+  padding: 30px;
+  border: 2px solid white;
+  width: 60%;
+  color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: white;
+} 

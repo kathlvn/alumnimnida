@@ -72,6 +72,22 @@
   color: white;
 }
 
+.btn-change-password {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #5b1780;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-change-password:hover {
+    background-color: #3e105a;
+}
+
 .profile-bio-box {
   margin-top: 15px;
   border: 2px solid white;

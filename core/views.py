@@ -33,6 +33,7 @@ from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, Clu
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now
+from datetime import date
 
 
 
@@ -245,7 +246,7 @@ def admin_event_list(request):
             Q(location__icontains=query)
         )  
 
-    return render(request, 'admin_panel/event_list.html', {'events': events, query: query})
+    return render(request, 'admin_panel/event_list.html', {'events': events, query: query, 'today': date.today(),})
 
 @login_required
 @user_passes_test(is_admin)

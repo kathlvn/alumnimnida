@@ -97,13 +97,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def batch(self):
         return self.year_graduated
     
-    degree = models.CharField(max_length=50, choices=[
-        ('IT', 'Information Technology'),
-        ('CS', 'Computer Science'),
-        ('ACT', 'Associate in Computer Technology'),
-        ('EMC', 'Entertainment and Multimedia Computing'),
-    ])
-
 
     
 class ClubOrg(models.Model):
@@ -121,6 +114,26 @@ class JobEntry(models.Model):
 
     def __str__(self):
         return self.job_title
+    
+visibility_choices = [
+    ('public', 'Public'),
+    ('batch', 'By Batch'),
+    ('degree', 'By Degree'),
+    ('both', 'By Batch and Degree'),
+]
+
+class Degree(models.Model):
+    code = models.CharField(max_length=10, unique=True)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.name)
+
+class Batch(models.Model):
+    year = models.IntegerField(unique=True)
+
+    def __str__(self):
+        return str(self.year)
 
 
 class Event(models.Model):
@@ -133,6 +146,10 @@ class Event(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    visibility_type = models.CharField(max_length=20, choices=visibility_choices, default='public')
+    visibility_batches = models.ManyToManyField('Batch', blank=True)
+    visibility_degrees = models.ManyToManyField('Degree', blank=True)
     
     def __str__(self):
         return self.title
@@ -150,6 +167,10 @@ class Updates(models.Model):
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
     related_event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, blank=True)
+
+    visibility_type = models.CharField(max_length=20, choices=visibility_choices, default='public')
+    visibility_batches = models.ManyToManyField('Batch', blank=True)
+    visibility_degrees = models.ManyToManyField('Degree', blank=True)
 
     def __str__(self):
         return self.title

@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/updates_form.css' %}">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -40,13 +45,55 @@
                 {% endfor %}
             </div>
 
+            <!-- Visibility Section -->
+            <div class="form-group">
+                <label for="id_visibility_type">Visibility</label>
+                {{ form.visibility_type }}
+            </div>
+
+            <div class="form-group hidden" id="group-visibility_batches">
+                <label for="id_visibility_batches">Visible to Batches</label>
+                {{ form.visibility_batches }}
+            </div>
+
+            <div class="form-group hidden" id="group-visibility_degrees">
+                <label for="id_visibility_degrees">Visible to Degrees</label>
+                {{ form.visibility_degrees }}
+            </div>
+            <!-- End of Visibility Section -->
+
             <div class="button-group">
-                <button type="submit">
-                    {{ is_edit|yesno:"Update,Create" }}
-                </button>
+                <button type="submit">{{ is_edit|yesno:"Update,Create" }}</button>
                 <a href="{% url 'admin_updates_list' %}" class="cancel-link">Cancel</a>
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const visibilityField = document.getElementById('id_visibility_type');
+            const groupBatch = document.getElementById('group-visibility_batches');
+            const groupDegree = document.getElementById('group-visibility_degrees');
+
+            function updateVisibilityFields() {
+                const value = visibilityField.value;
+
+                groupBatch.classList.add('hidden');
+                groupDegree.classList.add('hidden');
+
+                if (value === 'batch') {
+                    groupBatch.classList.remove('hidden');
+                } else if (value === 'degree') {
+                    groupDegree.classList.remove('hidden');
+                } else if (value === 'both') {
+                    groupBatch.classList.remove('hidden');
+                    groupDegree.classList.remove('hidden');
+                }
+            }
+
+            updateVisibilityFields();
+            visibilityField.addEventListener('change', updateVisibilityFields);
+        });
+    </script>
 </body>
 </html>

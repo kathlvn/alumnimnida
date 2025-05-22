@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import CustomUser, JobEntry, ClubOrg, Event, Updates, Forum, Comment
+from .models import CustomUser, JobEntry, ClubOrg, Event, Updates, Forum, Comment, Batch, Degree
 
 class CustomUserCreationForm(forms.ModelForm):
     class Meta:
@@ -64,11 +64,36 @@ class AdminProfileForm(forms.ModelForm):
             user.save()
         
         return user
+    
+DEGREE_CHOICES = CustomUser._meta.get_field('degree').choices
+BATCH_CHOICES = CustomUser._meta.get_field('year_graduated').choices
+
+visibility_choices = [
+    ('public', 'Public'),
+    ('batch', 'By Batch'),
+    ('degree', 'By Degree'),
+    ('both', 'By Batch and Degree'),
+]
 
 class EventForm(forms.ModelForm):
+
+    visibility_type = forms.ChoiceField(choices=visibility_choices)
+
+    visibility_batches = forms.ModelMultipleChoiceField(
+        queryset=Batch.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    visibility_degrees = forms.ModelMultipleChoiceField(
+        queryset=Degree.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple
+    )    
+
     class Meta:
         model = Event
-        fields = ['title', 'description', 'date', 'time', 'location']
+        fields = ['title', 'description', 'date', 'time', 'location', 'visibility_type', 'visibility_degrees', 'visibility_batches']
         labels = {
             'date': 'Event Date',
             'time': 'Event Time',
@@ -78,14 +103,47 @@ class EventForm(forms.ModelForm):
             'time': forms.TimeInput(attrs={'type': 'time'}),
         }
 
+    def clean(self):
+        cleaned = super().clean()
+        vis = cleaned.get('visibility_type')
+        if vis == 'public':
+            cleaned['visibility_batches'] = []
+            cleaned['visibility_degrees'] = []
+        return cleaned
+
+    
+
         
 class UpdatesForm(forms.ModelForm):
+
+    visibility_type = forms.ChoiceField(choices=visibility_choices)
+
+    visibility_batches = forms.ModelMultipleChoiceField(
+        queryset=Batch.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    visibility_degrees = forms.ModelMultipleChoiceField(
+        queryset=Degree.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple
+    )    
+
     class Meta:
         model = Updates
-        fields = ['title', 'content', 'related_event']
+        fields = ['title', 'content', 'related_event', 'visibility_type','visibility_degrees', 'visibility_batches']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        vis = cleaned.get('visibility_type')
+        if vis == 'public':
+            cleaned['visibility_batches'] = []
+            cleaned['visibility_degrees'] = []
+        return cleaned
 
 class ForumPostForm(forms.ModelForm):
     class Meta:

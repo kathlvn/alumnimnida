@@ -8,6 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/event_form.css' %}">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,7 +22,15 @@
         <form method="post">
             {% csrf_token %}
             <table>
-                {{ form.as_table }}
+                {% for field in form %}
+                    <tr id="row-{{ field.name }}"
+                        {% if field.name == 'visibility_batches' or field.name == 'visibility_degrees' %}
+                            class="hidden"
+                        {% endif %}>
+                        <th>{{ field.label_tag }}</th>
+                        <td>{{ field }}</td>
+                    </tr>
+                {% endfor %}
             </table>
 
             <div class="button-group">
@@ -28,6 +41,37 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const visibilityField = document.getElementById('id_visibility_type');
+            const rowBatch = document.getElementById('row-visibility_batches');
+            const rowDegree = document.getElementById('row-visibility_degrees');
+
+            function updateVisibilityFields() {
+                const value = visibilityField.value;
+
+                // Hide both by default
+                rowBatch.classList.add('hidden');
+                rowDegree.classList.add('hidden');
+
+                if (value === 'batch') {
+                    rowBatch.classList.remove('hidden');
+                } else if (value === 'degree') {
+                    rowDegree.classList.remove('hidden');
+                } else if (value === 'both') {
+                    rowBatch.classList.remove('hidden');
+                    rowDegree.classList.remove('hidden');
+                }
+            }
+
+            // Initialize state
+            updateVisibilityFields();
+
+            // Listen for changes
+            visibilityField.addEventListener('change', updateVisibilityFields);
+        });
+    </script>
 
 </body>
 </html>

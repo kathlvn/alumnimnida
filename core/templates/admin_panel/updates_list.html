@@ -27,6 +27,7 @@
                     <th>Content</th>
                     <th>Related Event</th>
                     <th>Date Posted</th>
+                    <th>Visibility</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,6 +44,30 @@
                         {% endif %}
                     </td>
                     <td>{{ update.date_posted|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <strong>{{ update.get_visibility_type_display }}</strong><br>
+                        {% if update.visibility_type == "batch" or update.visibility_type == "batch_degree" %}
+                            <span>
+                                Batches:
+                                {% for batch in update.visibility_batches.all %}
+                                    {{ batch.year }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    None
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                        {% if update.visibility_type == "degree" or update.visibility_type == "batch_degree" %}
+                            <span>
+                                Degrees:
+                                {% for degree in update.visibility_degrees.all %}
+                                    {{ degree.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    None
+                                {% endfor %}
+                            </span>
+
+                        {% endif %}
+                    </td>
                     <td>
                         <a href="{% url 'admin_updates_edit' update.id %}" class="btn btn-sm btn-warning">Edit</a>
                         <a href="{% url 'admin_updates_delete' update.id %}" class="btn btn-sm btn-danger"

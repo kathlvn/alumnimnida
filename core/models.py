@@ -127,7 +127,7 @@ class Degree(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return str(self.name)
+        return str(self.code)
 
 class Batch(models.Model):
     year = models.IntegerField(unique=True)

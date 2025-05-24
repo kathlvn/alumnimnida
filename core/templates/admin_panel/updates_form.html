@@ -74,6 +74,8 @@
             const visibilityField = document.getElementById('id_visibility_type');
             const groupBatch = document.getElementById('group-visibility_batches');
             const groupDegree = document.getElementById('group-visibility_degrees');
+            const relatedEventField = document.getElementById('id_related_event');
+            const visibilityGroup = visibilityField.closest('.form-group');
 
             function updateVisibilityFields() {
                 const value = visibilityField.value;
@@ -91,9 +93,28 @@
                 }
             }
 
-            updateVisibilityFields();
+            function toggleVisibilitySection() {
+                const hasRelatedEvent = relatedEventField.value !== "";
+
+                // Hide all visibility-related fields if event is selected
+                visibilityField.closest('.form-group').classList.toggle('hidden', hasRelatedEvent);
+                groupBatch.classList.toggle('hidden', true);
+                groupDegree.classList.toggle('hidden', true);
+
+                // If no related event, show fields based on visibility type
+                if (!hasRelatedEvent) {
+                    updateVisibilityFields();
+                }
+            }
+
+            // Initial setup
+            toggleVisibilitySection();
+
+            // Event listeners
+            relatedEventField.addEventListener('change', toggleVisibilitySection);
             visibilityField.addEventListener('change', updateVisibilityFields);
         });
     </script>
+
 </body>
 </html>

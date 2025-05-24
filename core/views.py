@@ -527,8 +527,18 @@ class EventDetailView(DetailView):
 
 @login_required
 def updates_view(request):
-    updates = Updates.objects.order_by('-date_posted')
-    recent_updates = Updates.objects.order_by('-date_posted')[:5]
+    user = request.user
+    updates = Updates.objects.filter(
+        Q(visibility_type='public') |
+        Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
+        Q(visibility_type='degree', visibility_degrees__code=user.degree) |
+        Q(visibility_type='both',
+          visibility_batches__year=user.year_graduated,
+          visibility_degrees__code=user.degree)
+    ).distinct().order_by('-date_posted')
+
+    recent_updates = updates[:5]
+
     return render(request, 'core/updates.html', {
         'updates': updates,
         'recent_updates': recent_updates

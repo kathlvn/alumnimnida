@@ -132,18 +132,46 @@ class UpdatesForm(forms.ModelForm):
 
     class Meta:
         model = Updates
-        fields = ['title', 'content', 'related_event', 'visibility_type','visibility_degrees', 'visibility_batches']
+        fields = ['title', 'content', 'related_event', 'visibility_type', 'visibility_degrees', 'visibility_batches']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4}),
         }
 
     def clean(self):
         cleaned = super().clean()
-        vis = cleaned.get('visibility_type')
-        if vis == 'public':
-            cleaned['visibility_batches'] = []
-            cleaned['visibility_degrees'] = []
+        related_event = cleaned.get('related_event')
+
+        if related_event:
+            # Inherit visibility from event
+            cleaned['visibility_type'] = related_event.visibility_type
+            cleaned['visibility_batches'] = related_event.visibility_batches.all()
+            cleaned['visibility_degrees'] = related_event.visibility_degrees.all()
+        else:
+            vis = cleaned.get('visibility_type')
+            if vis == 'public':
+                cleaned['visibility_batches'] = []
+                cleaned['visibility_degrees'] = []
+
         return cleaned
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if self.cleaned_data.get('related_event'):
+            event = self.cleaned_data['related_event']
+            instance.visibility_type = event.visibility_type
+            if commit:
+                instance.save()
+                instance.visibility_batches.set(event.visibility_batches.all())
+                instance.visibility_degrees.set(event.visibility_degrees.all())
+        else:
+            if commit:
+                instance.save()
+                instance.visibility_batches.set(self.cleaned_data['visibility_batches'])
+                instance.visibility_degrees.set(self.cleaned_data['visibility_degrees'])
+
+        return instance
+
 
 class ForumPostForm(forms.ModelForm):
     class Meta:

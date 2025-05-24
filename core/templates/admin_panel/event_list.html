@@ -57,7 +57,7 @@
                             <span>
                                 Degrees:
                                 {% for degree in event.visibility_degrees.all %}
-                                    {{ degree.name }}{% if not forloop.last %}, {% endif %}
+                                    {{ degree.code }}{% if not forloop.last %}, {% endif %}
                                 {% empty %}
                                     None
                                 {% endfor %}

@@ -1,0 +1,55 @@
+{% load static %}
+
+<div class="search-detail-modal-body">
+  {% if event %}
+    <h2>{{ event.title }}</h2>
+    <p><strong>Date & Time:</strong> {{ event.datetime }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Description:</strong> {{ event.description }}</p>
+
+  {% elif forum %}
+    <h2>{{ forum.title }}</h2>
+    <p>{{ forum.content }}</p>
+    <p>Posted by: {{ forum.author.full_name }}</p>
+    <p>Created at: {{ forum.created_at }}</p>
+    <p>Likes: {{ forum.likes.count }}</p>
+
+    <h4>Comments:</h4>
+    <ul>
+      {% for comment in forum.comments.all %}
+        <li><strong>{{ comment.author.full_name }}</strong>: {{ comment.content }}</li>
+      {% empty %}
+        <li>No comments yet.</li>
+      {% endfor %}
+    </ul>
+
+  {% elif updates %}
+    <h2>{{ updates.title }}</h2>
+    <p>{{ updates.content }}</p>
+    {% if updates.related_event %}
+      <p>Related Event:
+        <a href="{% url 'event_detail' updates.related_event.pk %}">
+          {{ updates.related_event.title }}
+        </a>
+      </p>
+    {% endif %}
+    <p>Date posted: {{ updates.date_posted }}</p>
+
+  {% elif user_profile %}
+    <h2>{{ user_profile.full_name }}</h2>
+    {% if user_profile.profile_picture %}
+      <img src="{{ user_profile.profile_picture.url }}"
+           alt="Profile Picture"
+           class="rounded-circle mb-3"
+           width="150"
+           height="150">
+    {% endif %}
+    <p>Student Number: {{ user_profile.student_number }}</p>
+    <p>Address: {{ user_profile.address }}</p>
+    <p>Employment Status: {{ user_profile.employment_status }}</p>
+    <p>Bio: {{ user_profile.bio }}</p>
+
+  {% else %}
+    <p>No detail found.</p>
+  {% endif %}
+</div>

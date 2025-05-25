@@ -4,6 +4,45 @@
   font-family: 'Poppins', sans-serif;
 }
 
+.admin-top-nav {
+  display: flex;
+  justify-content: center;  /* center horizontally */
+  align-items: center;
+  padding: 10px 0;
+  background: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.admin-top-nav nav {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.admin-top-nav a img {
+  max-width: 65px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px #f4d7ff);
+  transition: transform 0.3s ease;
+}
+
+.admin-top-nav a img:hover {
+  transform: scale(1.2);
+}
+
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  margin-left: 0; /* Removes sidebar spacing */
+}
+
+
+
+
+
 body {
   margin: 0;
   padding: 0;
@@ -19,6 +58,7 @@ a {
 .container {
   display: flex;
   padding: 30px;
+  margin-left: 130;
 }
 
 /* ===== Sidebar ===== */

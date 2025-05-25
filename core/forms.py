@@ -33,6 +33,32 @@ class UserProfileForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={'rows': 3}),
         }
 
+class UserProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'full_name',
+            'student_number',
+            'degree',
+            'year_graduated',
+            'address',
+            'employment_status',
+            'bio',
+            'profile_picture',
+        ]
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make these fields readonly (disabled)
+        readonly_fields = ['full_name', 'student_number', 'degree', 'year_graduated']
+        for field_name in readonly_fields:
+            if field_name in self.fields:
+                self.fields[field_name].disabled = True  # disables field (read-only in form)
+
+
 class ClubOrgForm(forms.ModelForm):
     class Meta:
         model = ClubOrg
@@ -41,7 +67,8 @@ class ClubOrgForm(forms.ModelForm):
 class JobEntryForm(forms.ModelForm):
     class Meta:
         model = JobEntry
-        fields = ['job_title', 'is_current']
+        fields = ['job_title']
+        exclude = ['is_current']
         
 JobEntryFormSet = inlineformset_factory(
     CustomUser,

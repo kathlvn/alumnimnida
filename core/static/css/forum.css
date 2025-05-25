@@ -1,4 +1,5 @@
 
+
 .create-btn {
   background-color: white;
   color: #5b1780;
@@ -16,7 +17,7 @@
 .create-btn:hover {
   background-color: #5b1780;
   color: white;
-}
+} 
 
 /* ===== Content Sections ===== */
 .forum-post {
@@ -196,4 +197,12 @@
 
 .close:hover {
     color: #000;
+}
+
+
+.top-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }

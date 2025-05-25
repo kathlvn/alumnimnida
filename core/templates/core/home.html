@@ -12,11 +12,12 @@ Welcome back, {{ user.full_name }}!
 {% endblock %}
 
 {% block content %}
+{% load humanize %}
 <!-- Upcoming Events -->
 <div class="event-box">
 <div class="forum-post">
   <h3>UPCOMING EVENTS</h3>
-  {% for event in upcoming_event|slice:":5" %}
+  {% for event in upcoming_events|slice:":5" %}
     <div class="item-row">
       <div>
         <strong>{{ event.date|date:"F d" }}</strong> &nbsp;
@@ -39,7 +40,7 @@ Welcome back, {{ user.full_name }}!
     <div class="item-row">
       <div>
         <strong>{{ update.title }}</strong><br>
-        <em>{{ update.posted_at|timesince }} ago</em>
+        <em>{{ update.date_posted|timesince }} ago</em>
       </div>
       <a href="{% url 'update_detail' update.id%}" class="view-button">View Details</a> 
     </div>

@@ -1,116 +1,105 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
-</head>
-<body>
-  <div class="container">
-    <h1>Welcome back, Admin!</h1>
 
-    <div class="dashboard-grid">
-      <!-- Profile Card -->
-      <div class="card">
-        <div class="card-body center-text">
-          <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" alt="Profile Picture"
-               class="profile-picture">
-          <h5>{{ user.first_name }} {{ user.last_name }}</h5>
-          <p>Username: {{ user.username }}</p>
-          <p class="muted">Administrator</p>
-          <a href="{% url 'admin_profile' %}" class="btn-outline">View Profile</a>
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+
+  <div class="dashboard-grid">
+  <!-- USERS: Upper Left -->
+    <div class="card"> <!-- USERS -->
+      <div class="card-body">
+        <h5>Manage Users</h5>
+        <p>Create, edit, and delete users.</p>
+        <div class="button-group">
+          <a href="{% url 'admin_user_list' %}" class="btn-primary">Manage Users</a>
         </div>
       </div>
+    </div>
 
-      <!-- Users -->
-      <div class="card">
-        <div class="card-body">
-          <h5>Manage Users</h5>
-          <p>Create, edit, and delete users.</p>
-          <div class="button-group">
-            <a href="{% url 'admin_user_list' %}" class="btn-primary">Manage Users</a>
-          </div>
+    <!-- EVENTS: Upper Middle -->
+    <div class="card"> <!-- EVENTS -->
+      <div class="card-body">
+        <h5>Manage Events</h5>
+        <p>Create, edit, and delete events.</p>
+        <div class="button-group">
+          <a href="{% url 'admin_event_list' %}" class="btn-primary">Manage Events</a>
         </div>
       </div>
+    </div>
 
-      <!-- Events -->
-      <div class="card">
-        <div class="card-body">
-          <h5>Manage Events</h5>
-          <p>Create, edit, and delete events.</p>
-          <div class="button-group">
-            <a href="{% url 'admin_event_list' %}" class="btn-primary">Manage Events</a>
-          </div>
+    <!-- PROFILE: Upper Right -->
+    <div class="card card-wide"> <!-- PROFILE -->
+      <div class="card-body center-text">
+        <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" alt="Profile Picture" class="profile-picture">
+        <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+        <p>Username: {{ user.username }}</p>
+        <p class="muted">Administrator</p>
+        <a href="{% url 'admin_profile' %}" class="btn-outline">View Profile</a>
+      </div>
+    </div>
+
+    <!-- UPDATES: Lower Left -->
+    <div class="card"> <!-- UPDATES -->
+      <div class="card-body">
+        <h5>Manage Updates</h5>
+        <p>Create, edit, and delete updates.</p>
+        <div class="button-group">
+          <a href="{% url 'admin_updates_list' %}" class="btn-primary">Manage Updates</a>
         </div>
       </div>
+    </div>
 
-      <!-- Updates -->
-      <div class="card">
-        <div class="card-body">
-          <h5>Manage Updates</h5>
-          <p>Create, edit, and delete updates.</p>
-          <div class="button-group">
-            <a href="{% url 'admin_updates_list' %}" class="btn-primary">Manage Updates</a>
-          </div>
+    <!-- FORUM: Lower Middle -->
+    <div class="card"> <!-- FORUM -->
+      <div class="card-body">
+        <h5>Manage Forum</h5>
+        <p>Post to forum and delete posts.</p>
+        <div class="button-group">
+          <a href="{% url 'admin_forum_list' %}" class="btn-primary">Manage Posts</a>
         </div>
       </div>
+    </div>
 
-      <!-- Forum -->
-      <div class="card">
-        <div class="card-body">
-          <h5>Manage Forum</h5>
-          <p>Post to forum and delete posts.</p>
-          <div class="button-group">
-            <a href="{% url 'admin_forum_list' %}" class="btn-primary">Manage Posts</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chart -->
-      <div class="card">
-        <div class="card-body center-text">
-          <h5>Alumni Distribution</h5>
-          <canvas id="alumniPieChart" width="300" height="300"></canvas>
-        </div>
+    <!-- CHART: Lower Right -->
+    <div class="card card-wide-tall"> <!-- CHART -->
+      <div class="card-body center-text">
+        <h5>Alumni Distribution</h5>
+        <canvas id="alumniPieChart" width="300" height="300"></canvas>
       </div>
     </div>
   </div>
 
- <!-- Chart.js only -->
-{{ course_data|json_script:"course-data" }}
 
+{{ course_data|json_script:"course-data" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Wait until DOM is loaded before accessing elements
-  document.addEventListener("DOMContentLoaded", function () {
-    const ctx = document.getElementById('alumniPieChart').getContext('2d');
-    const chartData = JSON.parse(document.getElementById('course-data').textContent);
+document.addEventListener("DOMContentLoaded", function () {
+  const ctx = document.getElementById('alumniPieChart').getContext('2d');
+  const chartData = JSON.parse(document.getElementById('course-data').textContent);
 
-    new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: ['IT Alumni', 'CS Alumni', 'ACT Alumni', 'EMC Alumni'],
-        datasets: [{
-          label: 'Alumni Breakdown',
-          data: [chartData.IT, chartData.CS, chartData.ACT, chartData.EMC],
-          backgroundColor: ['#F4EAFE', '#B99DF3', '#D6AEF7', '#7E55CC'],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    });
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['IT Alumni', 'CS Alumni', 'ACT Alumni', 'EMC Alumni'],
+      datasets: [{
+        data: [chartData.IT, chartData.CS, chartData.ACT, chartData.EMC],
+        backgroundColor: ['#F4EAFE', '#B99DF3', '#D6AEF7', '#7E55CC'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
   });
+});
 </script>
+{% endblock %}
 
-</body>
-</html>

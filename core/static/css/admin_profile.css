@@ -36,9 +36,11 @@ h2 {
   font-weight: 700;
   margin-bottom: 30px;
   background: linear-gradient(90deg, #d09fff, #a352ff);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
 
 img.rounded-circle {
   border-radius: 50%;

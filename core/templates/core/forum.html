@@ -13,17 +13,20 @@
 
 
 {% block content %}
-<!-- Create Post Button -->
-<button class="create-btn" onclick="openModal()">CREATE A POST</button>
+<div class="top-row">
+  <button class="create-btn" onclick="openModal()">CREATE A POST</button>
 
-<form method="get" class="filter-form">
-  <label for="visibility">Filter posts by visibility:</label>
-  <select name="visibility" id="visibility" onchange="this.form.submit()">
-    <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
-    <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>My Batch</option>
-    <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>My Degree</option>
-  </select>
-</form>
+  <form method="get" class="filter-form">
+    <label for="visibility">Filter by:</label>
+    <select name="visibility" id="visibility" onchange="this.form.submit()">
+      <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+      <option value="public" {% if visibility_filter == 'public' %}selected{% endif %}>Public</option>
+      <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}> Batch</option>
+      <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>Degree</option>
+    </select>
+  </form>
+</div>
+
 
 
 <!-- Forum Posts -->

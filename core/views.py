@@ -26,9 +26,10 @@ from .forms import (
     ClubOrgForm,
     UpdatesForm,
     UserProfileForm,
+    UserProfileEditForm,
     AdminProfileForm,
 )
-from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates, Batch, Degree
+from .models import Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates, Batch, Degree
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now
@@ -233,7 +234,7 @@ def admin_user_reset_password(request, user_id):
 def admin_event_list(request):
     query = request.GET.get('q', '')
     sort_by = request.GET.get('sort', '-created_at')
-    events = Event.objects.all().order_by(sort_by)
+    today = date.today()
 
     if query:
         events = events.filter(
@@ -242,6 +243,10 @@ def admin_event_list(request):
             Q(date__icontains=query) |
             Q(location__icontains=query)
         )  
+
+    events = Event.objects.all().order_by(sort_by)
+    events= list(events)
+    events.sort(key=lambda e:e.done)
 
     return render(request, 'admin_panel/event_list.html', {'events': events, query: query, 'today': date.today(),})
 
@@ -284,8 +289,12 @@ def admin_event_delete(request, event_id):
 @user_passes_test(is_admin)
 def admin_event_mark_done(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    event.done = True
-    event.save()
+    if not event.done:
+        event.done = True
+        event.save()
+        messages.success(request, f'Event "{event.title}" marked as done.')
+    else:
+        messages.info(request, f'Event "{event.title}" is already done.')
     return redirect('admin_event_list')
 
 
@@ -380,18 +389,7 @@ def home(request):
     recent_updates = Updates.objects.all().order_by('-date_posted')
     forum_posts_count = Forum.objects.filter(author=request.user).count()
     comments_count = Comment.objects.filter(user=user).count()
-    events_attended_count = Attendance.objects.filter(user=user).count()
     
-    attended = Attendance.objects.filter(
-        user=user,
-        event__date__lt=current_datetime.date()
-    ) | Attendance.objects.filter(
-        user=user,
-        event__date=current_datetime.date(),
-        event__time__lt=current_datetime.time()
-    )
-    
-    events_attended_count = attended.count()
 
     return render(request, 'core/home.html', {
         'user': user,
@@ -399,7 +397,6 @@ def home(request):
         'recent_updates': recent_updates,
         'forum_posts_count': forum_posts_count,
         'comments_count': comments_count,
-        'events_attended_count': events_attended_count,
     })
 
 
@@ -407,13 +404,29 @@ def home(request):
 @login_required
 def profile_view(request):
     user = request.user
-    can_edit = request.GET.get('edit') == '1'
+
+    job_entries = user.job_entries.all().order_by('-date_added')
+    club_orgs = user.club_orgs.all()
+
+    context = {
+        'user_profile': user,
+        'job_entries': job_entries,
+        'club_orgs': club_orgs,
+        'can_edit': False,  # no editing in this view
+    }
+
+    return render(request, 'core/profile.html', context)
+
+
+@login_required
+def profile_edit_view(request):
+    user = request.user
 
     JobEntryFormSet = inlineformset_factory(CustomUser, JobEntry, form=JobEntryForm, extra=1, can_delete=True)
     ClubOrgFormSet = inlineformset_factory(CustomUser, ClubOrg, form=ClubOrgForm, extra=1, can_delete=True)
 
-    if request.method == 'POST' and can_edit:
-        form = UserProfileForm(request.POST, request.FILES, instance=user)
+    if request.method == 'POST':
+        form = UserProfileEditForm(request.POST, request.FILES, instance=user)
         job_formset = JobEntryFormSet(request.POST, instance=user)
         club_formset = ClubOrgFormSet(request.POST, instance=user)
 
@@ -421,9 +434,7 @@ def profile_view(request):
             form.save()
             job_entries = job_formset.save(commit=False)
 
-            # Reset all job entries' is_current flags
             JobEntry.objects.filter(user=user).update(is_current=False)
-
             for job in job_entries:
                 job.user = user
                 if not job.is_current:
@@ -433,41 +444,26 @@ def profile_view(request):
             club_formset.save()
 
             messages.success(request, 'Profile updated successfully.')
-            return redirect('profile')
+            return redirect('profile')  # Redirect to read-only profile page
     else:
-        form = UserProfileForm(instance=user)
+        form = UserProfileEditForm(instance=user)
         job_formset = JobEntryFormSet(instance=user)
         club_formset = ClubOrgFormSet(instance=user)
 
-    job_entries = user.job_entries.all().order_by('-date_added')
-    club_orgs = user.club_orgs.all()
-
-    return render(request, 'core/profile.html', {
+    context = {
         'form': form,
         'formset': job_formset,
         'club_formset': club_formset,
-        'can_edit': can_edit,
-        'user_profile': user,
-        'job_entries': job_entries,
-        'club_orgs': club_orgs,
-    })
+        'can_edit': True,
+    }
+    return render(request, 'core/profile.html', context)
+
 
 class UserProfileDetailView(DetailView):
     model = CustomUser
-    template_name = 'core/user_profile_detail.html'
+    template_name = 'core/search_detail.html'
     context_object_name = 'user_profile'
 
-# def login_view(request):
-#     if request.method == 'POST':
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('post-login-redirect')
-#         else:
-#             return render(request, 'login.html', {'error': 'Invalid credentials'})
-#     return render(request, 'login.html')
 
 def login_view(request):
     if request.method == 'POST':
@@ -492,10 +488,13 @@ def events_view(request):
     now = timezone.now()
     visibility_filter = request.GET.get('visibility', '')
 
-    # Initial queryset
-    events = Event.objects.all()
+    # Initial queryset (not done and still upcoming/ongoing)
+    events = Event.objects.filter(done=False).exclude(
+        Q(date__lt=now.date()) |
+        Q(date=now.date(), time__lte=now.time())
+    )
 
-    # Apply visibility filtering
+    # Apply visibility filter
     if visibility_filter == 'public':
         events = events.filter(visibility_type='public')
     elif visibility_filter == 'batch':
@@ -503,36 +502,28 @@ def events_view(request):
     elif visibility_filter == 'degree':
         events = events.filter(visibility_type='degree', visibility_degrees__code=user.degree)
     else:
-        # Default visibility (show what the user can access)
         events = events.filter(
             Q(visibility_type='public') |
             Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
             Q(visibility_type='degree', visibility_degrees__code=user.degree)
         ).distinct()
 
-    # Order by created time (or by event date/time if preferred)
     events = events.order_by('-created_at')
 
-    # Get user's attendance records
-    attendance = Attendance.objects.filter(user=request.user).select_related('event')
-
-    # Upcoming and past events
-    upcoming_events = [
-        entry.event for entry in attendance
-        if entry.event.date > now.date() or
-           (entry.event.date == now.date() and entry.event.time > now.time())
-    ]
-
-    past_events = [
-        entry.event for entry in attendance
-        if entry.event.date < now.date() or
-           (entry.event.date == now.date() and entry.event.time <= now.time())
-    ]
+    # Recently concluded = manually marked as done OR past events
+    recently_concluded = Event.objects.filter(
+        Q(done=True) |
+        Q(date__lt=now.date()) |
+        Q(date=now.date(), time__lte=now.time())
+    ).filter(
+        Q(visibility_type='public') |
+        Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
+        Q(visibility_type='degree', visibility_degrees__code=user.degree)
+    ).distinct().order_by('-date', '-time')[:5]  # limit for panel
 
     context = {
         'events': events,
-        'planned_event_ids': [e.id for e in upcoming_events],
-        'upcoming_events': upcoming_events,
+        'recently_concluded': recently_concluded,
         'now': now,
         'visibility_filter': visibility_filter
     }
@@ -540,27 +531,15 @@ def events_view(request):
     return render(request, 'core/events.html', context)
 
 
-@login_required
-def mark_attending(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-    now = timezone.now()
-
-    # Prevent marking if event is already in the past
-    if event.date < now.date() or (event.date == now.date() and event.time <= now.time()):
-        return redirect('events')
-
-    Attendance.objects.get_or_create(user=request.user, event=event)
-    return redirect('events')
 
 @login_required
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    attended = Attendance.objects.filter(user=request.user, event=event).exists()
-    return render(request, 'core/event_detail.html', {'event': event, 'attended': attended, 'now': timezone.now()})
+    return render(request, 'core/event_detail.html', {'event': event, 'now': timezone.now()})
 
 class EventDetailView(DetailView):
     model = Event
-    template_name = 'core/event_detail.html'
+    template_name = 'core/search_detail.html'
     context_object_name = 'event'
 
 @login_required
@@ -595,7 +574,7 @@ def updates_view(request):
 
 class UpdateDetailView(DetailView):
     model = Updates
-    template_name = 'core/update_detail.html'
+    template_name = 'core/search_detail.html'
     context_object_name = 'updates'
 
 @login_required
@@ -745,60 +724,13 @@ def delete_comment(request, comment_id):
     if comment.user != request.user and not request.user.is_staff:
         return redirect('forum')
 
-    if request.method == 'POST':
-        comment.delete()
-        return redirect('forum')
+    comment.delete()
+    return redirect('forum')
 
-    return render(request, 'core/comment_delete_confirm.html', {'comment': comment})
-
-# @login_required
-# def forum_create(request):
-#     if request.method == 'POST':
-#         print("submitted")
-#         form = ForumPostForm(request.POST)
-#         if form.is_valid():
-#             print("valid")
-#             forum = form.save(commit=False)
-#             forum.author = request.user
-#             forum.save()
-#             return redirect('forum')
-#     else:
-#         form = ForumPostForm()
-#     return render(request, 'core/forum_create.html', {'form': form})
-
-@login_required
-def forum_update(request, post_id):
-    post = get_object_or_404(Forum, id=post_id)
-
-    if post.author != request.user:
-        return redirect('forum')
-
-    if request.method == 'POST':
-        form = ForumPostForm(request.POST, instance=post)
-        if form.is_valid():
-            form.save()
-            return redirect('forum')
-    else:
-        form = ForumPostForm(instance=post)
-    
-    return render(request, 'core/forum_update.html', {'form': form})
-
-@login_required
-def forum_delete(request, post_id):
-    post = get_object_or_404(Forum, id=post_id)
-
-    if post.author != request.user and not request.user.is_staff:
-        return redirect('forum')
-
-    if request.method == 'POST':
-        post.delete()
-        return redirect('forum')
-    
-    return render(request, 'core/forum_delete.html', {'post': post})
 
 class ForumPostDetailView(DetailView):
     model = Forum
-    template_name = 'core/forum_detail.html'
+    template_name = 'core/search_detail.html'
     context_object_name = 'forum'
 
 

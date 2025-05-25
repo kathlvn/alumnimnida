@@ -72,6 +72,8 @@
   color: white;
 }
 
+
+
 .btn-change-password {
     display: inline-block;
     margin-top: 10px;
@@ -120,4 +122,110 @@
 ul {
   padding-left: 20px;
   font-size: 14px
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: white;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #d6aef7;
+  font-size: 0.9rem;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="email"],
+.edit-form input[type="number"],
+.edit-form select,
+.edit-form textarea,
+.edit-form input[type="file"] {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid white;
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: white;
+  font-size: 14px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: "Poppins", sans-serif;
+  resize: vertical;
+}
+
+.edit-form input[type="text"]:focus,
+.edit-form input[type="email"]:focus,
+.edit-form input[type="number"]:focus,
+.edit-form select:focus,
+.edit-form textarea:focus {
+  border-color: #b99df3;
+  box-shadow: 0 0 8px #b99df3;
+  outline: none;
+}
+
+/* Readonly and disabled field styles */
+.edit-form input[readonly],
+.edit-form input[disabled],
+.edit-form select[disabled],
+.edit-form textarea[readonly] {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Buttons */
+.btn-save,
+.btn-cancel {
+  border-radius: 20px;
+  font-weight: 700;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-align: center;
+  border: none;
+  display: inline-block;
+  margin-top: 10px;
+  min-width: 120px;
+}
+
+.btn-save {
+  background-color: #b99df3;
+  color: #5b1780;
+  box-shadow: 0 4px 12px rgba(185, 157, 243, 0.6);
+}
+
+.btn-save:hover {
+  background-color: #9c81d9;
+  color: #3c1059;
+}
+
+.btn-cancel {
+  background-color: white;
+  color: #5b1780;
+  border: 2px solid #5b1780;
+}
+
+.btn-cancel:hover {
+  background-color: #5b1780;
+  color: white;
+}
+
+
+/* Form section spacing */
+.form-section {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
 }

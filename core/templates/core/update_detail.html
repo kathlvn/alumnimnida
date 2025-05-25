@@ -1,9 +1,0 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h2>{{ updates.title }}</h2>
-  <p>{{ updates.content }}</p>
-  {% if updates.related_event %}
-    <p>Related Event: <a href="{% url 'event_detail' updates.related_event.pk %}">{{ updates.related_event.title }}</a></p>
-  {% endif %}
-  <p>Date posted: {{ updates.date_posted }}</p>
-{% endblock %}

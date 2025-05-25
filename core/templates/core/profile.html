@@ -24,7 +24,7 @@
             <p class="profile-class">Class of {{ user.year_graduated }}</p>
 
             {% if not can_edit %}
-                <a href="{% url 'profile' %}?edit=1" class="btn-edit-profile">Edit Profile</a>
+                <a href="{% url 'profile_edit' %}" class="btn-edit-profile">Edit Profile</a>
             {% endif %}
 
             <div class="change-password-link">
@@ -40,69 +40,95 @@
 
         <div class="profile-details">
             {% if can_edit %}
-                <form method="post" enctype="multipart/form-data" class="edit-form">
-                    {% csrf_token %}
+            <form method="post" enctype="multipart/form-data" class="edit-form">
+                {% csrf_token %}
 
-                    <h4>Basic Info</h4>
-                    {{ form.as_p }}
-
-                    <h4 class="mt-4">Professional Background</h4>
-                    {{ formset.management_form }}
-                    {% for job_form in formset %}
-                        <div class="form-section">
-                            {{ job_form.as_p }}
-                            {% if job_form.instance.pk %}
-                                <label>Delete: {{ job_form.DELETE }}</label>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-
-                    <h4 class="mt-4">Clubs / Organizations</h4>
-                    {{ club_formset.management_form }}
-                    {% for club_form in club_formset %}
-                        <div class="form-section">
-                            {{ club_form.as_p }}
-                            {% if club_form.instance.pk %}
-                                <label>Delete: {{ club_form.DELETE }}</label>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-
-                    <button type="submit" class="btn-save">Save Changes</button>
-                    <a href="{% url 'profile' %}" class="btn-cancel">Cancel</a>
-                </form>
-            {% else %}
-                <div class="read-only-info">
-                    <p><strong>Name:</strong> {{ user.full_name }}</p>
-                    <p><strong>Student Number:</strong> {{ user.student_number }}</p>
-                    <p><strong>Address:</strong> {{ user.address }}</p>
-                    <p><strong>Degree:</strong> {{ user.get_degree_display }}</p>
-                    <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
-                    <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
-                    <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
-
-
-                    <h4 class="mt-4">Professional Background</h4>
-                    {% for job in user.job_entries.all %}
-                        <div class="job-entry">
-                            <strong>{{ job.job_title }}</strong><br>
-                            <small>{{ job.start_year }} -
-                                {% if job.is_current %}Present{% else %}Inactive{% endif %}
-                            </small>
-                        </div>
-                    {% empty %}
-                        <p>No job entries available.</p>
-                    {% endfor %}
-
-                    <h4 class="mt-4">Clubs / Organizations</h4>
-                    <ul>
-                        {% for club in club_orgs %}
-                            <li>{{ club.org_name }}</li>
-                        {% empty %}
-                            <li>No clubs or organizations listed.</li>
-                        {% endfor %}
-                    </ul>
+                <h4>Basic Info</h4>
+                <div class="form-group">
+                    {{ form.full_name.label_tag }}
+                    {{ form.full_name }}
                 </div>
+                <div class="form-group">
+                    {{ form.student_number.label_tag }}
+                    {{ form.student_number }}
+                </div>
+                <div class="form-group">
+                    {{ form.degree.label_tag }}
+                    {{ form.degree }}
+                </div>
+                <div class="form-group">
+                    {{ form.year_graduated.label_tag }}
+                    {{ form.year_graduated }}
+                </div>
+                <div class="form-group">
+                    {{ form.address.label_tag }}
+                    {{ form.address }}
+                </div>
+                <div class="form-group">
+                    {{ form.employment_status.label_tag }}
+                    {{ form.employment_status }}
+                </div>
+                <div class="form-group">
+                    {{ form.bio.label_tag }}
+                    {{ form.bio }}
+                </div>
+                <div class="form-group">
+                    {{ form.profile_picture.label_tag }}
+                    {{ form.profile_picture }}
+                </div>
+
+                <h4 class="mt-4">Professional Background</h4>
+                {{ formset.management_form }}
+                {% for job_form in formset %}
+                    <div class="form-section">
+                        {{ job_form.as_p }}
+                        {# remove any explicit {{ job_form.DELETE }} rendering #}
+                    </div>
+                {% endfor %}
+
+                <h4 class="mt-4">Clubs / Organizations</h4>
+                {{ club_formset.management_form }}
+                {% for club_form in club_formset %}
+                    <div class="form-section">
+                        {{ club_form.as_p }}
+                        {# remove any explicit {{ job_form.DELETE }} rendering #}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn-save">Save Changes</button>
+                <a href="{% url 'profile' %}" class="btn-cancel">Cancel</a>
+            </form>
+            {% else %}
+            <div class="read-only-info">
+                <p><strong>Name:</strong> {{ user.full_name }}</p>
+                <p><strong>Student Number:</strong> {{ user.student_number }}</p>
+                <p><strong>Address:</strong> {{ user.address }}</p>
+                <p><strong>Degree:</strong> {{ user.get_degree_display }}</p>
+                <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
+                <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
+                <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
+
+                <h4 class="mt-4">Professional Background</h4>
+                {% for job in job_entries %}
+                    <div class="job-entry">
+                        <strong>{{ job.job_title }}</strong><br>
+                        <small>{{ job.start_year }} -
+                            {% if job.is_current %}Present{% else %}Inactive{% endif %}
+                        </small>
+                    </div>
+                {% empty %}
+                    <p>No job entries available.</p>
+                {% endfor %}
+
+                <h4 class="mt-4">Clubs / Organizations</h4>
+                <ul>
+                    {% for club in club_orgs %}
+                        <li>{{ club.org_name }}</li>
+                    {% empty %}
+                        <li>No clubs or organizations listed.</li>
+                    {% endfor %}
+                </ul>
+            </div>
             {% endif %}
         </div>
     </div>

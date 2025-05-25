@@ -10,45 +10,57 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <div class="container">
 
-    <!-- Sidebar -->
-    <div class="sidebar">
+  {% if request.user.is_authenticated and request.user.is_staff and request.resolver_match.url_name != 'admin_dashboard' %}
+    <div class="admin-top-nav">
       <nav>
-        <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
-        <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
-        <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
-        <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
-        <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+        <a href="{% url 'admin_dashboard' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+        <a href="{% url 'admin_user_list' %}"><img src="{% static 'img/user_icon.png' %}" alt="Users"></a>
+        <a href="{% url 'admin_event_list' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+        <a href="{% url 'admin_updates_list' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+        <a href="{% url 'admin_forum_list' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
         <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
       </nav>
     </div>
+  {% endif %}
+
+  <div class="{% if request.user.is_authenticated and request.user.is_staff %}admin-container{% else %}container{% endif %}">
+
+    {% if not request.user.is_staff %}
+      <!-- Sidebar for Regular Users -->
+      <div class="sidebar">
+        <nav>
+          <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
+          <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+          <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+          <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
+          <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+          <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+        </nav>
+      </div>
+    {% endif %}
 
     <!-- Main Content -->
     <div class="main-content">
-      <!-- Global Header with Page Title and Search Bar -->
-      <div class="global-header">
-        <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
-        <form method="get" action="{% url 'global_search' %}">
-          <input type="text" name="q" class="search-bar" placeholder="Search...">
-        </form>
+      {% if not request.user.is_staff %}
+        <div class="global-header">
+          <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+          <form method="get" action="{% url 'global_search' %}">
+            <input type="text" name="q" class="search-bar" placeholder="Search...">
+          </form>
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </div>
+
+    {% if not request.user.is_staff %}
+      <!-- Right Panel for Regular Users -->
+      <div class="right-panel">
+        {% block right_panel %}{% endblock %}
       </div>
-
-      {% block content %}
-      <!-- Page-specific content will appear here -->
-      {% endblock %}
-    </div>
-
-    <!-- Right Panel -->
-    <div class="right-panel">
-      {% block right_panel %}
-      <!-- Additional info per page goes here -->
-      {% endblock %}
-    </div>
-
+    {% endif %}
   </div>
 
-  <!-- Modal Block (for pages like Forum) -->
   {% block modal %}{% endblock %}
   {% block extra_js %}{% endblock %}
   {% block scripts %}{% endblock %}

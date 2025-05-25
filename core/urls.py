@@ -38,15 +38,12 @@ urlpatterns = [
 
     path('', views.home, name='home'),
     path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.profile_edit_view, name='profile_edit'),
     path('users/<int:pk>/', UserProfileDetailView.as_view(), name='user_profile'),
-    # path('profile/job/add/', views.add_job_entry, name='add_job_entry'),
-    # path('edit-job/<int:entry_id>/', views.edit_job_entry, name='edit_job_entry'),
-    # path('profile/job/delete/<int:job_id>/', views.delete_job_entry, name='delete_job_entry'),
 
 
     path('events/', views.events_view, name='events'),
     path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
-    path('events/attend/<int:event_id>/', views.mark_attending, name='mark_attending'),
     path('updates/', views.updates_view, name='updates'),
     path('updates/<int:pk>/', UpdateDetailView.as_view(), name='update_detail'),
 
@@ -55,9 +52,6 @@ urlpatterns = [
     path('forum/', views.forum, name='forum'),
     path('like-post/', views.like_post_ajax, name='like_post_ajax'),
     path('forum/comment/<int:post_id>/', views.comment_post_ajax, name='comment_post'),
-    # path('forum/create/', views.forum_create, name='forum_create'),
-    path('forum/update/<int:post_id>/', views.forum_update, name='forum_update'),
-    path('forum/delete/<int:post_id>/', views.forum_delete, name='forum_delete'),
     path('forum/comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
 
     path('search/', views.global_search_view, name='global_search'),

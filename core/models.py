@@ -148,9 +148,9 @@ class VisibilityManager(models.Manager):
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    date = models.DateField(default=date.today)
-    time = models.TimeField()
-    location = models.CharField(max_length=200)
+    date = models.DateField(blank=True, null=True)
+    time = models.TimeField(blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
     done = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -165,14 +165,6 @@ class Event(models.Model):
     
     def __str__(self):
         return self.title
-
-
-class Attendance(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    marked_on = models.DateTimeField(auto_now_add=True)
-
-
 
 class Updates(models.Model):
     title = models.CharField(max_length=200)

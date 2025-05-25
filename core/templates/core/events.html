@@ -15,6 +15,15 @@ EVENTS
 <div class="content-wrapper">
   <!-- Events List -->
   <div class="events-section">
+    <form method="get" class="filter-form">
+      <label for="visibility">Filter posts by visibility:</label>
+      <select name="visibility" id="visibility" onchange="this.form.submit()">
+        <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+        <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>My Batch</option>
+        <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>My Degree</option>
+      </select>
+    </form>
+
     {% for event in events %}
     <div class="event-box" onclick="openModal('{{ event.id }}')">
       <h3 class="event-title">{{ event.title }}</h3>

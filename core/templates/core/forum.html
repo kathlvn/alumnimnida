@@ -11,26 +11,19 @@
 <!-- Optional: Sidebar links or navs -->
 {% endblock %}
 
+
 {% block content %}
 <!-- Create Post Button -->
 <button class="create-btn" onclick="openModal()">CREATE A POST</button>
 
-{% comment %} <!-- Modal for creating a post -->
-<div id="postModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2>Create Post</h2>
-    <form method="POST">
-      {% csrf_token %}
-      <input type="hidden" name="create_post" value="1">
-      <input type="text" name="title" placeholder="Title" class="modal-input" required><br>
-      <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input" required></textarea>
-      <button type="submit" class="attend-button">Publish</button>
-    </form>
-  </div>
-</div> {% endcomment %}
-
-
+<form method="get" class="filter-form">
+  <label for="visibility">Filter posts by visibility:</label>
+  <select name="visibility" id="visibility" onchange="this.form.submit()">
+    <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+    <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>My Batch</option>
+    <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>My Degree</option>
+  </select>
+</form>
 
 
 <!-- Forum Posts -->
@@ -109,23 +102,6 @@
 </script>
 {% endblock %}
 
-{% comment %} {% block modal %}
-<!-- Modal for creating a post -->
-<div id="postModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2>Create Post</h2>
-    <form method="POST">
-      {% csrf_token %}
-      <input type="hidden" name="create_post" value="1">
-      <input type="text" name="title" placeholder="Title" class="modal-input" required><br>
-      <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input" required></textarea>
-      <button type="submit" class="attend-button">Publish</button>
-    </form>
-  </div>
-</div>
-{% endblock %} {% endcomment %}
-
 {% block modal %}
 <!-- Modal for creating a post -->
 <div id="postModal" class="modal" style="display:none;">
@@ -137,6 +113,12 @@
       <input type="hidden" name="create_post" value="1">
       <input type="text" name="title" placeholder="Title" class="modal-input" required><br>
       <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input" required></textarea>
+      <label for="visibility">Visibility:</label>
+      <select name="visibility_type" class="modal-input" required>
+        <option value="public">Public</option>
+        <option value="batch">By Batch</option>
+        <option value="degree">By Degree</option>
+      </select>
       <button type="submit" class="attend-button">Publish</button>
     </form>
   </div>

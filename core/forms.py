@@ -176,10 +176,11 @@ class UpdatesForm(forms.ModelForm):
 class ForumPostForm(forms.ModelForm):
     class Meta:
         model = Forum
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'visibility_type']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control'}),
+            'visibility_type': forms.Select(attrs={'class': 'form-control'}),
         }
 
 class CommentForm(forms.ModelForm):

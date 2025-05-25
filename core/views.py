@@ -1,7 +1,6 @@
 import json
 import csv
 from django.contrib import messages
-from django.utils.safestring import mark_safe
 from collections import Counter
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -11,7 +10,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.db.models import Count, F, ExpressionWrapper, IntegerField
 from django.forms import inlineformset_factory
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -29,7 +28,7 @@ from .forms import (
     UserProfileForm,
     AdminProfileForm,
 )
-from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates
+from .models import Attendance, Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, Updates, Batch, Degree
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now
@@ -71,19 +70,18 @@ def admin_register(request):
 
     return render(request, 'admin_register.html')
 
-CustomUser = get_user_model()
 
 def is_admin(user):
     return user.is_staff or user.is_superuser
 
-@login_required
+# @login_required
 # @user_passes_test(is_admin)
-def post_login_redirect(request):
-    user = request.user
-    if user.is_staff:
-        return redirect('admin_dashboard')  
-    else:
-        return redirect('home')
+# def post_login_redirect(request):
+#     user = request.user
+#     if user.is_staff:
+#         return redirect('admin_dashboard')  
+#     else:
+#         return redirect('home')
 
 @login_required
 @user_passes_test(is_admin)
@@ -235,13 +233,12 @@ def admin_user_reset_password(request, user_id):
 def admin_event_list(request):
     query = request.GET.get('q', '')
     sort_by = request.GET.get('sort', '-created_at')
-    events = Event.objects.all().order_by('done', sort_by)
+    events = Event.objects.all().order_by(sort_by)
 
     if query:
         events = events.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(date__icontains=query) |
             Q(date__icontains=query) |
             Q(location__icontains=query)
         )  
@@ -299,7 +296,8 @@ def admin_event_mark_done(request, event_id):
 def admin_updates_list(request):
     query = request.GET.get('q', '')
     sort_by = request.GET.get('sort', '-date_posted')
-    updates = Updates.objects.order_by(sort_by)
+    updates = Updates.objects.all().order_by(sort_by)
+
 
     if query:
         updates = updates.filter(
@@ -362,7 +360,6 @@ def admin_forum_list(request):
             Q(date_posted__icontains=query) 
         )
 
-    posts = posts.order_by('-date_posted')
     return render(request, 'admin_panel/forum_list.html', {'posts': posts, 'query': query})
 
 @login_required
@@ -460,6 +457,18 @@ class UserProfileDetailView(DetailView):
     template_name = 'core/user_profile_detail.html'
     context_object_name = 'user_profile'
 
+# def login_view(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('post-login-redirect')
+#         else:
+#             return render(request, 'login.html', {'error': 'Invalid credentials'})
+#     return render(request, 'login.html')
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -467,27 +476,53 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('post-login-redirect')
+            if user.is_staff:
+                return redirect('admin_dashboard')
+            else:
+                return redirect('home')
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     return render(request, 'login.html')
 
+
+
 @login_required
 def events_view(request):
-    events = Event.objects.order_by('-created_at')
+    user = request.user
     now = timezone.now()
+    visibility_filter = request.GET.get('visibility', '')
 
-    # Get Attendance entries for the logged-in user
+    # Initial queryset
+    events = Event.objects.all()
+
+    # Apply visibility filtering
+    if visibility_filter == 'public':
+        events = events.filter(visibility_type='public')
+    elif visibility_filter == 'batch':
+        events = events.filter(visibility_type='batch', visibility_batches__year=user.year_graduated)
+    elif visibility_filter == 'degree':
+        events = events.filter(visibility_type='degree', visibility_degrees__code=user.degree)
+    else:
+        # Default visibility (show what the user can access)
+        events = events.filter(
+            Q(visibility_type='public') |
+            Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
+            Q(visibility_type='degree', visibility_degrees__code=user.degree)
+        ).distinct()
+
+    # Order by created time (or by event date/time if preferred)
+    events = events.order_by('-created_at')
+
+    # Get user's attendance records
     attendance = Attendance.objects.filter(user=request.user).select_related('event')
-    
-    # Upcoming planned events
+
+    # Upcoming and past events
     upcoming_events = [
         entry.event for entry in attendance
         if entry.event.date > now.date() or
            (entry.event.date == now.date() and entry.event.time > now.time())
     ]
 
-    # Past attended (based on marked events that have already occurred)
     past_events = [
         entry.event for entry in attendance
         if entry.event.date < now.date() or
@@ -499,8 +534,11 @@ def events_view(request):
         'planned_event_ids': [e.id for e in upcoming_events],
         'upcoming_events': upcoming_events,
         'now': now,
+        'visibility_filter': visibility_filter
     }
+
     return render(request, 'core/events.html', context)
+
 
 @login_required
 def mark_attending(request, event_id):
@@ -528,20 +566,31 @@ class EventDetailView(DetailView):
 @login_required
 def updates_view(request):
     user = request.user
-    updates = Updates.objects.filter(
-        Q(visibility_type='public') |
-        Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
-        Q(visibility_type='degree', visibility_degrees__code=user.degree) |
-        Q(visibility_type='both',
-          visibility_batches__year=user.year_graduated,
-          visibility_degrees__code=user.degree)
-    ).distinct().order_by('-date_posted')
+    visibility_filter = request.GET.get('visibility', '')
+
+    updates = Updates.objects.all()
+
+    if visibility_filter == 'public':
+        updates = updates.filter(visibility_type='public')
+    elif visibility_filter == 'batch':
+        updates = updates.filter(visibility_type='batch', visibility_batches__year=user.year_graduated)
+    elif visibility_filter == 'degree':
+        updates = updates.filter(visibility_type='degree', visibility_degrees__code=user.degree)
+    else:
+        updates = updates.filter(
+            Q(visibility_type='public') |
+            Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
+            Q(visibility_type='degree', visibility_degrees__code=user.degree)
+        ).distinct()
+
+    updates = updates.order_by('-date_posted')  
 
     recent_updates = updates[:5]
 
     return render(request, 'core/updates.html', {
         'updates': updates,
-        'recent_updates': recent_updates
+        'recent_updates': recent_updates,
+        'visibility_filter': visibility_filter
     })
 
 class UpdateDetailView(DetailView):
@@ -551,16 +600,44 @@ class UpdateDetailView(DetailView):
 
 @login_required
 def forum(request):
-    posts = Forum.objects.annotate(like_count=Count('likes')).order_by('-date_posted')
+    user = request.user
+    posts = Forum.visible.user_visible(request.user).order_by('-date_posted')
+
+    visibility_filter = request.GET.get('visibility', '')
+    if visibility_filter == 'public':
+        posts = posts.filter(visibility_type='public')
+    elif visibility_filter == 'batch':
+        posts = posts.filter(visibility_type='batch', visibility_batches__year=user.year_graduated)
+    elif visibility_filter == 'degree':
+        posts = posts.filter(visibility_type='degree', visibility_degrees__code=user.degree)
+
 
     if request.method == 'POST':
+        visibility_filter = request.GET.get('visibility', '') or request.POST.get('visibility', '')
+        query_param = f'?visibility={visibility_filter}' if visibility_filter else ''
         if 'create_post' in request.POST:
             form = ForumPostForm(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
                 post.save()
-                return redirect('forum')
+
+                post.visibility_batches.clear()
+                post.visibility_degrees.clear()
+
+                if post.visibility_type == 'batch':
+                    batch = Batch.objects.filter(year=user.year_graduated).first()
+                    if batch:
+                        post.visibility_batches.add(batch)
+                elif post.visibility_type == 'degree':
+                    degree = Degree.objects.filter(code=user.degree).first()
+                    if degree:
+                        post.visibility_degrees.add(degree)
+
+                        
+
+                return redirect(f"{reverse('forum')}{query_param}")
+
 
         elif 'like_post' in request.POST:
             post_id = request.POST.get('like_post')
@@ -570,7 +647,8 @@ def forum(request):
                 existing.delete()
             else:
                 Like.objects.create(user=request.user, post=post)
-            return redirect('forum')
+            return redirect(f"{reverse('forum')}{query_param}")
+
 
         elif 'comment_post' in request.POST:
             post_id = request.POST.get('comment_post')
@@ -578,21 +656,24 @@ def forum(request):
             post = get_object_or_404(Forum, id=post_id)
             if comment_content.strip():
                 Comment.objects.create(user=request.user, post=post, content=comment_content)
-            return redirect('forum')
+            return redirect(f"{reverse('forum')}{query_param}")
+
 
         elif 'delete_comment' in request.POST:
             comment_id = request.POST.get('delete_comment')
             comment = get_object_or_404(Comment, id=comment_id)
             if comment.user == request.user or request.user.is_staff:
                 comment.delete()
-            return redirect('forum')
+            return redirect(f"{reverse('forum')}{query_param}")
+
         
         elif 'delete_post' in request.POST:
             post_id = request.POST.get('delete_post')
             post = get_object_or_404(Forum, id=post_id)
             if post.author == request.user or request.user.is_staff:
                 post.delete()
-            return redirect('forum')
+            return redirect(f"{reverse('forum')}{query_param}")
+
 
 
     # Trending based on likes + comments
@@ -608,6 +689,7 @@ def forum(request):
     context = {
         'posts': posts,
         'create_form': ForumPostForm(),
+        'visibility_filter': visibility_filter,
         'comment_form': CommentForm(),
         'liked_post_ids': Like.objects.filter(user=request.user).values_list('post_id', flat=True),
         'trending_posts': trending_posts
@@ -669,20 +751,20 @@ def delete_comment(request, comment_id):
 
     return render(request, 'core/comment_delete_confirm.html', {'comment': comment})
 
-@login_required
-def forum_create(request):
-    if request.method == 'POST':
-        print("submitted")
-        form = ForumPostForm(request.POST)
-        if form.is_valid():
-            print("valid")
-            forum = form.save(commit=False)
-            forum.author = request.user
-            forum.save()
-            return redirect('forum')
-    else:
-        form = ForumPostForm()
-    return render(request, 'core/forum_create.html', {'form': form})
+# @login_required
+# def forum_create(request):
+#     if request.method == 'POST':
+#         print("submitted")
+#         form = ForumPostForm(request.POST)
+#         if form.is_valid():
+#             print("valid")
+#             forum = form.save(commit=False)
+#             forum.author = request.user
+#             forum.save()
+#             return redirect('forum')
+#     else:
+#         form = ForumPostForm()
+#     return render(request, 'core/forum_create.html', {'form': form})
 
 @login_required
 def forum_update(request, post_id):

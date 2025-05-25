@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
-    path('redirect-after-login/', views.post_login_redirect, name='post-login-redirect'),
+    # path('redirect-after-login/', views.post_login_redirect, name='post-login-redirect'),
 
     path('admin-register/', views.admin_register, name='admin_register'),
 
@@ -55,7 +55,7 @@ urlpatterns = [
     path('forum/', views.forum, name='forum'),
     path('like-post/', views.like_post_ajax, name='like_post_ajax'),
     path('forum/comment/<int:post_id>/', views.comment_post_ajax, name='comment_post'),
-    path('forum/create/', views.forum_create, name='forum_create'),
+    # path('forum/create/', views.forum_create, name='forum_create'),
     path('forum/update/<int:post_id>/', views.forum_update, name='forum_update'),
     path('forum/delete/<int:post_id>/', views.forum_delete, name='forum_delete'),
     path('forum/comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),

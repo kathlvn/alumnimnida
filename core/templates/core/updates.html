@@ -12,6 +12,17 @@
 {% block content %}
 <div class="content-wrapper">
   <div class="updates-section">
+
+    <form method="get" class="filter-form">
+      <label for="visibility">Filter posts by visibility:</label>
+      <select name="visibility" id="visibility" onchange="this.form.submit()">
+        <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+        <option value="public" {% if visibility_filter == 'public' %}selected{% endif %}>Public</option>
+        <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>By Batch</option>
+        <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>By Degree</option>
+      </select>
+    </form>
+
     {% for update in updates %}
     <div class="update-box" onclick="openModal('{{ update.id }}')">
       <h3 class="update-title">{{ update.title }}</h3>

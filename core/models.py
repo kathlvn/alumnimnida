@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, User
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 import datetime
 from datetime import date
 from PIL import Image
@@ -134,6 +135,14 @@ class Batch(models.Model):
 
     def __str__(self):
         return str(self.year)
+    
+class VisibilityManager(models.Manager):
+    def user_visible(self, user):
+        return self.get_queryset().filter(
+            Q(visibility_type='public') |
+            Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
+            Q(visibility_type='degree', visibility_degrees__code=user.degree)
+        ).distinct()
 
 
 class Event(models.Model):
@@ -150,6 +159,9 @@ class Event(models.Model):
     visibility_type = models.CharField(max_length=20, choices=visibility_choices, default='public')
     visibility_batches = models.ManyToManyField('Batch', blank=True)
     visibility_degrees = models.ManyToManyField('Degree', blank=True)
+
+    objects = models.Manager()
+    visible = VisibilityManager()
     
     def __str__(self):
         return self.title
@@ -172,6 +184,9 @@ class Updates(models.Model):
     visibility_batches = models.ManyToManyField('Batch', blank=True)
     visibility_degrees = models.ManyToManyField('Degree', blank=True)
 
+    objects = models.Manager()
+    visible = VisibilityManager()
+
     def __str__(self):
         return self.title
 
@@ -181,6 +196,13 @@ class Forum(models.Model):
     content = models.TextField()
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_posted = models.DateTimeField(auto_now_add=True)
+
+    visibility_type = models.CharField(max_length=20, choices=visibility_choices, default='public')
+    visibility_batches = models.ManyToManyField(Batch, blank=True)
+    visibility_degrees = models.ManyToManyField(Degree, blank=True)
+
+    objects = models.Manager()  
+    visible = VisibilityManager()
 
     def __str__(self):
         return self.title

@@ -67,8 +67,10 @@ class ClubOrgForm(forms.ModelForm):
 class JobEntryForm(forms.ModelForm):
     class Meta:
         model = JobEntry
-        fields = ['job_title']
-        exclude = ['is_current']
+        fields = ['job_title', 'is_current']
+        widgets = {
+            'is_current': forms.HiddenInput(),
+        }
         
 JobEntryFormSet = inlineformset_factory(
     CustomUser,

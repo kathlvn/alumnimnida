@@ -14,41 +14,52 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 5px 15px;
 }
 
-.welcome-heading {
-  text-align: left;
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 30px;
-}
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.8fr;
-  gap: 25px;
+  padding: 0%;
+  margin: 0%;
+  grid-template-columns: 320px 320px 400px;
+  grid-template-rows: auto auto;
+  column-gap: 25px;
+  row-gap: 2px;
+}
+
+.dashboard-grid > .card:nth-child(-n+3) {
+  align-self: start;
+}
+
+.dashboard-grid > .card:nth-child(n+4) {
+  align-self: end;
+  margin-top: -70px;
 }
 
 /* Card Styles */
 .card {
+  margin: 0px;
   background: rgba(255, 255, 255, 0.07);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
+  height: 300px;
+  width: 320px;
+  padding: 10px;
+  box-shadow: 0 8px 10px rgba(255, 255, 255, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-wide {
-  height: auto;
-  min-height: 200px; /* or adjust as needed */
+  height: 200px;
+  width: 400px;
 }
+
 
 /* Make chart card taller */
 .card-wide-tall {
-  height: 100%;
-  min-height: 100px; /* adjust for desired height */
+  height: 400px;
+  width: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,6 +91,9 @@ body {
 .card-body {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   gap: 10px;
 }
 
@@ -87,14 +101,43 @@ body {
   text-align: center;
 }
 
+.card.card-wide .card-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px; /* spacing between picture and content */
+  justify-content: flex-start;
+  height: 100%;
+  padding: 10px;
+}
+
 .profile-picture {
   width: 90px;
   height: 90px;
   object-fit: cover;
   border-radius: 50%;
-  margin: 0 auto 10px auto;
   border: 2px solid white;
+  margin: 0; /* remove auto margins */
 }
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  flex: 1;
+  text-align: center;
+}
+
+.profile-info h5,
+.profile-info p {
+  margin: 0 0 6px 0;
+}
+
+.profile-info .btn-outline {
+  align-self: center; /* left align the button */
+}
+
 
 /* Button Styles */
 .button-group {
@@ -109,7 +152,7 @@ body {
 .btn-primary {
   display: block;
   text-align: center;
-  padding: 10px 0;
+  padding: 10px;
   font-weight: 700;
   border-radius: 50px;
   text-decoration: none;

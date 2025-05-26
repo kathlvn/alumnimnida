@@ -17,7 +17,7 @@ EVENTS
   <div class="events-section">
     <div class="top-row">
     <form method="get" class="filter-form">
-      <label for="visibility">Filter by:</label>
+      <label for="visibility">Filter by: </label>
       <select name="visibility" id="visibility" onchange="this.form.submit()">
         <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
         <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>My Batch</option>

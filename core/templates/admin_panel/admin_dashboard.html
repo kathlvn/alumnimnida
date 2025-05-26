@@ -35,13 +35,16 @@
     </div>
 
     <!-- PROFILE: Upper Right -->
-    <div class="card card-wide"> <!-- PROFILE -->
-      <div class="card-body center-text">
+    <div class="card card-wide">
+      <div class="card-body">
         <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" alt="Profile Picture" class="profile-picture">
-        <h5>{{ user.first_name }} {{ user.last_name }}</h5>
-        <p>Username: {{ user.username }}</p>
-        <p class="muted">Administrator</p>
-        <a href="{% url 'admin_profile' %}" class="btn-outline">View Profile</a>
+
+        <div class="profile-info">
+          <h5>{{ user.full_name }}</h5>
+          <p>Username: {{ user.username }}</p>
+          <p class="muted">Administrator</p>
+          <a href="{% url 'admin_profile' %}?edit=1"class="btn-outline">View Profile</a>
+        </div>
       </div>
     </div>
 
@@ -89,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
     data: {
       labels: ['IT Alumni', 'CS Alumni', 'ACT Alumni', 'EMC Alumni'],
       datasets: [{
-        data: [chartData.IT, chartData.CS, chartData.ACT, chartData.EMC],
+        data: [chartData.BSIT, chartData.BSCS, chartData.ACT, chartData.BSEMC],
         backgroundColor: ['#F4EAFE', '#B99DF3', '#D6AEF7', '#7E55CC'],
         borderWidth: 1
       }]

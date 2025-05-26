@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
+from django.core.paginator import Paginator
 from .forms import (
     CommentForm,
     CustomUserCreationForm,
@@ -33,7 +34,7 @@ from .models import Comment, CustomUser, Event, Forum, JobEntry, ClubOrg, Like, 
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import now
-from datetime import date
+from datetime import datetime
 
 
 
@@ -91,10 +92,10 @@ def admin_dashboard(request):
     count = Counter(degrees)
 
     course_data = {
-        "IT": count.get("IT", 0),
-        "CS": count.get("CS", 0),
+        "BSIT": count.get("BSIT", 0),
+        "BSCS": count.get("BSCS", 0),
         "ACT": count.get("ACT", 0),
-        "EMC": count.get("EMC", 0)
+        "BSEMC": count.get("BSEMC", 0)
     }
 
     return render(request, 'admin_panel/admin_dashboard.html', {
@@ -113,7 +114,7 @@ def admin_profile_view(request):
         form = AdminProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('admin_profile')
+            return redirect('admin_dashboard')
 
     edit_mode = request.method == 'POST' or request.GET.get('edit') == '1'
     return render(request, 'admin_panel/admin_profile.html', {
@@ -137,7 +138,13 @@ def admin_user_list(request):
             Q(degree__icontains=query)
         )
 
-    return render(request, 'admin_panel/user_list.html', {'users': users, 'query': query})
+    paginator = Paginator(users, 10)  # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'admin_panel/user_list.html', {'users': page_obj.object_list, 
+                                                          'query': query,
+                                                          'page_obj':page_obj})
 
 @login_required
 @user_passes_test(is_admin)
@@ -160,7 +167,12 @@ def admin_user_batch_upload(request):
             messages.error(request, 'This is not a CSV file.')
             return redirect('admin_user_batch_upload')
 
-        decoded_file = csv_file.read().decode('utf-8').splitlines()
+        try:
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+        except UnicodeDecodeError:
+            csv_file.seek(0)
+            decoded_file = csv_file.read().decode('windows-1252').splitlines()
+
         reader = csv.DictReader(decoded_file)
 
         created_count = 0
@@ -234,7 +246,8 @@ def admin_user_reset_password(request, user_id):
 def admin_event_list(request):
     query = request.GET.get('q', '')
     sort_by = request.GET.get('sort', '-created_at')
-    today = date.today()
+    today = datetime.now()
+    events = Event.objects.all().order_by(sort_by, 'done')
 
     if query:
         events = events.filter(
@@ -244,11 +257,17 @@ def admin_event_list(request):
             Q(location__icontains=query)
         )  
 
-    events = Event.objects.all().order_by(sort_by)
     events= list(events)
     events.sort(key=lambda e:e.done)
 
-    return render(request, 'admin_panel/event_list.html', {'events': events, query: query, 'today': date.today(),})
+    paginator = Paginator(events, 10)  # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'admin_panel/event_list.html', {'events': page_obj.object_list, 
+                                                           'query': query,
+                                                           'page_obj': page_obj,
+                                                           'today': today,})
 
 @login_required
 @user_passes_test(is_admin)
@@ -307,7 +326,6 @@ def admin_updates_list(request):
     sort_by = request.GET.get('sort', '-date_posted')
     updates = Updates.objects.all().order_by(sort_by)
 
-
     if query:
         updates = updates.filter(
             Q(title__icontains=query) |
@@ -316,7 +334,12 @@ def admin_updates_list(request):
             Q(related_event__title__icontains=query)
         )  
 
-    return render(request, 'admin_panel/updates_list.html', {'updates': updates})
+    paginator = Paginator(updates, 10)  # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'admin_panel/updates_list.html', {'updates': page_obj.object_list, 
+                                                             'page_obj': page_obj})
 
 
 @login_required
@@ -369,7 +392,13 @@ def admin_forum_list(request):
             Q(date_posted__icontains=query) 
         )
 
-    return render(request, 'admin_panel/forum_list.html', {'posts': posts, 'query': query})
+    paginator = Paginator(posts, 5)  # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'admin_panel/forum_list.html', {'posts': page_obj.object_list, 
+                                                           'page_obj': page_obj,
+                                                           'query': query})
 
 @login_required
 @user_passes_test(is_admin)
@@ -409,14 +438,13 @@ def profile_view(request):
     club_orgs = user.club_orgs.all()
 
     context = {
-        'user_profile': user,
+        'user': user,
         'job_entries': job_entries,
         'club_orgs': club_orgs,
         'can_edit': False,  # no editing in this view
     }
 
     return render(request, 'core/profile.html', context)
-
 
 @login_required
 def profile_edit_view(request):
@@ -427,28 +455,48 @@ def profile_edit_view(request):
 
     if request.method == 'POST':
         form = UserProfileEditForm(request.POST, request.FILES, instance=user)
-        job_formset = JobEntryFormSet(request.POST, instance=user)
-        club_formset = ClubOrgFormSet(request.POST, instance=user)
+        job_formset = JobEntryFormSet(request.POST, instance=user, prefix='jobentry_set')
+        club_formset = ClubOrgFormSet(request.POST, instance=user, prefix='cluborg_set')
 
         if form.is_valid() and job_formset.is_valid() and club_formset.is_valid():
             form.save()
-            job_entries = job_formset.save(commit=False)
 
-            JobEntry.objects.filter(user=user).update(is_current=False)
+            # Delete removed job entries
+            for deleted_form in job_formset.deleted_forms:
+                if deleted_form.instance.pk:
+                    deleted_form.instance.delete()
+
+            # Save job entries (new and updated)
+            job_entries = job_formset.save(commit=False)
             for job in job_entries:
                 job.user = user
-                if not job.is_current:
-                    job.is_current = True
                 job.save()
             job_formset.save_m2m()
-            club_formset.save()
+
+            # Delete removed clubs
+            for deleted_form in club_formset.deleted_forms:
+                if deleted_form.instance.pk:
+                    deleted_form.instance.delete()
+
+            # Save club entries (new and updated)
+            club_entries = club_formset.save(commit=False)
+            for club in club_entries:
+                club.user = user
+                club.save()
+            club_formset.save_m2m()
+
+        else:
+            print('Form errors:', form.errors)
+            print('JobFormset errors:', job_formset.errors)
+            print('ClubFormset errors:', club_formset.errors)
 
             messages.success(request, 'Profile updated successfully.')
-            return redirect('profile')  # Redirect to read-only profile page
+            return redirect('profile')
     else:
+        
         form = UserProfileEditForm(instance=user)
-        job_formset = JobEntryFormSet(instance=user)
-        club_formset = ClubOrgFormSet(instance=user)
+        job_formset = JobEntryFormSet(instance=user, prefix='jobentry_set')
+        club_formset = ClubOrgFormSet(instance=user, prefix='cluborg_set')
 
     context = {
         'form': form,
@@ -457,6 +505,8 @@ def profile_edit_view(request):
         'can_edit': True,
     }
     return render(request, 'core/profile.html', context)
+
+
 
 
 class UserProfileDetailView(DetailView):
@@ -787,7 +837,7 @@ def global_search_view(request):
 
 class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
     template_name = 'change_password.html'
-    success_url = reverse_lazy('change_password')
+    success_url = reverse_lazy('profile')
     success_message = "Your password was successfully updated."
 
 def logout_view(request):

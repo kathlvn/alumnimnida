@@ -109,5 +109,10 @@
 .filter-form {
     display: flex;
     margin-left: auto;
+    
   
+}
+
+.filter-form label {
+  margin-right: 10px;
 }

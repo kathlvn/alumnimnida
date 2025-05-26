@@ -50,7 +50,7 @@ body {
   color: white;
 }
 
-a {
+a:not(.page-link) {
   text-decoration: none;
   color: inherit;
 }
@@ -142,6 +142,10 @@ a {
   outline: none;
 }
 
+.filter-form label {
+  margin-right: 10px;
+}
+
 /* ===== Right Panel (Generic Use) ===== */
 .right-panel {
   width: 300px;
@@ -202,4 +206,30 @@ a {
   border-radius: 10px;
 }
 
+.pagination {
+  margin-top: 20px;
+  text-align: right;
+}
 
+.pagination .page-link {
+  margin: 0 10px;
+  display: inline-block;
+  color: #4cacec !important;
+  font-weight: normal;
+  padding-bottom: 3px;
+  /* border-bottom: 2px solid #6f45ed !important; */
+  background-color: transparent;
+  text-decoration: none !important;
+}
+
+
+
+.pagination .page-link:hover {
+  color: #b300a1;
+  border-color: #cc860d;
+}
+
+.pagination .page-info {
+  margin: 0 10px;
+  font-weight: 500;
+}

@@ -7,27 +7,29 @@
 
 html, body {
     height: 100%;
-    overflow-x: hidden;
-}
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
     background: radial-gradient(circle at center, #5b1780, #000000);
     color: white;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* align items at the top */
+    padding-top: 40px;
+    padding: 30px;
+    overflow-x: hidden;
 }
 
 /* Container Styling */
 .container {
     background: rgba(255, 255, 255, 0.07);
-    padding: 20px 35px;
+    padding: 40px;
     border-radius: 20px;
-    max-width: 600px;
-    width: 90%;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
@@ -35,35 +37,36 @@ body {
 /* Header */
 h1 {
     text-align: center;
-    font-size: 28px;
-    margin-bottom: 30px;
+    font-size: 30px;
+    margin-bottom: 35px;
     font-weight: 600;
 }
 
-/* Form Table Styling */
-table {
-    width: 100%;
-    color: white;
-    border-spacing: 0 15px;
+/* Form Grid Layout */
+form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px 40px;
 }
 
-table td {
-    vertical-align: top;
+/* Form Groups (wrap each label+input in .form-group) */
+.form-group {
+    display: flex;
+    flex-direction: column;
 }
 
-table label {
-    display: block;
+label {
     margin-bottom: 6px;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 15px;
 }
 
-/* Inputs, Selects, Textareas */
-input, textarea, select {
-    width: 100%;
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
+/* Inputs, selects, textareas */
+input,
+textarea,
+select {
     padding: 10px 15px;
+    font-size: 15px;
     border-radius: 10px;
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -72,27 +75,51 @@ input, textarea, select {
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-input:focus, textarea:focus, select:focus {
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
     background-color: rgba(255, 255, 255, 0.25);
     border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Buttons */
+/* Help text and error list */
+.form-text,
+.errorlist {
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.errorlist {
+    color: #ff6b6b;
+}
+
+/* Button Group */
 .button-group {
-    margin-top: 30px;
+    grid-column: 1 / -1; /* Span full width */
     text-align: center;
+    margin-top: 30px;
 }
 
 .button-group button,
 .button-group .cancel-link {
-    padding: 10px 22px;
+    display: inline-block;
+    padding: 10px 24px;
     background-color: rgba(255, 255, 255, 0.12);
     color: white;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    margin: 0 8px;
     font-weight: 500;
+    margin: 0 10px;
     text-decoration: none;
     transition: all 0.3s ease;
 }
@@ -100,5 +127,6 @@ input:focus, textarea:focus, select:focus {
 .button-group button:hover,
 .button-group .cancel-link:hover {
     background-color: rgba(255, 255, 255, 0.25);
-    transform: scale(1.05);
+    transform: translateY(-1px);
 }
+

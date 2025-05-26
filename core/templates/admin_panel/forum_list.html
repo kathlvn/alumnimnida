@@ -46,5 +46,16 @@
   {% empty %}
   <p>No forum posts available.</p>
   {% endfor %}
+  <div class="pagination">
+    <span class="page-info">SHOWING PAGE {{ page_obj.number }} OF {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Previous</a>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">Next</a>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

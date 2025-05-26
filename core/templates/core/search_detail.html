@@ -40,14 +40,15 @@
     {% if user_profile.profile_picture %}
       <img src="{{ user_profile.profile_picture.url }}"
            alt="Profile Picture"
-           class="rounded-circle mb-3"
+           style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover;"
+           class="mb-3"
            width="150"
            height="150">
     {% endif %}
-    <p>Student Number: {{ user_profile.student_number }}</p>
-    <p>Address: {{ user_profile.address }}</p>
-    <p>Employment Status: {{ user_profile.employment_status }}</p>
-    <p>Bio: {{ user_profile.bio }}</p>
+    <p>Degree: <strong>{{ user_profile.degree }}</strong></p>
+    <p>Year Graduated: <strong>{{ user_profile.year_graduated }}</strong></p>
+    <p>Employment Status: <strong>{{ user_profile.employment_status }}</strong></p>
+    <p>Bio: <strong>{{user_profile.bio}}</strong></p>
 
   {% else %}
     <p>No detail found.</p>

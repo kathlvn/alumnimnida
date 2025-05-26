@@ -1,7 +1,6 @@
-
 {% load static %}
 
-{% block extra_css%}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/admin_profile.css' %}">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 {% endblock %}
@@ -10,35 +9,38 @@
 <div class="container mt-4 text-center">
     <h2>Admin Profile</h2>
 
-    {% if edit_mode %}
-        <form method="post" enctype="multipart/form-data" class="text-start mx-auto" style="max-width: 400px;">
-            {% csrf_token %}
-            <div class="text-center">
-                <img src="{% if admin_user.profile_picture %}{{ admin_user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
-                     alt="Profile Picture"
-                     class="rounded-circle mb-3"
-                     style="width: 150px; height: 150px; object-fit: cover;">
+    <form method="post" enctype="multipart/form-data" class="text-center mx-auto" style="max-width: 500px;">
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
             </div>
+        {% endif %}
 
-            {{ form.as_p }}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% csrf_token %}
+        <div class="text-center">
+            <img src="{% if admin_user.profile_picture %}{{ admin_user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
+                    alt="Profile Picture"
+                    class="profile-picture-img">
+        </div>
 
-            <div class="d-grid gap-2 mt-3">
-                <button type="submit" class="btn btn-success">Save Changes</button>
-                <a href="{% url 'admin_profile' %}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+        <div class="profile-picture-upload">
+            <label for="id_profile_picture" style="display:none;">Profile Picture</label>
+            <input type="file" name="profile_picture" id="id_profile_picture" style="display:none;">
+        </div>
 
-    {% else %}
-        <img src="{% if admin_user.profile_picture %}{{ admin_user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}"
-             alt="Profile Picture"
-             class="rounded-circle mb-3"
-             style="width: 150px; height: 150px; object-fit: cover;">
+        {{ form.as_p }}
 
-        <p><strong>Name:</strong> {{ admin_user.first_name }} {{ admin_user.last_name }}</p>
-        <p><strong>Username:</strong> {{ admin_user.username }}</p>
-        <p><strong>Role:</strong> Administrator</p>
-
-        <a href="?edit=1" class="btn btn-primary mt-3">Edit Profile</a>
-    {% endif %}
+        <div class="d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="{% url 'admin_profile' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
 </div>
 {% endblock %}

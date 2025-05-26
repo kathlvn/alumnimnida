@@ -23,8 +23,19 @@ body {
   width: 100%;
   max-width: 550px;
   text-align: center;
-  animation: fadeIn 1s ease-out;
 }
+
+form.text-center label,
+form.text-center input,
+form.text-center select,
+form.text-center textarea {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 100%;  /* optional: keeps inputs full width */
+}
+
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(30px); }
@@ -42,19 +53,26 @@ h2 {
 }
 
 
-img.rounded-circle {
-  border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 0 20px rgba(163, 82, 255, 0.4);
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  transition: 0.3s ease;
+.container .profile-picture-img {
+  border-radius: 50% !important;
+  border: 3px solid white !important;
+  box-shadow: 0 0 20px rgba(163, 82, 255, 0.4) !important;
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: cover !important;
+  transition: 0.3s ease !important;
+  justify-content: center !important;
 }
 
-img.rounded-circle:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px rgba(163, 82, 255, 0.6);
+
+
+.profile-picture-upload {
+  margin-bottom: 1rem;
+}
+
+.profile-picture-upload label,
+.profile-picture-upload input[type="file"] {
+  display: none;
 }
 
 /* Form Styling */
@@ -86,7 +104,6 @@ form textarea {
   border-radius: 12px;
   color: #ffffff;
   font-size: 0.95rem;
-  transition: 0.3s ease;
 }
 
 form input:focus,
@@ -121,6 +138,7 @@ a.btn,
   transition: 0.3s ease-in-out;
   text-align: center;
   text-decoration: none;
+  align-items: center;
 }
 
 .btn-primary {

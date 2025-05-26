@@ -14,7 +14,7 @@
   <div class="updates-section">
     <div class="top-row">
     <form method="get" class="filter-form">
-      <label for="visibility">Filter by:</label>
+      <label for="visibility">Filter by: </label>
       <select name="visibility" id="visibility" onchange="this.form.submit()">
         <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
         <option value="public" {% if visibility_filter == 'public' %}selected{% endif %}>Public</option>

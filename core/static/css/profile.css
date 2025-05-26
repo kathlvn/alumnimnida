@@ -1,5 +1,5 @@
 .profile-container {
-  display: flex;
+  display: block;
   flex-direction: column;
   gap: 20px;
 }
@@ -14,22 +14,33 @@
 .profile-card-wrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 30px;
+  gap: 2rem;
   justify-content: space-between;
   padding: 20px;
+  align-items: flex-start;
 }
 
-.profile-overview, .profile-details {
+.profile-details {
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid white;
   border-radius: 20px;
   padding: 20px;
-  flex: 1;
-  min-width: 300px;
+  flex: 1 1 50%;
+  max-width: 600px;
+  overflow-y: auto;
   box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
 }
 
 .profile-overview {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid white;
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1 1 30%;
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
+  flex: 0 0 350px;
+  align-self: flex-start;
+  max-height: fit-content;
   max-width: 350px;
   text-align: center;
 }
@@ -228,4 +239,170 @@ ul {
   margin-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 15px;
+}
+
+.tag-container, .tag-formset-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tag-item {
+  background-color: #4a90e2;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: inline-block;
+}
+/* Base tag style for jobs and clubs with border only */
+.tag-form-item {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 16px;
+  padding: 6px 12px;
+  margin: 4px 6px 4px 0;
+  font-size: 14px;
+  color: #333;
+  border: 2px solid transparent;
+  position: relative;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Base tag style with border only for job entries */
+.job-form-item {
+  display: inline-flex;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 16px;
+  padding: 6px 12px;
+  margin: 4px 6px 4px 0;
+  font-size: 14px;
+  color: #fdf8f8;
+  border: 2px solid #007bff; /* default active blue border */
+  position: relative;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Inactive job entry: gray border, gray text */
+.job-form-item.inactive {
+  border-color: #6c757d;
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+/* Clubs with solid background and color */
+.club-form-item {
+  display: inline-flex;
+  align-items: center;
+  background-color: #d4edda;
+  border-radius: 16px;
+  padding: 6px 12px;
+  margin: 4px 6px 4px 0;
+  font-size: 14px;
+  color: #155724;
+  position: relative;
+}
+
+/* Remove "×" button */
+.btn-remove-tag {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-weight: bold;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.btn-remove-tag:hover {
+  color: #e63946;
+}
+
+/* Add buttons styling */
+.btn-add-job,
+.btn-add-club {
+  display: inline-block;
+  margin: 8px 6px 16px 0;
+  padding: 6px 14px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-add-job:hover,
+.btn-add-club:hover {
+  background-color: #0056b3;
+}
+
+/* Inputs inside tag items styling */
+.tag-form-item input[type="text"],
+.tag-form-item input[type="number"],
+.tag-form-item select {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  width: auto;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+}
+
+/* Profile Save and Cancel buttons */
+.btn-save {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 12px;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  display: inline-block;
+  line-height: normal;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Responsive tweak: stack tags on narrow screens */
+@media (max-width: 480px) {
+  .tag-form-item {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 14px;
+    margin: 6px 0;
+    font-size: 16px;
+  }
 }

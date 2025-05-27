@@ -24,11 +24,13 @@ Welcome back!
           <span style="font-weight: bold;">{{ event.title }}</span><br>
           <em>{{ event.location }}</em>
         </div>
-        <a href="javascript:void(0);" class="view-button" onclick="openModal('event-{{ event.id }}')">View Details</a>
       </div>
     {% empty %}
       <p>No upcoming events.</p>
     {% endfor %}
+    <div style="text-align: right; margin-top: 10px;">
+      <a href="{% url 'events' %}" class="view-button">View All Events</a>
+    </div>
   </div>
 </div>
 
@@ -42,39 +44,15 @@ Welcome back!
           <strong>{{ update.title }}</strong><br>
           <em>{{ update.date_posted|timesince }} ago</em>
         </div>
-        <a href="javascript:void(0);" class="view-button" onclick="openModal('update-{{ update.id }}')">View Details</a>
       </div>
     {% empty %}
       <p>No recent updates.</p>
     {% endfor %}
+    <div style="text-align: right; margin-top: 10px;">
+      <a href="{% url 'updates' %}" class="view-button">View All Updates</a>
+    </div>
   </div>
 </div>
-
-<!-- All Event Modals (outside .event-box) -->
-{% for event in upcoming_events|slice:":5" %}
-  <div id="modal-event-{{ event.id }}" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('event-{{ event.id }}')">&times;</span>
-      <h2>{{ event.title }}</h2>
-      <p>{{ event.description }}</p>
-      <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
-      <p><strong>Time:</strong> {{ event.time }}</p>
-      <p><strong>Location:</strong> {{ event.location }}</p>
-    </div>
-  </div>
-{% endfor %}
-
-<!-- All Update Modals (outside .event-box) -->
-{% for update in recent_updates|slice:":3" %}
-  <div id="modal-update-{{ update.id }}" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('update-{{ update.id }}')">&times;</span>
-      <h2>{{ update.title }}</h2>
-      <p>{{ update.content }}</p>
-      <p><strong>Posted:</strong> {{ update.date_posted|date:"F d, Y, g:i A" }}</p>
-    </div>
-  </div>
-{% endfor %}
 {% endblock %}
 
 {% block right_panel %}
@@ -104,23 +82,5 @@ Welcome back!
 {% endblock %}
 
 {% block scripts %}
-<script>
-  function openModal(id) {
-    document.getElementById("modal-" + id).style.display = "block";
-  }
-
-  function closeModal(id) {
-    document.getElementById("modal-" + id).style.display = "none";
-  }
-
-  // Optional: close modal when clicking outside
-  window.onclick = function(event) {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-  };
-</script>
+<!-- No modal script needed anymore -->
 {% endblock %}

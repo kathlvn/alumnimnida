@@ -53,7 +53,7 @@
   <div class="comment-section">
     <strong>Comments</strong>
     {% for comment in post.comments.all %}
-      <p>{{ comment.user.get_full_name }}: {{ comment.content }}
+      <p>{{ comment.user.full_name }}: {{ comment.content }}
         {% if comment.user == request.user %}
           <a class="delete-link" href="{% url 'delete_comment' comment.id %}">Delete</a>
         {% endif %}

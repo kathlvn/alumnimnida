@@ -51,10 +51,13 @@ Welcome back!
 </div>
 {% endblock %}
 
-
 {% block right_panel %}
 <div style="text-align: center; margin-bottom: 20px;">
-  <img src="{% static 'img/user_icon.png' %}" alt="Profile" style="width: 60px;">
+  {% if user.profile_picture %}
+    <img src="{{ user.profile_picture.url }}" alt="Profile Picture" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
+  {% else %}
+    <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture" style="width: 60px;">
+  {% endif %}
   <h3>{{ user.full_name }}</h3>
   <em>Class of {{ user.year_graduated }}</em>
   <br>
@@ -71,9 +74,10 @@ Welcome back!
     <span class="label">Comments made:</span>
     <span class="value">{{ comments_count }}</span>
   </div>
-  <div class="info-row">
+  <!-- <div class="info-row">
     <span class="label">Events Attended:</span>
     <span class="value">{{ events_attended_count }}</span>
-  </div>
+  </div> -->
 </div>
 {% endblock %}
+

@@ -40,9 +40,9 @@
   margin-top: 15px;
   padding: 10px 20px;
   font-size: 14px;
-  background-color: white;
-  color: #5b1780;
-  border: none;
+  background-color: #5b1780;
+  color: white;
+  border: 2px solid white;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;

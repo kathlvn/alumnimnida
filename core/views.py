@@ -135,6 +135,7 @@ def admin_user_list(request):
             Q(full_name__icontains=query) |
             Q(student_number__icontains=query) |
             Q(year_graduated__icontains=query) |
+            Q(address__icontains=query) |
             Q(degree__icontains=query)
         )
 
@@ -442,6 +443,7 @@ def profile_view(request):
         'job_entries': job_entries,
         'club_orgs': club_orgs,
         'can_edit': False,  # no editing in this view
+        
     }
 
     return render(request, 'core/profile.html', context)
@@ -478,6 +480,7 @@ def profile_edit_view(request):
                 if deleted_form.instance.pk:
                     deleted_form.instance.delete()
 
+
             # Save club entries (new and updated)
             club_entries = club_formset.save(commit=False)
             for club in club_entries:
@@ -486,11 +489,8 @@ def profile_edit_view(request):
             club_formset.save_m2m()
 
         else:
-            print('Form errors:', form.errors)
-            print('JobFormset errors:', job_formset.errors)
-            print('ClubFormset errors:', club_formset.errors)
+            messages.error(request, 'There were errors in your form. Please check and try again.')
 
-            messages.success(request, 'Profile updated successfully.')
             return redirect('profile')
     else:
         

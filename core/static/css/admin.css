@@ -158,11 +158,12 @@ body {
   text-decoration: none;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+  background-color: #5b1780;
 }
 
 .btn-outline {
   background: transparent;
-  color: white;
+  color: #5b1780;
   border: 2px solid white;
 }
 
@@ -183,9 +184,9 @@ body {
 }
 
 .btn-primary {
-  background-color: white;
-  color: #5b1780;
-  border: none;
+  background-color: #5b1780;
+  color: white;
+  border: 2px solid white;
 }
 
 .btn-primary:hover {

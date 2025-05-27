@@ -70,8 +70,8 @@
 .btn-edit-profile {
   display: inline-block;
   margin-top: 15px;
-  background-color: white;
-  color: #5b1780;
+  background-color: #5b1780;
+  color: white;
   padding: 8px 16px;
   border-radius: 20px;
   font-weight: bold;
@@ -79,8 +79,8 @@
 }
 
 .btn-edit-profile:hover {
-  background-color: #5b1780;
-  color: white;
+  background-color: white;
+  color: #5b1780;
 }
 
 
@@ -98,7 +98,8 @@
 }
 
 .btn-change-password:hover {
-    background-color: #3e105a;
+    background-color: white;
+    color: #5b1780;
 }
 
 .profile-bio-box {

@@ -1,7 +1,7 @@
 import json
 import csv
 from django.contrib import messages
-from collections import Counter
+from collections import Counter, defaultdict
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
@@ -9,6 +9,7 @@ from django.contrib.auth.views import PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.db.models import Count, F, ExpressionWrapper, IntegerField
+from django.db.models.functions import ExtractYear
 from django.forms import inlineformset_factory
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -91,6 +92,7 @@ def admin_dashboard(request):
     degrees = CustomUser.objects.values_list('degree', flat=True)
     count = Counter(degrees)
 
+    # Chart 1: Total alumni by degree
     course_data = {
         "BSIT": count.get("BSIT", 0),
         "BSCS": count.get("BSCS", 0),
@@ -98,8 +100,26 @@ def admin_dashboard(request):
         "BSEMC": count.get("BSEMC", 0)
     }
 
+    # Chart 2: Alumni count per year per degree
+    alumni_years = (
+        CustomUser.objects
+        .values('year_graduated', 'degree')
+    )
+
+    yearly_distribution = defaultdict(lambda: {"BSIT": 0, "BSCS": 0, "ACT": 0, "BSEMC": 0})
+    for record in alumni_years:
+        year = record["year_graduated"]
+        degree = record["degree"]
+        if year:
+            yearly_distribution[year][degree] += 1
+
+
+    # Convert to sorted list for JSON
+    yearly_data = [{"year": y, **d} for y, d in sorted(yearly_distribution.items())]
+
     return render(request, 'admin_panel/admin_dashboard.html', {
         'course_data': course_data,
+        'yearly_data': yearly_data,
         'user': request.user
     })
 

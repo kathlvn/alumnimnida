@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Home{% endblock %}
 
@@ -12,43 +13,68 @@ Welcome back!
 {% endblock %}
 
 {% block content %}
-{% load humanize %}
 <!-- Upcoming Events -->
 <div class="event-box">
-<div class="forum-post">
-  <h3>UPCOMING EVENTS</h3>
-  {% for event in upcoming_events|slice:":5" %}
-    <div class="item-row">
-      <div>
-        <strong>{{ event.date|date:"F d" }}</strong> &nbsp;
-        <span style="font-weight: bold;">{{ event.title }}</span><br>
-        <em>{{ event.location }}</em>
+  <div class="forum-post">
+    <h3>UPCOMING EVENTS</h3>
+    {% for event in upcoming_events|slice:":5" %}
+      <div class="item-row">
+        <div>
+          <strong>{{ event.date|date:"F d" }}</strong> &nbsp;
+          <span style="font-weight: bold;">{{ event.title }}</span><br>
+          <em>{{ event.location }}</em>
+        </div>
+        <a href="javascript:void(0);" class="view-button" onclick="openModal('event-{{ event.id }}')">View Details</a>
       </div>
-      <a href="{% url 'event_detail' event.id %}" class="view-button">View Details</a>
-    </div>
-  {% empty %}
-    <p>No upcoming events.</p>
-  {% endfor %}
-</div>
+    {% empty %}
+      <p>No upcoming events.</p>
+    {% endfor %}
+  </div>
 </div>
 
 <!-- Recent Updates -->
 <div class="event-box">
-<div class="forum-post">
-  <h3>RECENT UPDATES</h3>
-  {% for update in recent_updates|slice:":3" %}
-    <div class="item-row">
-      <div>
-        <strong>{{ update.title }}</strong><br>
-        <em>{{ update.date_posted|timesince }} ago</em>
+  <div class="forum-post">
+    <h3>RECENT UPDATES</h3>
+    {% for update in recent_updates|slice:":3" %}
+      <div class="item-row">
+        <div>
+          <strong>{{ update.title }}</strong><br>
+          <em>{{ update.date_posted|timesince }} ago</em>
+        </div>
+        <a href="javascript:void(0);" class="view-button" onclick="openModal('update-{{ update.id }}')">View Details</a>
       </div>
-      <a href="{% url 'update_detail' update.id%}" class="view-button">View Details</a> 
+    {% empty %}
+      <p>No recent updates.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- All Event Modals (outside .event-box) -->
+{% for event in upcoming_events|slice:":5" %}
+  <div id="modal-event-{{ event.id }}" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('event-{{ event.id }}')">&times;</span>
+      <h2>{{ event.title }}</h2>
+      <p>{{ event.description }}</p>
+      <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
+      <p><strong>Time:</strong> {{ event.time }}</p>
+      <p><strong>Location:</strong> {{ event.location }}</p>
     </div>
-  {% empty %}
-    <p>No recent updates.</p>
-  {% endfor %}
-</div>
-</div>
+  </div>
+{% endfor %}
+
+<!-- All Update Modals (outside .event-box) -->
+{% for update in recent_updates|slice:":3" %}
+  <div id="modal-update-{{ update.id }}" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('update-{{ update.id }}')">&times;</span>
+      <h2>{{ update.title }}</h2>
+      <p>{{ update.content }}</p>
+      <p><strong>Posted:</strong> {{ update.date_posted|date:"F d, Y, g:i A" }}</p>
+    </div>
+  </div>
+{% endfor %}
 {% endblock %}
 
 {% block right_panel %}
@@ -74,10 +100,27 @@ Welcome back!
     <span class="label">Comments made:</span>
     <span class="value">{{ comments_count }}</span>
   </div>
-  <!-- <div class="info-row">
-    <span class="label">Events Attended:</span>
-    <span class="value">{{ events_attended_count }}</span>
-  </div> -->
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+  function openModal(id) {
+    document.getElementById("modal-" + id).style.display = "block";
+  }
+
+  function closeModal(id) {
+    document.getElementById("modal-" + id).style.display = "none";
+  }
+
+  // Optional: close modal when clicking outside
+  window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+  };
+</script>
+{% endblock %}

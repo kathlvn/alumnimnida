@@ -74,25 +74,38 @@
     <div class="card card-wide-tall"> <!-- CHART -->
       <div class="card-body center-text">
         <h5>Alumni Distribution</h5>
+        
+        <div class="chart-toggle-links" style="margin-bottom: 10px;">
+          <a class="by-degree" href="javascript:void(0);" onclick="showChart('pie')">By Degree</a>
+          <a class="by-year" href="javascript:void(0);" onclick="showChart('bar')">By Year</a>
+        </div>
+
         <canvas id="alumniPieChart" width="300" height="300"></canvas>
+        <canvas id="alumniBarChart" width="300" height="300" style="display: none;"></canvas>
       </div>
     </div>
-  </div>
+
+
+    {{ course_data|json_script:"course-data" }}
+    {{ yearly_data|json_script:"yearly-data" }}
 
 
 {{ course_data|json_script:"course-data" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const ctx = document.getElementById('alumniPieChart').getContext('2d');
-  const chartData = JSON.parse(document.getElementById('course-data').textContent);
+  const pieCtx = document.getElementById('alumniPieChart').getContext('2d');
+  const barCtx = document.getElementById('alumniBarChart').getContext('2d');
 
-  new Chart(ctx, {
+  const pieData = JSON.parse(document.getElementById('course-data').textContent);
+  const barData = JSON.parse(document.getElementById('yearly-data').textContent);
+
+  const pieChart = new Chart(pieCtx, {
     type: 'pie',
     data: {
       labels: ['IT Alumni', 'CS Alumni', 'ACT Alumni', 'EMC Alumni'],
       datasets: [{
-        data: [chartData.BSIT, chartData.BSCS, chartData.ACT, chartData.BSEMC],
+        data: [pieData.BSIT, pieData.BSCS, pieData.ACT, pieData.BSEMC],
         backgroundColor: ['#F4EAFE', '#B99DF3', '#D6AEF7', '#7E55CC'],
         borderWidth: 1
       }]
@@ -102,7 +115,48 @@ document.addEventListener("DOMContentLoaded", function () {
       plugins: { legend: { position: 'bottom' } }
     }
   });
+
+  const years = barData.map(item => item.year);
+  const barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'BSIT',
+          data: barData.map(item => item.BSIT),
+        },
+        {
+          label: 'BSCS',
+          data: barData.map(item => item.BSCS),
+        },
+        {
+          label: 'ACT',
+          data: barData.map(item => item.ACT),
+        },
+        {
+          label: 'BSEMC',
+          data: barData.map(item => item.BSEMC),
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      },
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  window.showChart = function(type) {
+    document.getElementById('alumniPieChart').style.display = (type === 'pie') ? 'block' : 'none';
+    document.getElementById('alumniBarChart').style.display = (type === 'bar') ? 'block' : 'none';
+  };
 });
 </script>
+
 {% endblock %}
 

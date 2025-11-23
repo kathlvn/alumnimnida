@@ -32,15 +32,80 @@
   transform: scale(1.2);
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 22px;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  margin-bottom: 5px;
+  color: white;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+}
+
+.logo-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+}
+
+.header-text h1 {
+  margin: -5px 0;
+  font-size: 1.50rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #ffffff;
+}
+
+.header-text p {
+  margin: -8px 0;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.92);
+  opacity: 0.95;
+}
+
+.admin-nav {
+  display: flex;
+  justify-content: center;  /* center horizontally */
+  align-items: center;
+  padding: 10px 0;
+  background: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.admin-nav nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.admin-nav nav a img {
+  max-width: 65px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px #f4d7ff);
+  transition: transform 0.3s ease;
+}
+
+.admin-nav nav a img:hover { transform: scale(1.12); }
+
 .admin-container {
   display: flex;
   flex-direction: column;
-  padding: 30px;
-  margin-left: 0; /* Removes sidebar spacing */
+  padding: 20px;
 }
-
-
-
 
 
 body {
@@ -98,9 +163,23 @@ a:not(.page-link) {
 .main-content {
   margin-left: 130px;
   flex: 2;
-  padding: 30px;
+  padding: 5px;
   overflow-y: auto;
   position: relative;
+}
+
+/* Variant styles: keep user layout (with sidebar) and provide admin layout */
+.container .main-content {
+  /* default for regular users who have a fixed sidebar */
+  margin-left: 130px;
+  padding: 30px;
+}
+
+.admin-container .main-content {
+  
+  max-width: 1280px;
+  width: 100%;
+  margin-top: -10px;
 }
 
 /* ===== Global Header for All Pages ===== */

@@ -163,9 +163,9 @@ def admin_user_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/user_list.html', {'users': page_obj.object_list, 
+    return render(request, 'admin_panel/admin_list.html', {'panel': 'users', 'users': page_obj.object_list, 
                                                           'query': query,
-                                                          'page_obj':page_obj})
+                                                          'page_obj': page_obj})
 
 @login_required
 @user_passes_test(is_admin)
@@ -285,7 +285,7 @@ def admin_event_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/event_list.html', {'events': page_obj.object_list, 
+    return render(request, 'admin_panel/admin_list.html', {'panel': 'events', 'events': page_obj.object_list, 
                                                            'query': query,
                                                            'page_obj': page_obj,
                                                            'today': today,})
@@ -359,8 +359,9 @@ def admin_updates_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/updates_list.html', {'updates': page_obj.object_list, 
-                                                             'page_obj': page_obj})
+    return render(request, 'admin_panel/admin_list.html', {'panel': 'updates', 'updates': page_obj.object_list, 
+                                                             'page_obj': page_obj,
+                                                             'query': query})
 
 
 @login_required
@@ -417,7 +418,7 @@ def admin_forum_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/forum_list.html', {'posts': page_obj.object_list, 
+    return render(request, 'admin_panel/admin_list.html', {'panel': 'forum', 'posts': page_obj.object_list, 
                                                            'page_obj': page_obj,
                                                            'query': query})
 

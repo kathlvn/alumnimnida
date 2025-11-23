@@ -1,13 +1,5 @@
 /* General layout */
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to bottom right, #5b1780, #000000);
-    color: #ffffff;
-    margin: 0;
-    padding: 30px;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
+
 
 h1 {
     color: #ffffff;

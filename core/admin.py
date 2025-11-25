@@ -11,9 +11,13 @@ class CustomUserAdmin(UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('student_number', 'full_name', 'password')}),
-        ('Personal Info', {'fields': (
-            'address', 'degree', 'year_graduated'
-        )}),
+        ('Personal Info', {
+            'fields': (
+                'address', 'current_address', 'degree', 'year_graduated',
+                'birthday', 'year_attended', 'contact_number', 'email'
+            )
+        }),
+
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
     )
 
@@ -21,7 +25,9 @@ class CustomUserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': (
-                'student_number', 'full_name', 'address', 'degree', 'year_graduated', 'is_staff', 'is_active'
+                'student_number', 'full_name', 'address', 'current_address',
+                'degree', 'year_graduated', 'birthday', 'year_attended',
+                'contact_number', 'email', 'is_staff', 'is_active'
             ),
         }),
     )

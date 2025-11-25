@@ -5,8 +5,15 @@ from .models import CustomUser, JobEntry, ClubOrg, Event, Updates, Forum, Commen
 class CustomUserCreationForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['student_number', 'full_name','address', 'degree', 'year_graduated', 'is_active', 'is_staff', 'is_superuser']
-        # fields = '__all__'
+        fields = [
+            'student_number', 'full_name', 'address', 'degree', 'year_graduated',
+            'birthday', 'current_address', 'year_attended',
+            'contact_number', 'email',
+            'is_active', 'is_staff', 'is_superuser'
+        ]
+        widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'})
+        }
         # labels = {
         #     'curr_location': 'Current Location',
         # }
@@ -25,11 +32,17 @@ class UserProfileForm(forms.ModelForm):
         model = CustomUser
         fields = [
             'address',
+            'current_address',
+            'birthday',
+            'year_attended',
+            'contact_number',
+            'email',
             'employment_status',
             'bio',
             'profile_picture',
         ]
         widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
             'bio': forms.Textarea(attrs={'rows': 3}),
         }
 
@@ -42,11 +55,17 @@ class UserProfileEditForm(forms.ModelForm):
             'degree',
             'year_graduated',
             'address',
+            'current_address',
+            'birthday',
+            'year_attended',
+            'contact_number',
+            'email',
             'employment_status',
             'bio',
             'profile_picture',
         ]
         widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
             'bio': forms.Textarea(attrs={'rows': 3}),
         }
 

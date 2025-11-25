@@ -59,6 +59,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     year_selection = [(year, str(year)) for year in range(current_year, 2015, -1)]  
     year_graduated = models.IntegerField(choices=year_selection, null=True, blank=True)
     
+    birthday = models.DateField(null=True, blank=True)
+    current_address = models.CharField(max_length=255, blank=True, null=True)
+    year_attended = models.IntegerField(null=True, blank=True)
+    contact_number = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+
     bio = models.TextField(blank=True)
 
     EMPLOYMENT_STATUS_CHOICES = [

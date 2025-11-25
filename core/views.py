@@ -623,6 +623,29 @@ def profile_view(request):
 
     job_entries = user.job_entries.all().order_by('-date_added')
     club_orgs = user.club_orgs.all()
+    # Determine active/inactive state for display:
+    # Consider these employment statuses as "active-capable" (include freelancing and others as requested)
+    ACTIVE_STATUSES = {'employed', 'freelancing', 'studying', 'other'}
+    active_capable = (user.employment_status in ACTIVE_STATUSES)
+
+    if active_capable and job_entries.exists():
+        # Prefer jobs explicitly marked current; if multiple, pick the most recent one by date_added
+        current_jobs = [j for j in job_entries if j.is_current]
+        if current_jobs:
+            # pick most recent current job
+            active_job = max(current_jobs, key=lambda j: j.date_added or datetime.min)
+        else:
+            # if only one job, it's active; otherwise choose the most recent job
+            if job_entries.count() == 1:
+                active_job = job_entries[0]
+            else:
+                active_job = max(job_entries, key=lambda j: j.date_added or datetime.min)
+
+        for job in job_entries:
+            job.is_active = (job.pk == active_job.pk)
+    else:
+        for job in job_entries:
+            job.is_active = False
 
     context = {
         'user': user,
@@ -674,15 +697,61 @@ def profile_edit_view(request):
                 club.save()
             club_formset.save_m2m()
 
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('profile')
         else:
             messages.error(request, 'There were errors in your form. Please check and try again.')
-
-            return redirect('profile')
     else:
         
         form = UserProfileEditForm(instance=user)
         job_formset = JobEntryFormSet(instance=user, prefix='jobentry_set')
         club_formset = ClubOrgFormSet(instance=user, prefix='cluborg_set')
+
+    # Annotate each form in the job formset with an `is_active` flag for template rendering.
+    ACTIVE_STATUSES = {'employed', 'freelancing', 'studying', 'other'}
+    active_capable = (user.employment_status in ACTIVE_STATUSES)
+
+    # Collect existing job instances (those with pk) ordered by date_added desc
+    existing_jobs = list(JobEntry.objects.filter(user=user).order_by('-date_added'))
+    existing_count = len(existing_jobs)
+
+    # Determine which job should be active in the edit UI
+    active_job_pk = None
+    if active_capable and (existing_count > 0 or any(not getattr(jf.instance, 'pk', None) for jf in job_formset.forms)):
+        # Prefer explicit current flags among existing jobs
+        current_existing = [j for j in existing_jobs if j.is_current]
+        if current_existing:
+            active_job_pk = max(current_existing, key=lambda j: j.date_added or datetime.min).pk
+        else:
+            # If there's any new (unsaved) form, make the newest new form active (assume it's appended last)
+            new_forms = [jf for jf in job_formset.forms if not getattr(jf.instance, 'pk', None)]
+            if new_forms:
+                # mark the last new form as active by setting a marker on the form (no pk available)
+                # we'll set is_active=True on that form below
+                pass
+            else:
+                # fallback: if only one existing job, active that; else pick most recent existing
+                if existing_count == 1:
+                    active_job_pk = existing_jobs[0].pk
+                elif existing_count > 1:
+                    active_job_pk = existing_jobs[0].pk
+
+    # Apply is_active flags to formset forms
+    if active_capable:
+        # find last new form if any
+        new_forms = [jf for jf in job_formset.forms if not getattr(jf.instance, 'pk', None)]
+        last_new_form = new_forms[-1] if new_forms else None
+
+        for jf in job_formset.forms:
+            inst = getattr(jf, 'instance', None)
+            if inst and getattr(inst, 'pk', None):
+                jf.is_active = (active_job_pk is not None and inst.pk == active_job_pk)
+            else:
+                # unsaved/new form: active if it's the last new form and no existing job was explicitly selected
+                jf.is_active = (last_new_form is not None and jf is last_new_form and active_job_pk is None)
+    else:
+        for jf in job_formset.forms:
+            jf.is_active = False
 
     context = {
         'form': form,

@@ -33,6 +33,7 @@
 }
 
 .header {
+  position: fixed;
   display: flex;
   align-items: center;
   gap: 18px;
@@ -42,6 +43,10 @@
   margin-bottom: 5px;
   color: white;
   box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .logo-img {
@@ -164,8 +169,7 @@ a:not(.page-link) {
   margin-left: 130px;
   flex: 2;
   padding: 5px;
-  overflow-y: auto;
-  position: relative;
+  overflow-y: auto; 
 }
 
 /* Variant styles: keep user layout (with sidebar) and provide admin layout */
@@ -179,7 +183,7 @@ a:not(.page-link) {
   
   max-width: 1280px;
   width: 100%;
-  margin-top: -10px;
+  padding-top: 7%;
 }
 
 /* ===== Global Header for All Pages ===== */

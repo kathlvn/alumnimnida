@@ -32,6 +32,29 @@
   max-width: 760px;
 }
 
+/* Modal form fields: match user form styling for consistency */
+.modal-box input,
+.modal-box textarea,
+.modal-box select {
+  padding: 10px 15px;
+  font-size: 15px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #fff;
+  outline: none;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.modal-box textarea { resize: vertical; min-height: 80px; }
+
+.modal-box input:focus,
+.modal-box textarea:focus,
+.modal-box select:focus {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.30);
+}
+
 .admin-container input[type="text"] {
   padding: 10px 12px;
   border-radius: 12px;

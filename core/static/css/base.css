@@ -209,6 +209,21 @@ a:not(.page-link) {
   align-items: center;
 }
 
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.back-button:hover { background: rgba(255,255,255,0.08); }
+
 .search-bar {
   width: 250px;
   padding: 10px 15px;
@@ -320,7 +335,8 @@ a:not(.page-link) {
 /* General modal overlay (hidden by default). Shared by form_modals.html */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1200; }
 .modal-overlay.open { display: flex; }
-.modal-box { background: rgba(6,6,8,0.94); color: #fff; padding: 20px; border-radius: 12px; width: 96%; max-width: 760px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: none; }
+.modal-box { background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(80px); color: #fff; padding: 30px; border-radius: 12px; width: 96%; max-width: 760px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: none; }
 .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .modal-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .modal-actions .confirm { background:linear-gradient(135deg,#6d1fb5,#4e126d); color:#fff; }
@@ -329,10 +345,10 @@ a:not(.page-link) {
 /* Logout modal styles (namespaced) */
 .logout-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1200; }
 .logout-modal-overlay.logout-open { display: flex; }
-.logout-modal-box { background: rgba(255, 255, 255, 0.30);
+.logout-modal-box { background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(50px);
   color: #ffffff; padding: 20px; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.3);
-  width: 90%; max-width: 420px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); padding: 20px; }
+  width: 90%; max-width: 420px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); padding: 30px; }
 .logout-modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .logout-modal-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
 .logout-modal-actions .logout-confirm { background:#d33; color:#fff; }
@@ -362,3 +378,42 @@ body.modal-opened .logout-modal-box {
   filter: none !important;
   -webkit-filter: none !important;
 }
+
+/* Shared modal form field styles - centralised so all modal forms look consistent */
+.modal-box input,
+.modal-box textarea,
+.modal-box select {
+  padding: 10px 15px;
+  font-size: 15px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #fff;
+  outline: none;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.modal-box textarea { resize: vertical; min-height: 80px; }
+
+.modal-box input:focus,
+.modal-box textarea:focus,
+.modal-box select:focus {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.30);
+}
+
+.back-button {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+}
+
+.back-button img {
+    display: block;
+    width: 30px;   
+    height: 30px;
+}
+

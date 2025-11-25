@@ -127,6 +127,16 @@
   </div>
 </div>
 
+<!-- Detail/Read-only Modal: used to show read-only details for items (events, users, updates, forum posts) -->
+<div id="detailModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <div id="detail-modal-body" class="modal-body">
+      <p>Loading...</p>
+    </div>
+  </div>
+</div>
+
 <script>
 // Simple modal opener/closer for the shared modals
 (function(){

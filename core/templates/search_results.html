@@ -66,54 +66,35 @@
     <p>No results found.</p>
   {% endif %}
 
-  <!-- Modal for search detail, scoped inside content -->
-  <div id="searchDetailModal" class="modal-overlay" style="display:none;">
-    <div class="modal-card">
-      <span class="close-btn" onclick="closeSearchDetailModal()">&times;</span>
-      <div id="search-detail-content" class="modal-body">
-        <p>Loading...</p>
-      </div>
-    </div>
-  </div>
-{% endblock %}
+  {% endblock %}
 
 {% block extra_js %}
 <script>
-  function loadSearchDetail(url) {
-    const modal = document.getElementById('searchDetailModal');
-    const content = document.getElementById('search-detail-content');
-    modal.style.display = 'flex';
-    content.innerHTML = "<p>Loading...</p>";
-
-    fetch(url)
-      .then(response => {
-        if (!response.ok) throw new Error("Failed to load detail view");
-        return response.text();
-      })
-      .then(html => {
-        content.innerHTML = html;
-      })
-      .catch(() => {
-        content.innerHTML = "<p>Error loading detail view.</p>";
-      });
+  function openDetailModalWithHTML(html){
+    const modal = document.getElementById('detailModal');
+    const body = document.getElementById('detail-modal-body');
+    if(!modal || !body) return;
+    body.innerHTML = html;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-opened');
   }
 
-  function closeSearchDetailModal() {
-    document.getElementById('searchDetailModal').style.display = 'none';
+  function loadSearchDetail(url){
+    const body = document.getElementById('detail-modal-body');
+    if(body) body.innerHTML = '<p>Loading...</p>';
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+      .then(r => { if(!r.ok) throw new Error('Failed to load'); return r.text(); })
+      .then(html => openDetailModalWithHTML(html))
+      .catch(() => openDetailModalWithHTML('<p>Error loading detail view.</p>'));
   }
 
-  window.onclick = function(event) {
-    const modal = document.getElementById('searchDetailModal');
-    if (event.target === modal) {
-      closeSearchDetailModal();
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.search-result-link').forEach(function (link) {
-      link.addEventListener('click', function (e) {
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.search-result-link').forEach(function(link){
+      link.addEventListener('click', function(e){
         e.preventDefault();
         const url = this.getAttribute('data-url');
+        if(!url) return;
         loadSearchDetail(url);
       });
     });

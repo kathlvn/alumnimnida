@@ -11,8 +11,17 @@
 
     <div class="action-search-row">
       <div class="search">
-        <form method="get" action="{% url 'admin_event_list' %}">
-          <input type="text" name="q" placeholder="{% if panel == 'users' %}Search users...{% elif panel == 'events' %}Search events...{% elif panel == 'updates' %}Search updates...{% else %}Search...{% endif %}" value="{{ query }}">
+        <form method="get" action="{% url 'admin_event_list' %}" class="search-form" role="search">
+          <button type="button" class="back-button" title="Go back" aria-label="Go back" onclick="window.history.back();">
+            <img src="{% static 'img/back-icon.png' %}" alt="Back" class="back-icon">
+          </button>
+          <input type="text" name="q"
+            placeholder="{% if panel == 'users' %}Search users...
+                          {% elif panel == 'events' %}Search events...
+                          {% elif panel == 'updates' %}Search updates...
+                          {% else %}Search...
+                          {% endif %}"
+            value="{{ query }}">
           <button type="submit">Search</button>
         </form>
       </div>
@@ -34,7 +43,7 @@
       <tbody>
         {% for event in events %}
           <tr {% if event.done or event.date < today.date or event.date == today.date and event.time <= today.time %}class="done-event"{% endif %}>
-            <td>{{ event.title|truncatechars:20 }}</td>
+            <td><a href="#" class="admin-detail-link" data-url="{% url 'event_detail' event.pk %}">{{ event.title|truncatechars:20 }}</a></td>
             <td>{{ event.date }}</td>
             <td>
               <strong>{{ event.get_visibility_type_display }}</strong><br>
@@ -81,8 +90,17 @@
 
     <div class="action-search-row">
       <div class="search">
-        <form method="get" action="{% url 'admin_updates_list' %}" class="mb-3 d-flex" role="search">
-          <input type="text" name="q" value="{{ query }}" class="form-control me-2" placeholder="{% if panel == 'users' %}Search users...{% elif panel == 'events' %}Search events...{% elif panel == 'updates' %}Search updates...{% else %}Search...{% endif %}">
+        <form method="get" action="{% url 'admin_updates_list' %}" class="mb-3 d-flex search-form" role="search">
+          <button type="button" class="back-button" title="Go back" aria-label="Go back" onclick="window.history.back();">
+            <img src="{% static 'img/back-icon.png' %}" alt="Back" class="back-icon">
+          </button>
+          <input type="text" name="q"
+            placeholder="{% if panel == 'users' %}Search users...
+                          {% elif panel == 'events' %}Search events...
+                          {% elif panel == 'updates' %}Search updates...
+                          {% else %}Search...
+                          {% endif %}"
+            value="{{ query }}">
           <button type="submit" class="btn btn-outline-primary">Search</button>
         </form>
       </div>
@@ -104,7 +122,7 @@
       <tbody>
         {% for update in updates %}
         <tr>
-          <td>{{ update.title }}</td>
+          <td><a href="#" class="admin-detail-link" data-url="{% url 'update_detail' update.pk %}">{{ update.title }}</a></td>
           <td>
             {% if update.related_event %}
               {{ update.related_event.title }}
@@ -148,8 +166,17 @@
 
     <div class="action-search-row">
       <div class="search">
-        <form method="get" action="{% url 'admin_forum_list' %}" style="margin-bottom: 30px;">
-          <input type="text" name="q" placeholder="{% if panel == 'forum' %}Search posts or authors...{% elif panel == 'users' %}Search users...{% elif panel == 'events' %}Search events...{% elif panel == 'updates' %}Search updates...{% else %}Search...{% endif %}" value="{{ query }}" />
+        <form method="get" action="{% url 'admin_forum_list' %}" class="search-form" style="margin-bottom: 30px;" role="search">
+          <button type="button" class="back-button" title="Go back" aria-label="Go back" onclick="window.history.back();">
+            <img src="{% static 'img/back-icon.png' %}" alt="Back" class="back-icon">
+          </button>
+          <input type="text" name="q"
+            placeholder="{% if panel == 'users' %}Search users...
+                          {% elif panel == 'events' %}Search events...
+                          {% elif panel == 'updates' %}Search updates...
+                          {% else %}Search...
+                          {% endif %}"
+            value="{{ query }}">
           <button type="submit">Search</button>
         </form>
       </div>
@@ -160,10 +187,10 @@
 
     {% for post in posts %}
     <div class="post">
-      <strong>{{ post.author.get_full_name }}</strong> |
+      <strong><a href="#" class="admin-detail-link" data-url="{% url 'user_profile' post.author.pk %}">{{ post.author.get_full_name }}</a></strong> |
       {{ post.date_posted|date:"M d, Y H:i" }}
 
-      <p><strong>{{ post.title }}</strong></p>
+      <p><strong><a href="#" class="admin-detail-link" data-url="{% url 'forum_detail' post.pk %}">{{ post.title }}</a></strong></p>
       <p>{{ post.content }}</p>
 
       <form method="post" action="{% url 'admin_delete_post' post.id %}"
@@ -199,8 +226,17 @@
     {% endif %}
     <div class="action-search-row">
       <div class="search">
-        <form method="get" action="{% url 'admin_user_list' %}" style="margin-bottom: 20px;">
-          <input type="text" name="q" value="{{ query }}" placeholder="{% if panel == 'users' %}Search users...{% elif panel == 'events' %}Search events...{% elif panel == 'updates' %}Search updates...{% else %}Search...{% endif %}">
+        <form method="get" action="{% url 'admin_user_list' %}" class="search-form" style="margin-bottom: 20px;" role="search">
+          <button type="button" class="back-button" title="Go back" aria-label="Go back" onclick="window.history.back();">
+            <img src="{% static 'img/back-icon.png' %}" alt="Back" class="back-icon">
+          </button>
+          <input type="text" name="q"
+            placeholder="{% if panel == 'users' %}Search users...
+                          {% elif panel == 'events' %}Search events...
+                          {% elif panel == 'updates' %}Search updates...
+                          {% else %}Search...
+                          {% endif %}"
+            value="{{ query }}">
           <button type="submit">Search</button>
         </form>
       </div>
@@ -225,9 +261,9 @@
         {% for user in users %}
           <tr>
             <td>{{ user.id }}</td>
-            <td>{{ user.student_number|default:user.username }}</td>
+            <td><a href="#" class="admin-detail-link" data-url="{% url 'user_profile' user.pk %}">{{ user.student_number|default:user.username }}</a></td>
             
-            <td>{{ user.full_name }}</td>
+            <td><a href="#" class="admin-detail-link" data-url="{% url 'user_profile' user.pk %}">{{ user.full_name }}</a></td>
             <td>{{ user.address }}</td>
             <td>{% if user.is_staff %}
               <em>Admin User</em>
@@ -270,4 +306,47 @@
   
 </div>
   
+  {% block scripts %}
+  <script>
+    function openDetailModal(html){
+      const modal = document.getElementById('detailModal');
+      const body = document.getElementById('detail-modal-body');
+      if(!modal || !body) return;
+      body.innerHTML = html;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-opened');
+    }
+
+    function loadAdminDetail(url){
+      const body = document.getElementById('detail-modal-body');
+      if(body) body.innerHTML = '<p>Loading...</p>';
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+        .then(r => { if(!r.ok) throw new Error('Failed'); return r.text(); })
+        .then(html => openDetailModal(html))
+        .catch(() => openDetailModal('<p>Error loading details.</p>'));
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.admin-detail-link').forEach(function(el){
+        el.addEventListener('click', function(e){
+          e.preventDefault();
+          const url = this.getAttribute('data-url');
+          if(url) loadAdminDetail(url);
+        });
+      });
+
+      // Close behavior for the shared modal (button & backdrop click)
+      document.addEventListener('click', function(e){
+        if(e.target.classList.contains('modal-close')){
+          const modal = e.target.closest('.modal-overlay');
+          if(modal){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-opened'); }
+        }
+        if(e.target.classList && e.target.classList.contains('modal-overlay')){
+          e.target.classList.remove('open'); e.target.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-opened');
+        }
+      });
+    });
+  </script>
+  {% endblock %}
 {% endblock %}

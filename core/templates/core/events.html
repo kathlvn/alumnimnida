@@ -27,25 +27,14 @@ EVENTS
     </div>    
 
     {% for event in events %}
-    <div class="event-box" onclick="openModal('{{ event.id }}')">
-      <h3 class="event-title">{{ event.title }}</h3>
-      <p class="event-desc">{{ event.description|truncatechars:100 }}</p>
-      <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
-      <p><strong>Time:</strong> {{ event.time }}</p>
-      <p><strong>Location:</strong> {{ event.location }}</p>
-    </div>
-
-    <!-- Modal for full details -->
-    <div id="modal-{{ event.id }}" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal('{{ event.id }}')">&times;</span>
-        <h2>{{ event.title }}</h2>
-        <p>{{ event.description }}</p>
+    <div class="event-box">
+      <a href="#" class="detail-link" data-url="{% url 'event_detail' event.pk %}">
+        <h3 class="event-title">{{ event.title }}</h3>
+        <p class="event-desc">{{ event.description|truncatechars:100 }}</p>
         <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
         <p><strong>Time:</strong> {{ event.time }}</p>
         <p><strong>Location:</strong> {{ event.location }}</p>
-
-      </div>
+      </a>
     </div>
     {% empty %}
     <p>No events available.</p>
@@ -76,11 +65,34 @@ EVENTS
 
 {% block scripts %}
 <script>
-  function openModal(id) {
-    document.getElementById("modal-" + id).style.display = "block";
+  function openDetailModalWithHTML(html){
+    const modal = document.getElementById('detailModal');
+    const body = document.getElementById('detail-modal-body');
+    if(!modal || !body) return;
+    body.innerHTML = html;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-opened');
   }
-  function closeModal(id) {
-    document.getElementById("modal-" + id).style.display = "none";
+
+  function loadDetail(url){
+    const body = document.getElementById('detail-modal-body');
+    if(body) body.innerHTML = '<p>Loading...</p>';
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+      .then(r => { if(!r.ok) throw new Error('Failed to load'); return r.text(); })
+      .then(html => openDetailModalWithHTML(html))
+      .catch(() => openDetailModalWithHTML('<p>Error loading detail view.</p>'));
   }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.detail-link').forEach(function(link){
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        const url = this.getAttribute('data-url');
+        if(!url) return;
+        loadDetail(url);
+      });
+    });
+  });
 </script>
 {% endblock %}

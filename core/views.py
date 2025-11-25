@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.db.models import Count, F, ExpressionWrapper, IntegerField
 from django.db.models.functions import ExtractYear
 from django.forms import inlineformset_factory
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -117,10 +117,14 @@ def admin_dashboard(request):
     # Convert to sorted list for JSON
     yearly_data = [{"year": y, **d} for y, d in sorted(yearly_distribution.items())]
 
+    # provide admin profile form so the dashboard can open the edit modal in-place
+    admin_profile_form = AdminProfileForm(instance=request.user)
+
     return render(request, 'admin_panel/admin_dashboard.html', {
         'course_data': course_data,
         'yearly_data': yearly_data,
-        'user': request.user
+        'user': request.user,
+        'admin_profile_form': admin_profile_form,
     })
 
 ## ADMIN USER
@@ -134,14 +138,27 @@ def admin_profile_view(request):
         form = AdminProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_dashboard')})
             return redirect('admin_dashboard')
+        # AJAX invalid -> return partial with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render(request, 'admin_panel/partials/admin_profile_partial.html', {
+                'admin_profile_form': form,
+                'edit_url': reverse('admin_profile')
+            })
+            return HttpResponse(html.content, status=400)
+        return redirect('admin_dashboard')
 
-    edit_mode = request.method == 'POST' or request.GET.get('edit') == '1'
-    return render(request, 'admin_panel/admin_profile.html', {
-        'form': form,
-        'edit_mode': edit_mode,
-        'admin_user': request.user,
-    })
+    # For AJAX GET, return the modal partial so the frontend can inject a pre-populated form
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'admin_panel/partials/admin_profile_partial.html', {
+            'admin_profile_form': form,
+            'edit_url': reverse('admin_profile')
+        })
+
+    # Non-AJAX GET: redirect to dashboard (profile editing available via modal)
+    return redirect('admin_dashboard')
 
 
 @login_required
@@ -163,9 +180,18 @@ def admin_user_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/admin_list.html', {'panel': 'users', 'users': page_obj.object_list, 
-                                                          'query': query,
-                                                          'page_obj': page_obj})
+    # provide a blank user form for the modal (create)
+    user_form = CustomUserCreationForm()
+    admin_profile_form = AdminProfileForm(instance=request.user)
+
+    return render(request, 'admin_panel/admin_list.html', {
+        'panel': 'users',
+        'users': page_obj.object_list,
+        'query': query,
+        'page_obj': page_obj,
+        'user_form': user_form,
+        'admin_profile_form': admin_profile_form,
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -174,10 +200,20 @@ def admin_user_create(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_user_list')})
             return redirect('admin_user_list')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': False})
+        # AJAX invalid -> return partial HTML with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            user_form = form
+            html = render(request, 'admin_panel/partials/user_form_partial.html', {
+                'user_form': user_form,
+                'edit_url': reverse('admin_user_create')
+            })
+            return HttpResponse(html.content, status=400)
+        return redirect('admin_user_list')
+    # GET: redirect to users list since modal will be used
+    return redirect('admin_user_list')
 
 @login_required
 @user_passes_test(is_admin)
@@ -186,6 +222,8 @@ def admin_user_batch_upload(request):
         csv_file = request.FILES['csv_file']
         if not csv_file.name.endswith('.csv'):
             messages.error(request, 'This is not a CSV file.')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': 'This is not a CSV file.'}, status=400)
             return redirect('admin_user_batch_upload')
 
         try:
@@ -221,24 +259,42 @@ def admin_user_batch_upload(request):
             created_count += 1
 
         messages.success(request, f'{created_count} users created successfully.')
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'redirect': reverse('admin_user_list')})
         return redirect('admin_user_list')
 
-    return render(request, 'admin_panel/csv_upload.html')
+    # GET: redirect to users list (csv upload available via modal)
+    return redirect('admin_user_list')
 
 @login_required
 @user_passes_test(is_admin)
 def admin_user_edit(request, user_id):
-    print("edit")
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, instance=user)
         if form.is_valid():
-            print("valid")
             form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_user_list')})
             return redirect('admin_user_list')
-    else:
-        form = CustomUserCreationForm(instance=user)
-    return render(request, 'admin_panel/user_form.html', {'form': form, 'is_edit': True})
+        # AJAX invalid -> return partial with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            user_form = form
+            html = render(request, 'admin_panel/partials/user_form_partial.html', {
+                'user_form': user_form,
+                'edit_url': reverse('admin_user_edit', args=[user.id])
+            })
+            return HttpResponse(html.content, status=400)
+        return redirect('admin_user_list')
+    # For AJAX GET: return partial HTML for modal injection (pre-populated form)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        user_form = CustomUserCreationForm(instance=user)
+        return render(request, 'admin_panel/partials/user_form_partial.html', {
+            'user_form': user_form,
+            'edit_url': reverse('admin_user_edit', args=[user.id])
+        })
+    # Non-AJAX GET: redirect to users list (modal UI used instead)
+    return redirect('admin_user_list')
 
 @login_required
 @user_passes_test(is_admin)
@@ -285,10 +341,19 @@ def admin_event_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/admin_list.html', {'panel': 'events', 'events': page_obj.object_list, 
-                                                           'query': query,
-                                                           'page_obj': page_obj,
-                                                           'today': today,})
+    # blank event form for modal
+    event_form = EventForm()
+    admin_profile_form = AdminProfileForm(instance=request.user)
+
+    return render(request, 'admin_panel/admin_list.html', {
+        'panel': 'events',
+        'events': page_obj.object_list,
+        'query': query,
+        'page_obj': page_obj,
+        'today': today,
+        'event_form': event_form,
+        'admin_profile_form': admin_profile_form,
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -298,10 +363,21 @@ def admin_event_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Event created successfully.')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_event_list')})
             return redirect('admin_event_list')
-    else:
-        form = EventForm()
-    return render(request, 'admin_panel/event_form.html', {'form': form, 'is_edit': False})
+        # If AJAX POST and invalid, return rendered partial HTML with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            event_form = form
+            html = render(request, 'admin_panel/partials/event_form_partial.html', {
+                'event_form': event_form,
+                'edit_url': reverse('admin_event_create')
+            })
+            return HttpResponse(html.content, status=400)
+        # Non-AJAX fallthrough
+        return redirect('admin_event_list')
+    # For GET requests, redirect to events list (modal is used instead)
+    return redirect('admin_event_list')
 
 @login_required
 @user_passes_test(is_admin)
@@ -312,10 +388,27 @@ def admin_event_edit(request, event_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Event updated successfully.')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_event_list')})
             return redirect('admin_event_list')
-    else:
-        form = EventForm(instance=event)
-    return render(request, 'admin_panel/event_form.html', {'form': form, 'is_edit': True})
+        # AJAX invalid -> return partial with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            event_form = form
+            html = render(request, 'admin_panel/partials/event_form_partial.html', {
+                'event_form': event_form,
+                'edit_url': reverse('admin_event_edit', args=[event.id])
+            })
+            return HttpResponse(html.content, status=400)
+        return redirect('admin_event_list')
+    # For GET: if AJAX, return the form partial HTML so the modal can load it via AJAX.
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        event_form = EventForm(instance=event)
+        return render(request, 'admin_panel/partials/event_form_partial.html', {
+            'event_form': event_form,
+            'edit_url': reverse('admin_event_edit', args=[event.id])
+        })
+    # Non-AJAX GETs redirect to the list (modal UI is used instead)
+    return redirect('admin_event_list')
 
 @login_required
 @user_passes_test(is_admin)
@@ -359,9 +452,17 @@ def admin_updates_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/admin_list.html', {'panel': 'updates', 'updates': page_obj.object_list, 
-                                                             'page_obj': page_obj,
-                                                             'query': query})
+    updates_form = UpdatesForm()
+    admin_profile_form = AdminProfileForm(instance=request.user)
+
+    return render(request, 'admin_panel/admin_list.html', {
+        'panel': 'updates',
+        'updates': page_obj.object_list,
+        'page_obj': page_obj,
+        'query': query,
+        'updates_form': updates_form,
+        'admin_profile_form': admin_profile_form,
+    })
 
 
 @login_required
@@ -371,10 +472,20 @@ def admin_updates_create(request):
         form = UpdatesForm(request.POST)
         if form.is_valid():
             form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_updates_list')})
             return redirect('admin_updates_list')
-    else:
-        form = UpdatesForm()
-    return render(request, 'admin_panel/updates_form.html', {'form': form, 'is_edit': False})
+        # If AJAX POST and invalid, return rendered partial HTML with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            updates_form = form
+            html = render(request, 'admin_panel/partials/updates_form_partial.html', {
+                'updates_form': updates_form,
+                'edit_url': reverse('admin_updates_create')
+            })
+            return HttpResponse(html.content, status=400)
+        return redirect('admin_updates_list')
+    # GET: redirect to updates list (modal used instead)
+    return redirect('admin_updates_list')
 
 @login_required
 @user_passes_test(is_admin)
@@ -384,10 +495,27 @@ def admin_updates_edit(request, update_id):
         form = UpdatesForm(request.POST, instance=update)
         if form.is_valid():
             form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect': reverse('admin_updates_list')})
             return redirect('admin_updates_list')
-    else:
-        form = UpdatesForm(instance=update)
-    return render(request, 'admin_panel/updates_form.html', {'form': form, 'is_edit': True})
+        # AJAX invalid -> return partial with errors
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            updates_form = form
+            html = render(request, 'admin_panel/partials/updates_form_partial.html', {
+                'updates_form': updates_form,
+                'edit_url': reverse('admin_updates_edit', args=[update.id])
+            })
+            return HttpResponse(html.content, status=400)
+        return redirect('admin_updates_list')
+    # For GET: if AJAX, return the form partial HTML so the modal can load it via AJAX.
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        updates_form = UpdatesForm(instance=update)
+        return render(request, 'admin_panel/partials/updates_form_partial.html', {
+            'updates_form': updates_form,
+            'edit_url': reverse('admin_updates_edit', args=[update.id])
+        })
+    # Non-AJAX GETs redirect to the list (modal UI is used instead)
+    return redirect('admin_updates_list')
 
 @login_required
 @user_passes_test(is_admin)
@@ -418,9 +546,15 @@ def admin_forum_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'admin_panel/admin_list.html', {'panel': 'forum', 'posts': page_obj.object_list, 
-                                                           'page_obj': page_obj,
-                                                           'query': query})
+    admin_profile_form = AdminProfileForm(instance=request.user)
+
+    return render(request, 'admin_panel/admin_list.html', {
+        'panel': 'forum',
+        'posts': page_obj.object_list,
+        'page_obj': page_obj,
+        'query': query,
+        'admin_profile_form': admin_profile_form,
+    })
 
 @login_required
 @user_passes_test(is_admin)
@@ -428,6 +562,37 @@ def admin_delete_post(request, post_id):
     post = get_object_or_404(Forum, id=post_id)
     post.delete()
     return redirect('admin_forum_list')
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_panel_router(request):
+    """Compatibility router: accepts ?panel=users|events|updates|forum and redirects to the proper admin list view.
+
+    This helps when external links or bookmarks point to a generic admin panel with a `panel` query param.
+    """
+    panel = request.GET.get('panel', '').lower()
+    q = request.GET.get('q', '')
+    page = request.GET.get('page', '')
+
+    params = []
+    if q:
+        params.append(f"q={q}")
+    if page:
+        params.append(f"page={page}")
+    qs = ('?' + '&'.join(params)) if params else ''
+
+    if panel == 'users':
+        return redirect(f"{reverse('admin_user_list')}{qs}")
+    if panel == 'events':
+        return redirect(f"{reverse('admin_event_list')}{qs}")
+    if panel == 'updates':
+        return redirect(f"{reverse('admin_updates_list')}{qs}")
+    if panel == 'forum':
+        return redirect(f"{reverse('admin_forum_list')}{qs}")
+
+    # default to dashboard
+    return redirect('admin_dashboard')
 
 
 ## USER SIDE

@@ -37,10 +37,10 @@
   <p><em>By {{ post.author.full_name }} • {{ post.date_posted|date:"F j, Y g:i A" }}</em></p>
 
   {% if post.author == request.user or request.user.is_staff %}
-  <form method="POST" style="display:inline;">
+  <form method="POST" style="display:inline;" data-confirm="Are you sure you want to delete this post?">
     {% csrf_token %}
     <input type="hidden" name="delete_post" value="{{ post.id }}">
-    <button type="submit" class="delete-link" onclick="return confirm('Are you sure you want to delete this post?');">Delete</button>
+    <button type="submit" class="delete-link">Delete</button>
   </form>
   {% endif %}
 
@@ -55,7 +55,7 @@
     {% for comment in post.comments.all %}
       <p>{{ comment.user.full_name }}: {{ comment.content }}
         {% if comment.user == request.user %}
-          <a class="delete-link" href="{% url 'delete_comment' comment.id %}">Delete</a>
+          <a class="delete-link" href="{% url 'delete_comment' comment.id %}" data-confirm="Are you sure you want to delete this comment?">Delete</a>
         {% endif %}
       </p>
     {% empty %}

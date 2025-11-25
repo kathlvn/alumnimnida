@@ -1,0 +1,18 @@
+{% load static %}
+<button class="modal-close" aria-label="Close">&times;</button>
+<h3>Edit User</h3>
+<form method="post" action="{{ edit_url }}">
+  {% csrf_token %}
+  {% if user_form %}
+    {{ user_form.non_field_errors }}
+    {% for field in user_form %}
+      <div class="form-group">{% if field.field.widget.input_type == 'checkbox' %}{{ field }} <label for="{{ field.id_for_label }}">{{ field.label }}</label>{% else %}{{ field.label_tag }} {{ field }}{% endif %}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>
+    {% endfor %}
+  {% else %}
+    <p>No user form available.</p>
+  {% endif %}
+  <div class="modal-actions">
+    <button type="button" class="btn cancel modal-close">Cancel</button>
+    <button type="submit" class="btn confirm">Save</button>
+  </div>
+</form>

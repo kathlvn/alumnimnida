@@ -9,6 +9,9 @@ urlpatterns = [
 
     path('admin-register/', views.admin_register, name='admin_register'),
 
+    # Generic admin-panel router (accepts ?panel=users|events|updates|forum)
+    path('admin-panel/', views.admin_panel_router, name='admin_panel'),
+
     path('admin-panel/admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/profile/', views.admin_profile_view, name='admin_profile'),
     path('admin-panel/users/', views.admin_user_list, name='admin_user_list'),

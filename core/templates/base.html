@@ -37,7 +37,7 @@
             <a href="{% url 'admin_forum_list' %}" title="Forum">
               <img src="{% static 'img/forum_icon.png' %}" alt="Forum">
             </a>
-            <a href="{% url 'logout' %}" title="Logout">
+            <a href="{% url 'logout' %}" title="Logout" class="logout-link">
               <img src="{% static 'img/logout_icon.png' %}" alt="Logout">
             </a>
           </nav>
@@ -67,7 +67,7 @@
           <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
           <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
           <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
-          <a href="{% url 'logout' %}"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+          <a href="{% url 'logout' %}" class="logout-link"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
         </nav>
       </div>
     {% endif %}
@@ -93,8 +93,27 @@
     {% endif %}
   </div>
 
-  {% block modal %}{% endblock %}
+    <!-- A fixed backdrop used to blur/dim the page when any modal is open. It's placed
+      outside of `.main-content` so we avoid applying CSS `filter` to parents. -->
+    <div id="modal-backdrop" aria-hidden="true"></div>
+    {% block modal %}{% include 'admin_panel/form_modals.html' %}{% endblock %}
+  <!-- Logout confirmation modal (namespaced classes) -->
+  <div id="logoutModal" class="logout-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="logout-modal-box" role="document">
+      <h3>Confirm Logout</h3>
+      <p>Are you sure you want to logout?</p>
+      <div class="logout-modal-actions">
+          <button type="button" class="logout-cancel">Cancel</button>
+          <button type="button" class="logout-confirm">Yes, logout</button>
+      </div>
+    </div>
+  </div>
   {% block extra_js %}{% endblock %}
   {% block scripts %}{% endblock %}
+
+  {% comment %} Logout modal JS is moved to static file {% endcomment %}
+  {% load static %}
+  <script src="{% static 'js/logout-modal.js' %}"></script>
+  <script src="{% static 'js/modal-focus-blur.js' %}"></script>
 </body>
 </html>

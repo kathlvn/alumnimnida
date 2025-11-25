@@ -312,3 +312,49 @@ a:not(.page-link) {
   margin: 0 10px;
   font-weight: 500;
 }
+
+/* General modal overlay (hidden by default). Shared by form_modals.html */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1200; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: rgba(6,6,8,0.94); color: #fff; padding: 20px; border-radius: 12px; width: 96%; max-width: 760px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: none; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.modal-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+.modal-actions .confirm { background:linear-gradient(135deg,#6d1fb5,#4e126d); color:#fff; }
+.modal-actions .cancel { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); }
+
+/* Logout modal styles (namespaced) */
+.logout-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1200; }
+.logout-modal-overlay.logout-open { display: flex; }
+.logout-modal-box { background: rgba(255, 255, 255, 0.30);
+  backdrop-filter: blur(50px);
+  color: #ffffff; padding: 20px; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.3);
+  width: 90%; max-width: 420px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); padding: 20px; }
+.logout-modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.logout-modal-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+.logout-modal-actions .logout-confirm { background:#d33; color:#fff; }
+.logout-modal-actions .logout-cancel { background:#eee; }
+
+/* When any modal is open, show a full-screen backdrop that blurs/dims the page.
+   We avoid applying `filter` to parent containers because child elements can't opt-out
+   of a parent's `filter`. The backdrop sits between the page content and the modal. */
+#modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 1150; /* below modal overlays (1200) */
+  background: rgba(0,0,0,0.36);
+  backdrop-filter: blur(3px) saturate(0.80);
+}
+
+body.modal-opened #modal-backdrop {
+  display: block;
+}
+
+/* Safety: ensure modal overlays/boxes remain crisp */
+body.modal-opened .modal-overlay,
+body.modal-opened .logout-modal-overlay,
+body.modal-opened .modal-box,
+body.modal-opened .logout-modal-box {
+  filter: none !important;
+  -webkit-filter: none !important;
+}

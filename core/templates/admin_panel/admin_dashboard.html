@@ -43,7 +43,7 @@
           <h5>{{ user.full_name }}</h5>
           <p>Username: {{ user.username }}</p>
           <p class="muted">Administrator</p>
-          <a href="{% url 'admin_profile' %}?edit=1"class="btn-outline">View Profile</a>
+          <a href="#" data-open-modal="#adminProfileModal" data-edit-url="{% url 'admin_profile' %}" class="btn-outline">View Profile</a>
         </div>
       </div>
     </div>

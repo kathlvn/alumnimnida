@@ -1,0 +1,18 @@
+{% load static %}
+<button class="modal-close" aria-label="Close">&times;</button>
+<h3>Edit Admin Profile</h3>
+<form method="post" enctype="multipart/form-data" action="{{ edit_url }}">
+  {% csrf_token %}
+  {% if admin_profile_form %}
+    {{ admin_profile_form.non_field_errors }}
+    {% for field in admin_profile_form %}
+      <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+    {% endfor %}
+  {% else %}
+    <p>No profile form available.</p>
+  {% endif %}
+  <div class="modal-actions">
+    <button type="button" class="btn cancel modal-close">Cancel</button>
+    <button type="submit" class="btn confirm">Save</button>
+  </div>
+</form>

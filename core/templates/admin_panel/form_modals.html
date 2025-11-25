@@ -1,0 +1,327 @@
+{% load static %}
+
+<!-- Shared form modals (event, updates, user, csv upload, admin profile) -->
+
+<!-- Event Modal -->
+<div id="eventModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3>{% if event_form and is_edit %}Edit Event{% else %}Add Event{% endif %}</h3>
+    <form method="post" action="{% url 'admin_event_create' %}">
+      {% csrf_token %}
+      {% if event_form %}
+        {{ event_form.non_field_errors }}
+        {% for field in event_form %}
+          <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+        {% endfor %}
+      {% else %}
+        <!-- Fallback: simple fields -->
+        <p>No event form available.</p>
+      {% endif %}
+      <div class="modal-actions">
+        <button type="button" class="btn cancel modal-close">Cancel</button>
+        <button type="submit" class="btn confirm">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Updates Modal -->
+<div id="updatesModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3>{% if is_edit %}Edit Update{% else %}Add New Update{% endif %}</h3>
+    <form method="post" action="{% url 'admin_updates_create' %}">
+      {% csrf_token %}
+      {% if updates_form %}
+        {{ updates_form.non_field_errors }}
+        {% for field in updates_form %}
+          <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+        {% endfor %}
+      {% else %}
+        <p>No updates form available.</p>
+      {% endif %}
+      <div class="modal-actions">
+        <button type="button" class="btn cancel modal-close">Cancel</button>
+        <button type="submit" class="btn confirm">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div id="userModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3>{% if is_edit %}Edit User{% else %}Add User{% endif %}</h3>
+    <form method="post" action="{% url 'admin_user_create' %}">
+      {% csrf_token %}
+      {% if user_form %}
+        {{ user_form.non_field_errors }}
+        {% for field in user_form %}
+          <div class="form-group">{% if field.field.widget.input_type == 'checkbox' %}{{ field }} <label for="{{ field.id_for_label }}">{{ field.label }}</label>{% else %}{{ field.label_tag }} {{ field }}{% endif %}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>
+        {% endfor %}
+      {% else %}
+        <p>No user form available.</p>
+      {% endif %}
+      <div class="modal-actions">
+        <button type="button" class="btn cancel modal-close">Cancel</button>
+        <button type="submit" class="btn confirm">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CSV Upload Modal -->
+<div id="csvModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3>Batch Upload Users (CSV)</h3>
+    <form method="post" action="{% url 'admin_user_batch_upload' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="csv_file">Upload CSV File:</label>
+        <input type="file" name="csv_file" id="csv_file" accept=".csv" required class="form-control-file">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn cancel modal-close">Cancel</button>
+        <button type="submit" class="btn confirm">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Profile Modal -->
+<div id="adminProfileModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3>Edit Admin Profile</h3>
+    <form method="post" enctype="multipart/form-data" action="{% url 'admin_profile' %}">
+      {% csrf_token %}
+      {% if admin_profile_form %}
+        {{ admin_profile_form.non_field_errors }}
+        {% for field in admin_profile_form %}
+          <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+        {% endfor %}
+      {% else %}
+        <p>No profile form available.</p>
+      {% endif %}
+      <div class="modal-actions">
+        <button type="button" class="btn cancel modal-close">Cancel</button>
+        <button type="submit" class="btn confirm">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirmation Modal (shared by many actions) -->
+<div id="confirmModal" class="modal-overlay" role="dialog" aria-hidden="true">
+  <div class="modal-box">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3 id="confirmModalTitle">Are you sure?</h3>
+    <p id="confirmModalMessage">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn cancel modal-close">Cancel</button>
+      <button type="button" id="confirmModalConfirm" class="btn confirm">Yes, proceed</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Simple modal opener/closer for the shared modals
+(function(){
+  function openModal(selector){
+    var modal = document.querySelector(selector);
+    if(!modal) return;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+  }
+  function closeModal(modal){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  // Helper to reset a form (clear inputs/textarea/select, uncheck checkboxes)
+  function resetForm(form){
+    if(!form) return;
+    Array.from(form.elements).forEach(function(el){
+      if(!el.name) return;
+      // Preserve CSRF token input so AJAX submissions remain valid
+      if(el.name === 'csrfmiddlewaretoken') return;
+      var type = el.type;
+      if(type === 'checkbox' || type === 'radio') el.checked = false;
+      else if(el.tagName.toLowerCase() === 'select') el.selectedIndex = -1;
+      else if(type === 'file') el.value = null;
+      else el.value = '';
+    });
+  }
+
+  // Save original actions so we can restore them for create vs edit
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.modal-overlay form').forEach(function(f){
+      f.dataset.originalAction = f.getAttribute('action') || '';
+    });
+  });
+
+  document.addEventListener('click', function(e){
+    var opener = e.target.closest('[data-open-modal]');
+    if(opener){
+      e.preventDefault();
+      var selector = opener.getAttribute('data-open-modal');
+      var modal = document.querySelector(selector);
+      if(!modal) return;
+
+      // If opener provided an edit URL, fetch the pre-populated form HTML via AJAX
+      if(opener.dataset.editUrl){
+        var editUrl = opener.dataset.editUrl;
+        fetch(editUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+          .then(function(resp){ if(!resp.ok) throw new Error('Network error'); return resp.text(); })
+          .then(function(html){
+            // Inject server-rendered inner content into the modal box
+            var box = modal.querySelector('.modal-box');
+            if(box){
+              box.innerHTML = html;
+            }
+            // open modal after injection
+            openModal(selector);
+          }).catch(function(err){
+            console.error('Failed to load edit form:', err);
+          });
+        return;
+      }
+
+      // No edit URL: use existing static form in modal and reset fields for create
+      var form = modal.querySelector('form');
+      if(form){
+        // restore original create action if available
+        if(form.dataset && form.dataset.originalAction) form.setAttribute('action', form.dataset.originalAction);
+        resetForm(form);
+        var submit = form.querySelector('button[type="submit"]'); if(submit) submit.textContent = 'Create';
+      }
+
+      openModal(selector);
+      return;
+    }
+
+    if(e.target.classList.contains('modal-close') || e.target.classList.contains('cancel')){
+      var m = e.target.closest('.modal-overlay');
+      if(m) closeModal(m);
+      return;
+    }
+
+    if(e.target.classList && e.target.classList.contains('modal-overlay')){
+      closeModal(e.target);
+    }
+  });
+  
+  // Delegate form submissions within modals to use AJAX (so we can render validation errors inline)
+  document.addEventListener('submit', function(e){
+    var form = e.target;
+    if(!form.closest || !form.closest('.modal-overlay')) return; // only handle forms inside modals
+    e.preventDefault();
+
+    var modal = form.closest('.modal-overlay');
+    var box = modal.querySelector('.modal-box');
+
+    var action = form.getAttribute('action') || window.location.href;
+    var method = (form.getAttribute('method') || 'POST').toUpperCase();
+
+    var fd = new FormData(form);
+
+    fetch(action, {
+      method: method,
+      body: fd,
+      credentials: 'same-origin',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function(resp){
+      // success JSON
+      var ctype = resp.headers.get('content-type') || '';
+      if(ctype.indexOf('application/json') !== -1){
+        return resp.json().then(function(js){ return { ok: true, json: js }; });
+      }
+      // if validation error, server returns HTML with status 400
+      return resp.text().then(function(text){ return { ok: resp.ok, text: text, status: resp.status }; });
+    }).then(function(result){
+      if(result.json && result.json.success){
+        // close modal and reload to reflect changes
+        try{ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }catch(e){}
+        if(result.json.redirect){ window.location.href = result.json.redirect; }
+        else { window.location.reload(); }
+        return;
+      }
+
+      // if validation error or non-JSON, inject returned HTML into modal box
+      if(result.text && (result.status === 400 || result.status === 200)){
+        if(box) box.innerHTML = result.text;
+        return;
+      }
+
+      // fallback: reload on unexpected response
+      window.location.reload();
+    }).catch(function(err){
+      console.error('Modal form submit failed', err);
+      window.location.reload();
+    });
+  });
+  
+  // Confirmation modal support for links and forms using data-confirm
+  function openConfirm(message, title){
+    var modal = document.getElementById('confirmModal');
+    if(!modal) return null;
+    var msgEl = modal.querySelector('#confirmModalMessage');
+    var titleEl = modal.querySelector('#confirmModalTitle');
+    titleEl.textContent = title || 'Are you sure?';
+    msgEl.textContent = message || 'This action cannot be undone.';
+    modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+    return modal;
+  }
+
+  function closeConfirm(modal){ if(!modal) return; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+
+  // Delegate click to elements with data-confirm
+  document.addEventListener('click', function(e){
+    var el = e.target.closest && e.target.closest('[data-confirm]');
+    if(!el) return;
+    // If the element is inside a modal overlay already handled above, let modal handlers manage it
+    if(el.closest && el.closest('.modal-overlay')) return;
+    e.preventDefault();
+    var message = el.getAttribute('data-confirm') || 'Are you sure?';
+    var title = el.getAttribute('data-confirm-title') || null;
+    var modal = openConfirm(message, title);
+    if(!modal) return;
+
+    var confirmBtn = modal.querySelector('#confirmModalConfirm');
+    var cleanup = function(){
+      confirmBtn.replaceWith(confirmBtn.cloneNode(true)); // remove old listeners
+      closeConfirm(modal);
+    };
+
+    confirmBtn.addEventListener('click', function once(){
+      cleanup();
+      // If element is a form submit trigger (button/input inside a form)
+      if(el.tagName.toLowerCase() === 'button' && el.type === 'submit'){
+        var form = el.form;
+        if(form) form.submit();
+        return;
+      }
+
+      // If element is an anchor, navigate
+      if(el.tagName.toLowerCase() === 'a' && el.getAttribute('href')){
+        var href = el.getAttribute('href');
+        window.location.href = href;
+        return;
+      }
+
+      // If element is a form (e.g., <form data-confirm>), submit it
+      if(el.tagName.toLowerCase() === 'form'){
+        el.submit();
+        return;
+      }
+
+      // Fallback: if element has data-confirm-action (JS code), evaluate it
+      var action = el.getAttribute('data-confirm-action');
+      if(action){ try{ new Function(action)(); } catch(err){ console.error('confirm action failed', err); } }
+    });
+  });
+})();
+</script>

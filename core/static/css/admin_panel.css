@@ -99,3 +99,24 @@
   .admin-container table thead th, .admin-container tbody td { padding: 10px; }
   .panel-events .modal-content { width: 90%; }
 }
+
+/* Action + Search shared row */
+.action-search-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap; /* keep it on one line when possible */
+  margin-bottom: 16px;
+}
+/* allow the search area to shrink so actions stay on the right instead of wrapping */
+.action-search-row .search { order: 1; flex: 1 1 auto; min-width: 0; }
+.action-search-row .search form { display: flex; gap: 8px; width: 100%; }
+.action-search-row .search input[type="text"] { flex: 1 1 auto; min-width: 0; }
+.action-search-row .left-actions { order: 2; display: flex; gap: 8px; align-items: center; justify-content: flex-end; flex: 0 0 auto; }
+.action-search-row .left-actions a { white-space: nowrap; }
+
+/* @media (max-width: 720px) {
+  .action-search-row { flex-direction: column; align-items: stretch; }
+  .action-search-row .left-actions { justify-content: flex-start; }
+} */

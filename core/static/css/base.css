@@ -128,6 +128,7 @@ a:not(.page-link) {
 .container {
   display: flex;
   padding: 30px;
+  padding-top: 7%;
   margin-left: 130;
 }
 
@@ -183,7 +184,7 @@ a:not(.page-link) {
   
   max-width: 1280px;
   width: 100%;
-  padding-top: 7%;
+  
 }
 
 /* ===== Global Header for All Pages ===== */

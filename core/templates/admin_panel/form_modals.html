@@ -5,7 +5,7 @@
 <!-- Event Modal -->
 <div id="eventModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>{% if event_form and is_edit %}Edit Event{% else %}Add Event{% endif %}</h3>
     <form method="post" action="{% url 'admin_event_create' %}">
       {% csrf_token %}
@@ -29,7 +29,7 @@
 <!-- Updates Modal -->
 <div id="updatesModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>{% if is_edit %}Edit Update{% else %}Add New Update{% endif %}</h3>
     <form method="post" action="{% url 'admin_updates_create' %}">
       {% csrf_token %}
@@ -52,7 +52,7 @@
 <!-- User Modal -->
 <div id="userModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>{% if is_edit %}Edit User{% else %}Add User{% endif %}</h3>
     <form method="post" action="{% url 'admin_user_create' %}">
       {% csrf_token %}
@@ -75,7 +75,7 @@
 <!-- CSV Upload Modal -->
 <div id="csvModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>Batch Upload Users (CSV)</h3>
     <form method="post" action="{% url 'admin_user_batch_upload' %}" enctype="multipart/form-data">
       {% csrf_token %}
@@ -94,7 +94,7 @@
 <!-- Admin Profile Modal -->
 <div id="adminProfileModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>Edit Admin Profile</h3>
     <form method="post" enctype="multipart/form-data" action="{% url 'admin_profile' %}">
       {% csrf_token %}
@@ -117,7 +117,7 @@
 <!-- Confirmation Modal (shared by many actions) -->
 <div id="confirmModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3 id="confirmModalTitle">Are you sure?</h3>
     <p id="confirmModalMessage">This action cannot be undone.</p>
     <div class="modal-actions">
@@ -130,7 +130,7 @@
 <!-- Detail/Read-only Modal: used to show read-only details for items (events, users, updates, forum posts) -->
 <div id="detailModal" class="modal-overlay" role="dialog" aria-hidden="true">
   <div class="modal-box">
-    <button class="modal-close" aria-label="Close">&times;</button>
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <div id="detail-modal-body" class="modal-body">
       <p>Loading...</p>
     </div>
@@ -288,12 +288,43 @@
 
   function closeConfirm(modal){ if(!modal) return; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
 
-  // Delegate click to elements with data-confirm
+  // Delegate click to elements with data-confirm.
+  // Guard against accidental activation when the user presses Enter inside a text input
+  // (which can generate synthetic click events with detail===0 and clientX/Y===0).
   document.addEventListener('click', function(e){
     var el = e.target.closest && e.target.closest('[data-confirm]');
     if(!el) return;
+
     // If the element is inside a modal overlay already handled above, let modal handlers manage it
     if(el.closest && el.closest('.modal-overlay')) return;
+
+    // Only allow confirmation for explicit interactive elements (anchors, buttons, forms)
+    var tag = (el.tagName || '').toLowerCase();
+    if(['a','button','form'].indexOf(tag) === -1 && !el.hasAttribute('role')) return;
+
+    // Ignore synthetic click events that are produced by pressing Enter inside text inputs
+    if (e.detail === 0 && e.clientX === 0 && e.clientY === 0) {
+      var active = document.activeElement;
+      if (active && (active.tagName && (active.tagName.toLowerCase() === 'input' || active.tagName.toLowerCase() === 'textarea'))) {
+        console.debug('data-confirm: ignored synthetic click from input/textarea');
+        return;
+      }
+    }
+
+    // If the user pressed Enter inside an input that belongs to a different form than the
+    // element with data-confirm, ignore this click. This prevents the search input's Enter
+    // from activating unrelated data-confirm anchors elsewhere on the page.
+    var activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName || '').toLowerCase() === 'input'){
+      try{
+        var activeForm = activeEl.form;
+        if(activeForm && !activeForm.contains(el)){
+          console.debug('data-confirm: ignored click because active input belongs to a different form');
+          return;
+        }
+      }catch(ign){ /* ignore */ }
+    }
+
     e.preventDefault();
     var message = el.getAttribute('data-confirm') || 'Are you sure?';
     var title = el.getAttribute('data-confirm-title') || null;

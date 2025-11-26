@@ -1,5 +1,5 @@
 {% load static %}
-<button class="modal-close" aria-label="Close">&times;</button>
+<button type="button" class="modal-close" aria-label="Close">&times;</button>
 <h3>Edit Admin Profile</h3>
 <form method="post" enctype="multipart/form-data" action="{{ edit_url }}">
   {% csrf_token %}

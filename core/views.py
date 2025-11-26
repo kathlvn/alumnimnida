@@ -607,7 +607,8 @@ def home(request):
     comments_count = Comment.objects.filter(user=user).count()
     
 
-    return render(request, 'core/home.html', {
+    return render(request, 'core/contents.html', {
+        'page_name': 'home',
         'user': user,
         'upcoming_events': upcoming_events,
         'recent_updates': recent_updates,
@@ -655,7 +656,8 @@ def profile_view(request):
         
     }
 
-    return render(request, 'core/profile.html', context)
+    context['page_name'] = 'profile'
+    return render(request, 'core/contents.html', context)
 
 @login_required
 def profile_edit_view(request):
@@ -759,7 +761,8 @@ def profile_edit_view(request):
         'club_formset': club_formset,
         'can_edit': True,
     }
-    return render(request, 'core/profile.html', context)
+    context['page_name'] = 'profile'
+    return render(request, 'core/contents.html', context)
 
 
 
@@ -827,13 +830,14 @@ def events_view(request):
     ).distinct().order_by('-date', '-time')[:5]  # limit for panel
 
     context = {
+        'page_name': 'events',
         'events': events,
         'recently_concluded': recently_concluded,
         'now': now,
         'visibility_filter': visibility_filter
     }
 
-    return render(request, 'core/events.html', context)
+    return render(request, 'core/contents.html', context)
 
 
 
@@ -871,7 +875,8 @@ def updates_view(request):
 
     recent_updates = updates[:5]
 
-    return render(request, 'core/updates.html', {
+    return render(request, 'core/contents.html', {
+        'page_name': 'updates',
         'updates': updates,
         'recent_updates': recent_updates,
         'visibility_filter': visibility_filter
@@ -976,10 +981,11 @@ def forum(request):
         'visibility_filter': visibility_filter,
         'comment_form': CommentForm(),
         'liked_post_ids': Like.objects.filter(user=request.user).values_list('post_id', flat=True),
-        'trending_posts': trending_posts
+        'trending_posts': trending_posts,
+        'page_name': 'forum'
     }
 
-    return render(request, 'core/forum.html', context)
+    return render(request, 'core/contents.html', context)
 
 
 @require_POST

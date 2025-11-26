@@ -62,12 +62,12 @@
       <!-- Sidebar for Regular Users -->
       <div class="sidebar">
         <nav>
-          <a href="{% url 'profile' %}"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
-          <a href="{% url 'home' %}"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
-          <a href="{% url 'events' %}"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
-          <a href="{% url 'forum' %}"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
-          <a href="{% url 'updates' %}"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
-          <a href="{% url 'logout' %}" class="logout-link"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
+          <a href="{% url 'profile' %}" title="Profile"><img src="{% static 'img/user_icon.png' %}" alt="Profile"></a>
+          <a href="{% url 'home' %}" title="Home"><img src="{% static 'img/home_icon.png' %}" alt="Home"></a>
+          <a href="{% url 'forum' %}" title="Forum"><img src="{% static 'img/forum_icon.png' %}" alt="Forum"></a>
+          <a href="{% url 'events' %}" title="Events"><img src="{% static 'img/events_icon.png' %}" alt="Events"></a>
+          <a href="{% url 'updates' %}" title="Updates"><img src="{% static 'img/updates_icon.png' %}" alt="Updates"></a>
+          <a href="{% url 'logout' %}" title="Logout" class="logout-link"><img src="{% static 'img/logout_icon.png' %}" alt="Logout"></a>
         </nav>
       </div>
     {% endif %}
@@ -96,7 +96,13 @@
     <!-- A fixed backdrop used to blur/dim the page when any modal is open. It's placed
       outside of `.main-content` so we avoid applying CSS `filter` to parents. -->
     <div id="modal-backdrop" aria-hidden="true"></div>
-    {% block modal %}{% include 'admin_panel/form_modals.html' %}{% endblock %}
+    {% block modal %}
+      {% if request.user.is_authenticated and request.user.is_staff %}
+        {% include 'admin_panel/form_modals.html' %}
+      {% endif %}
+    {% endblock %}
+
+    
   <!-- Logout confirmation modal (namespaced classes) -->
   <div id="logoutModal" class="logout-modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="logout-modal-box" role="document">

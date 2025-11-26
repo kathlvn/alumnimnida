@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{#
+  Centralized content template for user-facing pages.
+  Usage: in your views, render with context variable `page_name` set to one of:
+    'home', 'events', 'forum', 'profile', 'updates'
+
+  Example: return render(request, 'core/contents.html', { 'page_name': 'events', ... })
+#}
+
+{% block title %}
+  {% if page_name == 'events' %}Events{% elif page_name == 'forum' %}Forum{% elif page_name == 'updates' %}Updates{% elif page_name == 'profile' %}My Profile{% else %}Home{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+  {% if page_name == 'events' %}
+    <link rel="stylesheet" href="{% static 'css/events.css' %}">
+  {% elif page_name == 'forum' %}
+    <link rel="stylesheet" href="{% static 'css/forum.css' %}">
+  {% elif page_name == 'updates' %}
+    <link rel="stylesheet" href="{% static 'css/updates.css' %}">
+  {% elif page_name == 'profile' %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  {% else %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% endif %}
+{% endblock %}
+
+{% block page_title %}
+  {% if page_name == 'events' %}EVENTS{% elif page_name == 'forum' %}FORUM{% elif page_name == 'updates' %}UPDATES{% elif page_name == 'profile' %}MY PROFILE{% else %}Welcome back!{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+
+  {% if page_name == 'events' %}
+    <!-- Events List -->
+    <div class="events-section">
+      <div class="top-row">
+      <form method="get" class="filter-form">
+        <label for="visibility">Filter by: </label>
+        <select name="visibility" id="visibility" onchange="this.form.submit()">
+          <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+          <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>My Batch</option>
+          <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>My Degree</option>
+        </select>
+      </form>
+      </div>
+
+      {% for event in events %}
+      <div class="event-box">
+        <a href="#" class="detail-link" data-url="{% url 'event_detail' event.pk %}">
+          <h3 class="event-title">{{ event.title }}</h3>
+          <p class="event-desc">{{ event.description|truncatechars:100 }}</p>
+          <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
+          <p><strong>Time:</strong> {{ event.time }}</p>
+          <p><strong>Location:</strong> {{ event.location }}</p>
+        </a>
+      </div>
+      {% empty %}
+      <p>No events available.</p>
+      {% endfor %}
+    </div>
+
+  {% elif page_name == 'forum' %}
+    <div class="top-row">
+      <button type="button" class="create-btn" onclick="openModal()">CREATE A POST</button>
+
+      <form method="get" class="filter-form">
+        <label for="visibility">Filter by:</label>
+        <select name="visibility" id="visibility" onchange="this.form.submit()">
+          <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+          <option value="public" {% if visibility_filter == 'public' %}selected{% endif %}>Public</option>
+          <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}> Batch</option>
+          <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>Degree</option>
+        </select>
+      </form>
+    </div>
+
+    {% for post in posts %}
+    <div class="forum-post" id="post-{{ post.id }}">
+      <h3><strong>{{ post.title|upper }}</strong></h3>
+      <p>{{ post.content }}</p>
+      <p><em>By {{ post.author.full_name }} • {{ post.date_posted|date:"F j, Y g:i A" }}</em></p>
+
+      {% if post.author == request.user or request.user.is_staff %}
+      <form method="POST" style="display:inline;" data-confirm="Are you sure you want to delete this post?">
+        {% csrf_token %}
+        <input type="hidden" name="delete_post" value="{{ post.id }}">
+        <button type="submit" class="delete-link">Delete</button>
+      </form>
+      {% endif %}
+
+      <form method="POST" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="like_post" value="{{ post.id }}">
+        <button class="like-button" type="submit">Like ({{ post.likes.count }})</button>
+      </form>
+
+      <div class="comment-section">
+        <strong>Comments</strong>
+        {% for comment in post.comments.all %}
+          <p>{{ comment.user.full_name }}: {{ comment.content }}
+            {% if comment.user == request.user %}
+              <a class="delete-link" href="{% url 'delete_comment' comment.id %}" data-confirm="Are you sure you want to delete this comment?">Delete</a>
+            {% endif %}
+          </p>
+        {% empty %}
+          <p>No comments yet.</p>
+        {% endfor %}
+
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="comment_post" value="{{ post.id }}">
+          <textarea name="comment_content" rows="2" class="comment-box" placeholder="Write a comment.."></textarea>
+          <button class="send-btn" type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+
+  {% elif page_name == 'updates' %}
+    <div class="updates-section">
+      <div class="top-row">
+      <form method="get" class="filter-form">
+        <label for="visibility">Filter by: </label>
+        <select name="visibility" id="visibility" onchange="this.form.submit()">
+          <option value="" {% if not visibility_filter %}selected{% endif %}>All</option>
+          <option value="public" {% if visibility_filter == 'public' %}selected{% endif %}>Public</option>
+          <option value="batch" {% if visibility_filter == 'batch' %}selected{% endif %}>By Batch</option>
+          <option value="degree" {% if visibility_filter == 'degree' %}selected{% endif %}>By Degree</option>
+        </select>
+      </form>
+    </div>
+
+      {% for update in updates %}
+      <div class="update-box" onclick="openModal('{{ update.id }}')">
+        <h3 class="update-title">{{ update.title }}</h3>
+        <p class="update-desc">{{ update.content }}</p>
+        <p class="update-date">
+          <em><strong>Posted on {{ update.date_posted|date:"F d, Y, g:i A" }}</strong></em>
+        </p>
+      </div>
+
+      <div id="modal-{{ update.id }}" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeModal('{{ update.id }}')">&times;</span>
+          <h2>{{ update.title }}</h2>
+          <p>{{ update.content }}</p>
+          <p><strong>Posted:</strong> {{ update.date_posted|date:"F d, Y, g:i A" }}</p>
+        </div>
+      </div>
+      {% empty %}
+      <p>No updates available.</p>
+      {% endfor %}
+    </div>
+
+  {% elif page_name == 'profile' %}
+    <div class="profile-container">
+      {% if can_edit %}
+      <form method="post" enctype="multipart/form-data" class="edit-form">
+        {% csrf_token %}
+        <div class="profile-card-wrapper">
+          <style>
+            .tag-form-item input[type="checkbox"][name$="-DELETE"]{ display: none !important; }
+          </style>
+          <div class="profile-overview">
+            <div class="profile-picture">
+              {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+              {% else %}
+                <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture">
+              {% endif %}
+              <div class="form-group">
+                <label for="id_profile_picture">Profile Picture</label>
+                <input type="file" name="profile_picture" id="id_profile_picture">
+              </div>
+            </div>
+            <h3 class="profile-name">{{ user.full_name }}</h3>
+            <p class="profile-class">Class of {{ user.year_graduated }}</p>
+
+            <div class="change-password-link">
+              <a href="{% url 'change_password' %}" class="btn-change-password">Change Password</a>
+            </div>
+
+            {% if user.bio %}
+              <div class="profile-bio-box"><p>{{ user.bio }}</p></div>
+            {% endif %}
+          </div>
+
+          <div class="profile-details">
+            <h4>Basic Info</h4>
+            <div class="form-group">{{ form.full_name.label_tag }}{{ form.full_name }}</div>
+            <div class="form-group">{{ form.student_number.label_tag }}{{ form.student_number }}</div>
+            <div class="form-group">{{ form.address.label_tag }}{{ form.address }}</div>
+            <div class="form-group">{{ form.degree.label_tag }}{{ form.degree }}</div>
+            <div class="form-group">{{ form.year_graduated.label_tag }}{{ form.year_graduated }}</div>
+
+            <h4>Additional Information</h4>
+            <div class="form-group">{{ form.birthday.label_tag }}{{ form.birthday }}</div>
+            <div class="form-group">{{ form.current_address.label_tag }}{{ form.current_address }}</div>
+            <div class="form-group">{{ form.year_attended.label_tag }}{{ form.year_attended }}</div>
+            <div class="form-group">{{ form.contact_number.label_tag }}{{ form.contact_number }}</div>
+            <div class="form-group">{{ form.email.label_tag }}{{ form.email }}</div>
+
+            <h4>Profile Details</h4>
+            <div class="form-group">{{ form.employment_status.label_tag }}{{ form.employment_status }}</div>
+            <div class="form-group">{{ form.bio.label_tag }}{{ form.bio }}</div>
+            <div class="form-group">{{ form.profile_picture.label_tag }}{{ form.profile_picture }}</div>
+
+            <h4 class="mt-4">Professional Background</h4>
+            <div class="job-formset-wrapper">{{ formset.management_form }}{% for job_form in formset %}{% endfor %}</div>
+            <button type="button" class="btn-add-job" onclick="addJobForm()">+ Add Job</button>
+
+            <h4 class="mt-4">Clubs / Organizations</h4>
+            <div class="tag-formset-wrapper">{{ club_formset.management_form }}{% for club_form in club_formset %}{% endfor %}</div>
+            <button type="button" class="btn-add-club" onclick="addClubForm()">+ Add</button>
+
+            <button type="submit" class="btn-save">Save Changes</button>
+            <a href="{% url 'profile' %}" class="btn-cancel">Cancel</a>
+          </div>
+        </div>
+      </form>
+
+      <div id="empty-job-form" style="display:none;"><div class="tag-form-item job-form-item">{{ formset.empty_form.as_p }}<button type="button" class="btn-remove-tag" onclick="removeTag(this)">×</button></div></div>
+      <div id="empty-club-form" style="display:none;"><div class="tag-form-item club-form-item">{{ club_formset.empty_form.as_p }}<button type="button" class="btn-remove-tag" onclick="removeTag(this)">×</button></div></div>
+
+      <script>
+        function removeTag(button) {
+          const formItem = button.closest('.tag-form-item'); if (!formItem) return;
+          const deleteCheckbox = formItem.querySelector('input[type="checkbox"][name$="-DELETE"]');
+          if (deleteCheckbox) { deleteCheckbox.checked = true; formItem.style.display = 'none'; } else { formItem.remove(); updateTotalForms(); }
+        }
+        function updateTotalForms() {
+          const jobTotal = document.getElementById('id_jobentry_set-TOTAL_FORMS'); if (jobTotal) { const jobForms = document.querySelectorAll('.job-formset-wrapper .tag-form-item:not([style*="display: none"])'); jobTotal.value = jobForms.length; }
+          const clubTotal = document.getElementById('id_cluborg_set-TOTAL_FORMS'); if (clubTotal) { const clubForms = document.querySelectorAll('.tag-formset-wrapper .tag-form-item:not([style*="display: none"])'); clubTotal.value = clubForms.length; }
+        }
+        function addJobForm() {
+          const totalFormsInput = document.getElementById('id_jobentry_set-TOTAL_FORMS'); const currentCount = parseInt(totalFormsInput.value, 10);
+          const emptyFormTemplate = document.getElementById('empty-job-form').innerHTML; let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, currentCount);
+          const tempDiv = document.createElement('div'); tempDiv.innerHTML = newFormHtml; const idInput = tempDiv.querySelector('input[name$="-id"]'); if (idInput) idInput.parentElement.removeChild(idInput);
+          const container = document.querySelector('.job-formset-wrapper'); container.insertAdjacentHTML('beforeend', tempDiv.innerHTML); totalFormsInput.value = currentCount + 1;
+        }
+        function addClubForm() {
+          const totalFormsInput = document.getElementById('id_cluborg_set-TOTAL_FORMS'); const currentCount = parseInt(totalFormsInput.value, 10);
+          const emptyFormTemplate = document.getElementById('empty-club-form').innerHTML; let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, currentCount);
+          const tempDiv = document.createElement('div'); tempDiv.innerHTML = newFormHtml; const idInput = tempDiv.querySelector('input[name$="-id"]'); if (idInput) idInput.parentElement.removeChild(idInput);
+          const container = document.querySelector('.tag-formset-wrapper'); container.insertAdjacentHTML('beforeend', tempDiv.innerHTML); totalFormsInput.value = currentCount + 1;
+        }
+      </script>
+
+      {% else %}
+      <div class="profile-card-wrapper">
+        <div class="profile-overview">
+          <div class="profile-picture">
+            {% if user.profile_picture %}
+              <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+            {% else %}
+              <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture">
+            {% endif %}
+          </div>
+          <h3 class="profile-name">{{ user.full_name }}</h3>
+          <p class="profile-class">Class of {{ user.year_graduated }}</p>
+
+          <a href="{% url 'profile_edit' %}" class="btn-edit-profile">Edit Profile</a>
+          <div class="change-password-link"><a href="{% url 'change_password' %}" class="btn-change-password">Change Password</a></div>
+          {% if user.bio %}<div class="profile-bio-box"><p>{{ user.bio }}</p></div>{% endif %}
+        </div>
+
+        <div class="profile-details">
+          <div class="read-only-info">
+            <h4>Basic Information</h4>
+            <p><strong>Name:</strong> {{ user.full_name }}</p>
+            <p><strong>Student Number:</strong> {{ user.student_number }}</p>
+            <p><strong>Address:</strong> {{ user.address }}</p>
+            <p><strong>Degree:</strong> {{ user.get_degree_display }}</p>
+            <p><strong>Year Graduated:</strong> {{ user.year_graduated }}</p>
+
+            <h4>Additional Information</h4>
+            <p><strong>Birthday:</strong> {% if user.birthday %}{{ user.birthday }}{% else %}<em>No data</em>{% endif %}</p>
+            <p><strong>Current Address:</strong> {% if user.current_address %}{{ user.current_address }}{% else %}<em>No data</em>{% endif %}</p>
+            <p><strong>Year Attended:</strong> {% if user.year_attended %}{{ user.year_attended }}{% else %}<em>No data</em>{% endif %}</p>
+            <p><strong>Contact Number:</strong> {% if user.contact_number %}{{ user.contact_number }}{% else %}<em>No data</em>{% endif %}</p>
+            <p><strong>Email:</strong> {% if user.email %}{{ user.email }}{% else %}<em>No data</em>{% endif %}</p>
+
+            <h4>Professional Information</h4>
+            <p><strong>Employment Status:</strong> {{ user.get_employment_status_display }}</p>
+            <p><strong>Bio/Description:</strong> {{ user.bio }}</p>
+
+            <h4 class="mt-4">Professional Background</h4>
+            {% for job in job_entries %}{% empty %}<p>No job entries available.</p>{% endfor %}
+
+            <h4 class="mt-4">Clubs / Organizations</h4>
+            <div class="tag-container">{% for club in club_entries %}{% empty %}<p>No clubs/organizations.</p>{% endfor %}</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+  {% else %}
+    <!-- Default: Home -->
+    <div class="event-box">
+      <div class="forum-post">
+        <h3>UPCOMING EVENTS</h3>
+        {% for event in upcoming_events|slice:":5" %}
+          <div class="item-row">
+            <div>
+              <strong>{{ event.date|date:"F d" }}</strong> &nbsp;
+              <span style="font-weight: bold;">{{ event.title }}</span><br>
+              <em>{{ event.location }}</em>
+            </div>
+          </div>
+        {% empty %}
+          <p>No upcoming events.</p>
+        {% endfor %}
+        <div style="text-align: right; margin-top: 10px;"><a href="{% url 'events' %}" class="view-button">View All Events</a></div>
+      </div>
+    </div>
+
+    <div class="event-box">
+      <div class="forum-post">
+        <h3>RECENT UPDATES</h3>
+        {% for update in recent_updates|slice:":3" %}
+          <div class="item-row">
+            <div>
+              <strong>{{ update.title }}</strong><br>
+              <em>{{ update.date_posted|timesince }} ago</em>
+            </div>
+          </div>
+        {% empty %}
+          <p>No recent updates.</p>
+        {% endfor %}
+        <div style="text-align: right; margin-top: 10px;"><a href="{% url 'updates' %}" class="view-button">View All Updates</a></div>
+      </div>
+    </div>
+
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block right_panel %}
+  {% if page_name == 'events' %}
+    <div class="quick-stats">
+      <h3 class="timeline-title">Recently Concluded Events</h3>
+      <ul>
+        {% for event in recently_concluded %}
+        <li>
+          <strong>{{ event.title }}</strong><br>
+          {% if event.date %}<em>{{ event.date|date:"F d, Y" }}</em>{% else %}<em>Marked as Done</em>{% endif %}
+        </li>
+        {% empty %}
+        <li>No recently concluded events.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  {% elif page_name == 'forum' %}
+    <div class="trending-posts">
+      <h3>Trending Posts</h3>
+      <ul>
+        {% for post in trending_posts %}
+          <li><a href="#post-{{ post.id }}">• {{ post.title|truncatechars:40 }}</a></li>
+        {% empty %}
+          <li>No trending posts yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  {% else %}
+    <div style="text-align: center; margin-bottom: 20px;">
+      {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" alt="Profile Picture" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
+      {% else %}
+        <img src="{% static 'default/profile.png' %}" alt="Default Profile Picture" style="width: 60px;">
+      {% endif %}
+      <h3>{{ user.full_name }}</h3>
+      <em>Class of {{ user.year_graduated }}</em>
+      <br>
+      <a class="view-button" href="{% url 'profile' %}">Edit Profile</a>
+
+      <h3>Your Engagements</h3>
+      <div class="info-row"><span class="label">Forum Posts:</span><span class="value">{{ forum_posts_count }}</span></div>
+      <div class="info-row"><span class="label">Comments made:</span><span class="value">{{ comments_count }}</span></div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block modal %}
+  {% if page_name == 'forum' %}
+  <div id="postModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Create Post</h2>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="create_post" value="1">
+        <input type="text" name="title" placeholder="Title" class="modal-input" required><br>
+        <textarea name="content" placeholder="Write your post..." rows="5" class="modal-input" required></textarea>
+        <label for="visibility">Visibility:</label>
+        <select name="visibility_type" class="modal-input" required>
+          <option value="public">Public</option>
+          <option value="batch">By Batch</option>
+          <option value="degree">By Degree</option>
+        </select>
+        <button type="submit" class="attend-button">Publish</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  {% if page_name == 'events' %}
+  <script>
+    function openDetailModalWithHTML(html){
+      const modal = document.getElementById('detailModal');
+      const body = document.getElementById('detail-modal-body');
+      if(!modal || !body) return;
+      body.innerHTML = html;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-opened');
+    }
+    function loadDetail(url){
+      const body = document.getElementById('detail-modal-body');
+      if(body) body.innerHTML = '<p>Loading...</p>';
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+        .then(r => { if(!r.ok) throw new Error('Failed to load'); return r.text(); })
+        .then(html => openDetailModalWithHTML(html))
+        .catch(() => openDetailModalWithHTML('<p>Error loading detail view.</p>'));
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.detail-link').forEach(function(link){
+        link.addEventListener('click', function(e){
+          e.preventDefault();
+          const url = this.getAttribute('data-url');
+          if(!url) return;
+          loadDetail(url);
+        });
+      });
+    });
+  </script>
+  {% endif %}
+
+  {% if page_name == 'updates' %}
+  <script>
+    function openModal(id) { document.getElementById("modal-" + id).style.display = "block"; }
+    function closeModal(id) { document.getElementById("modal-" + id).style.display = "none"; }
+  </script>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+  {% if page_name == 'forum' %}
+  <script>
+    function openModal() { document.getElementById('postModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('postModal').style.display = 'none'; }
+    window.onclick = function(event) { const modal = document.getElementById('postModal'); if (event.target === modal) { closeModal(); } }
+  </script>
+  {% endif %}
+{% endblock %}

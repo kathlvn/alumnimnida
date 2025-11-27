@@ -605,7 +605,7 @@ def home(request):
     recent_updates = Updates.objects.all().order_by('-date_posted')
     forum_posts_count = Forum.objects.filter(author=request.user).count()
     comments_count = Comment.objects.filter(user=user).count()
-    
+    events_attended_count = Event.objects.filter(done=True, interested=request.user).count()
 
     return render(request, 'core/contents.html', {
         'page_name': 'home',
@@ -614,6 +614,7 @@ def home(request):
         'recent_updates': recent_updates,
         'forum_posts_count': forum_posts_count,
         'comments_count': comments_count,
+        'events_attended_count': events_attended_count,
     })
 
 
@@ -816,7 +817,7 @@ def events_view(request):
             Q(visibility_type='degree', visibility_degrees__code=user.degree)
         ).distinct()
 
-    events = events.order_by('-created_at')
+    events = events.order_by('-created_at').prefetch_related('interested')
 
     # Recently concluded = manually marked as done OR past events
     recently_concluded = Event.objects.filter(
@@ -828,6 +829,8 @@ def events_view(request):
         Q(visibility_type='batch', visibility_batches__year=user.year_graduated) |
         Q(visibility_type='degree', visibility_degrees__code=user.degree)
     ).distinct().order_by('-date', '-time')[:5]  # limit for panel
+    # prefetch interested users so membership checks in template don't hit the DB repeatedly
+    recently_concluded = recently_concluded.prefetch_related('interested')
 
     context = {
         'page_name': 'events',
@@ -837,7 +840,40 @@ def events_view(request):
         'visibility_filter': visibility_filter
     }
 
+    # For client-side rendering of user's current interest state
+    try:
+        user_interested_ids = set(request.user.interested_events.values_list('id', flat=True))
+    except Exception:
+        user_interested_ids = set()
+    context['user_interested_ids'] = user_interested_ids
+
     return render(request, 'core/contents.html', context)
+
+
+@require_POST
+@login_required
+def toggle_event_interest(request, pk):
+    """Toggle the current user's interest for an event. Returns JSON with state and counts.
+    Interest is recorded regardless of event.done; callers may choose to show counts only when event.done is True.
+    """
+    event = get_object_or_404(Event, pk=pk)
+    user = request.user
+
+    if event.interested.filter(pk=user.pk).exists():
+        event.interested.remove(user)
+        interested = False
+    else:
+        event.interested.add(user)
+        interested = True
+
+    # interest count (total users who marked interest)
+    interest_count = event.interested.count()
+
+    return JsonResponse({
+        'interested': interested,
+        'interest_count': interest_count,
+        'done': bool(event.done),
+    })
 
 
 

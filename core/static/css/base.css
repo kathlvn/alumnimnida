@@ -110,6 +110,7 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  padding-top: 8%;
 }
 
 
@@ -184,6 +185,7 @@ a:not(.page-link) {
   
   max-width: 1280px;
   width: 100%;
+  padding-top: 7%;
   
 }
 

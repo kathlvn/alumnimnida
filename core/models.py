@@ -158,6 +158,7 @@ class Event(models.Model):
     time = models.TimeField(blank=True, null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
     done = models.BooleanField(default=False)
+    interested = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='interested_events')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

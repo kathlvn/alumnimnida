@@ -125,7 +125,7 @@ visibility_choices = [
 
 class EventForm(forms.ModelForm):
 
-    visibility_type = forms.ChoiceField(choices=visibility_choices)
+    visibility_type = forms.ChoiceField(choices=visibility_choices, initial='public')
 
     visibility_batches = forms.ModelMultipleChoiceField(
         queryset=Batch.objects.all(),
@@ -164,7 +164,7 @@ class EventForm(forms.ModelForm):
         
 class UpdatesForm(forms.ModelForm):
 
-    visibility_type = forms.ChoiceField(choices=visibility_choices)
+    visibility_type = forms.ChoiceField(choices=visibility_choices, initial='public')
 
     visibility_batches = forms.ModelMultipleChoiceField(
         queryset=Batch.objects.all(),
@@ -222,13 +222,19 @@ class UpdatesForm(forms.ModelForm):
 
 
 class ForumPostForm(forms.ModelForm):
+    # Ensure visibility defaults to public when creating forum posts
+    visibility_type = forms.ChoiceField(
+        choices=visibility_choices,
+        initial='public',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Forum
         fields = ['title', 'content', 'visibility_type']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control'}),
-            'visibility_type': forms.Select(attrs={'class': 'form-control'}),
         }
 
 class CommentForm(forms.ModelForm):

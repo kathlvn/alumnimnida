@@ -143,3 +143,110 @@
   .action-search-row { flex-direction: column; align-items: stretch; }
   .action-search-row .left-actions { justify-content: flex-start; }
 } */
+
+/* Admin modal (applies only to admin panel modals via the `admin-modal` class) */
+.admin-modal {
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 22px;
+  color: #fff;
+  width: 96%;
+  max-width: 760px;
+  box-shadow: 0 12px 30px rgba(91,23,128,0.12);
+}
+
+.admin-modal h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.15rem; }
+
+.admin-modal .form-group { margin-bottom: 12px; }
+.admin-modal .form-group label { display: block; margin-bottom: 6px; font-weight:600; }
+
+/* Inputs inside admin modals match admin panel form controls */
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #fff;
+  width: 100%;
+}
+
+.admin-modal textarea { min-height: 100px; resize: vertical; }
+
+.admin-modal input:focus,
+.admin-modal textarea:focus,
+.admin-modal select:focus { outline: none; border-color: rgba(255,255,255,0.30); background-color: rgba(255,255,255,0.14); }
+
+/* Modal action buttons adopt admin button look */
+.admin-modal .modal-actions { margin-top: 14px; display:flex; gap:10px; justify-content:flex-end; }
+.admin-modal .modal-actions .btn { padding: 10px 14px; border-radius: 12px; font-weight:700; }
+.admin-modal .modal-actions .cancel { background: transparent; border: 2px solid rgba(255,255,255,0.18); color: #fff; }
+.admin-modal .modal-actions .confirm { background: linear-gradient(135deg,#6d1fb5,#4e126d); color:#fff; border: none; }
+
+/* Two-column variant for forms with many fields (events, profile) */
+.admin-modal.two-col form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+.admin-modal.two-col .form-group {
+  flex: 1 1 calc(50% - 16px);
+  min-width: 220px;
+}
+.admin-modal.two-col .form-group.full-width {
+  flex: 1 1 100%;
+}
+
+/* Ensure checkboxes, file inputs, and buttons stay full width */
+.admin-modal.two-col .form-group input[type="file"],
+.admin-modal.two-col .form-group input[type="checkbox"],
+.admin-modal.two-col .form-group .form-text,
+.admin-modal.two-col .form-group select { width: 100%; }
+
+@media (max-width: 720px) {
+  .admin-modal.two-col form { display: block; }
+  .admin-modal.two-col .form-group { flex: 1 1 100%; }
+}
+
+/* Checkbox grid for visibility lists */
+.admin-modal .checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 6px;
+}
+.admin-modal .checkbox-grid ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.admin-modal .checkbox-grid li {
+  width: calc(50% - 12px);
+}
+
+.admin-modal .checkbox-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.admin-modal .checkbox-grid input[type="checkbox"] { margin: 0; }
+
+@media (max-width: 720px) {
+  .admin-modal .checkbox-grid label { width: 100%; }
+}
+
+/* Fix checkbox alignment in user forms bottom area */
+.admin-modal .form-group .checkbox-inline,
+.admin-modal .form-group .checkbox-list {
+  display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center;
+}
+.admin-modal .form-group .checkbox-inline label,
+.admin-modal .form-group .checkbox-list label { display: flex; align-items: center; gap: 8px; }
+.admin-modal .form-group input[type="checkbox"] { transform: translateY(1px); }

@@ -4,7 +4,7 @@
 
 <!-- Event Modal -->
 <div id="eventModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal two-col">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>{% if event_form and is_edit %}Edit Event{% else %}Add Event{% endif %}</h3>
     <form method="post" action="{% url 'admin_event_create' %}">
@@ -12,7 +12,24 @@
       {% if event_form %}
         {{ event_form.non_field_errors }}
         {% for field in event_form %}
-          <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+          {% if field.name == 'visibility_degrees' or field.name == 'visibility_batches' %}
+            <div class="form-group full-width">
+              {{ field.label_tag }}
+              <div class="checkbox-grid" data-field="{{ field.name }}">
+                {% for option in field.field.queryset %}
+                  {% with val=field.value|default_if_none:'' %}
+                  <label>
+                    <input type="checkbox" name="{{ field.html_name }}" id="{{ field.html_name }}_{{ forloop.counter }}" value="{{ option.pk }}" {% if option.pk|stringformat:"s" in val %}checked{% endif %}>
+                    {{ option }}
+                  </label>
+                  {% endwith %}
+                {% endfor %}
+              </div>
+              {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}
+            </div>
+          {% else %}
+            <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+          {% endif %}
         {% endfor %}
       {% else %}
         <!-- Fallback: simple fields -->
@@ -28,7 +45,7 @@
 
 <!-- Updates Modal -->
 <div id="updatesModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>{% if is_edit %}Edit Update{% else %}Add New Update{% endif %}</h3>
     <form method="post" action="{% url 'admin_updates_create' %}">
@@ -36,7 +53,24 @@
       {% if updates_form %}
         {{ updates_form.non_field_errors }}
         {% for field in updates_form %}
-          <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+          {% if field.name == 'visibility_degrees' or field.name == 'visibility_batches' %}
+            <div class="form-group full-width">
+              {{ field.label_tag }}
+              <div class="checkbox-grid" data-field="{{ field.name }}">
+                {% for option in field.field.queryset %}
+                  {% with val=field.value|default_if_none:'' %}
+                  <label>
+                    <input type="checkbox" name="{{ field.html_name }}" id="{{ field.html_name }}_{{ forloop.counter }}" value="{{ option.pk }}" {% if option.pk|stringformat:"s" in val %}checked{% endif %}>
+                    {{ option }}
+                  </label>
+                  {% endwith %}
+                {% endfor %}
+              </div>
+              {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}
+            </div>
+          {% else %}
+            <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.errors %}<div class="errorlist">{{ field.errors }}</div>{% endif %}</div>
+          {% endif %}
         {% endfor %}
       {% else %}
         <p>No updates form available.</p>
@@ -51,7 +85,7 @@
 
 <!-- User Modal -->
 <div id="userModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal two-col">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>{% if is_edit %}Edit User{% else %}Add User{% endif %}</h3>
     <form method="post" action="{% url 'admin_user_create' %}">
@@ -59,7 +93,18 @@
       {% if user_form %}
         {{ user_form.non_field_errors }}
         {% for field in user_form %}
-          <div class="form-group">{% if field.field.widget.input_type == 'checkbox' %}{{ field }} <label for="{{ field.id_for_label }}">{{ field.label }}</label>{% else %}{{ field.label_tag }} {{ field }}{% endif %}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>
+          {% if field.field.widget.input_type == 'checkbox' %}
+            <div class="form-group">
+              <div class="checkbox-inline">
+                {{ field }}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              </div>
+              {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+              {% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
+            </div>
+          {% else %}
+            <div class="form-group">{{ field.label_tag }} {{ field }} {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}{% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}</div>
+          {% endif %}
         {% endfor %}
       {% else %}
         <p>No user form available.</p>
@@ -74,7 +119,7 @@
 
 <!-- CSV Upload Modal -->
 <div id="csvModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>Batch Upload Users (CSV)</h3>
     <form method="post" action="{% url 'admin_user_batch_upload' %}" enctype="multipart/form-data">
@@ -93,7 +138,7 @@
 
 <!-- Admin Profile Modal -->
 <div id="adminProfileModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal two-col">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3>Edit Admin Profile</h3>
     <form method="post" enctype="multipart/form-data" action="{% url 'admin_profile' %}">
@@ -116,7 +161,7 @@
 
 <!-- Confirmation Modal (shared by many actions) -->
 <div id="confirmModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <h3 id="confirmModalTitle">Are you sure?</h3>
     <p id="confirmModalMessage">This action cannot be undone.</p>
@@ -129,7 +174,7 @@
 
 <!-- Detail/Read-only Modal: used to show read-only details for items (events, users, updates, forum posts) -->
 <div id="detailModal" class="modal-overlay" role="dialog" aria-hidden="true">
-  <div class="modal-box">
+  <div class="modal-box admin-modal">
     <button type="button" class="modal-close" aria-label="Close">&times;</button>
     <div id="detail-modal-body" class="modal-body">
       <p>Loading...</p>
@@ -145,6 +190,7 @@
     if(!modal) return;
     modal.classList.add('open');
     modal.setAttribute('aria-hidden','false');
+    try{ if(typeof toggleVisibilityControls === 'function') toggleVisibilityControls(modal); }catch(e){}
   }
   function closeModal(modal){
     modal.classList.remove('open');
@@ -187,14 +233,27 @@
         fetch(editUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
           .then(function(resp){ if(!resp.ok) throw new Error('Network error'); return resp.text(); })
           .then(function(html){
-            // Inject server-rendered inner content into the modal box
-            var box = modal.querySelector('.modal-box');
-            if(box){
-              box.innerHTML = html;
-            }
-            // open modal after injection
-            openModal(selector);
-          }).catch(function(err){
+              // Parse returned HTML and, if it contains a form, replace only the existing modal form's innerHTML
+              var parser = new DOMParser();
+              var doc = parser.parseFromString(html, 'text/html');
+              var returnedForm = doc.querySelector('form');
+              var box = modal.querySelector('.modal-box');
+              if(returnedForm && box){
+                var existingForm = box.querySelector('form');
+                if(existingForm){
+                  existingForm.innerHTML = returnedForm.innerHTML;
+                } else {
+                  box.innerHTML = html; // fallback
+                }
+              } else if(box) {
+                box.innerHTML = html;
+              }
+              // Normalize visibility fields and initialize controls after injection
+              try{ if(typeof normalizeVisibilityFields === 'function') normalizeVisibilityFields(modal); }catch(e){}
+              try{ if(typeof toggleVisibilityControls === 'function') toggleVisibilityControls(modal); }catch(e){}
+              // open modal after injection
+              openModal(selector);
+            }).catch(function(err){
             console.error('Failed to load edit form:', err);
           });
         return;
@@ -272,6 +331,103 @@
       console.error('Modal form submit failed', err);
       window.location.reload();
     });
+
+  // Show/hide visibility checkboxes based on visibility type and related_event selection
+  function toggleVisibilityControls(modal){
+    if(!modal) return;
+    var visSelect = modal.querySelector('[name$="visibility_type"]');
+    var relatedEvent = modal.querySelector('[name$="related_event"]');
+
+    function update() {
+      var v = visSelect ? visSelect.value : null;
+      var grids = modal.querySelectorAll('.checkbox-grid');
+      grids.forEach(function(g){
+        if(v === 'public') g.style.display = 'none';
+        else g.style.display = '';
+      });
+
+      // if a related event is selected, lock visibility controls (updates inherit event visibility)
+      if(relatedEvent && relatedEvent.value){
+        if(visSelect) visSelect.disabled = true;
+        modal.querySelectorAll('.checkbox-grid input').forEach(function(i){ i.disabled = true; });
+      } else {
+        if(visSelect) visSelect.disabled = false;
+        modal.querySelectorAll('.checkbox-grid input').forEach(function(i){ i.disabled = false; });
+      }
+    }
+
+    if(visSelect) visSelect.addEventListener('change', update);
+    if(relatedEvent) relatedEvent.addEventListener('change', update);
+    // initial update
+    update();
+  }
+
+  // Initialize visibility controls for modals when opened
+  document.addEventListener('click', function(e){
+    var opener = e.target.closest('[data-open-modal]');
+    if(opener){
+      var selector = opener.getAttribute('data-open-modal');
+      var modal = document.querySelector(selector);
+      setTimeout(function(){
+        // ensure checkbox fields are normalized (moved into .checkbox-grid) before toggling
+        try{ if(typeof normalizeVisibilityFields === 'function') normalizeVisibilityFields(modal); }catch(e){}
+        toggleVisibilityControls(modal);
+      }, 0);
+    }
+  });
+
+  // Move server-rendered checkbox lists (ul/li) into our .checkbox-grid wrapper so CSS applies
+  function normalizeVisibilityFields(modal){
+    if(!modal) return;
+    ['visibility_degrees','visibility_batches'].forEach(function(fieldName){
+      // find any input or ul rendered for this field
+      var inputs = modal.querySelectorAll('[name*="' + fieldName + '"]');
+      if(!inputs || inputs.length === 0) return;
+
+      // find existing target wrapper, or create one
+      var wrapper = modal.querySelector('.checkbox-grid[data-field="' + fieldName + '"]');
+      if(!wrapper){
+        // Create wrapper and a container form-group if needed
+        wrapper = document.createElement('div');
+        wrapper.className = 'checkbox-grid';
+        wrapper.setAttribute('data-field', fieldName);
+
+        // Try to find the label element for this field to insert after; fallback to end of form
+        var labelElem = modal.querySelector('label[for]');
+        var candidateLabel = null;
+        // look for label text matching fieldName
+        Array.from(modal.querySelectorAll('label')).forEach(function(l){ if(l.getAttribute('for') && l.getAttribute('for').indexOf(fieldName) !== -1) candidateLabel = l; });
+        if(candidateLabel && candidateLabel.parentElement){
+          // insert after the parent form-group
+          var parent = candidateLabel.parentElement;
+          parent.appendChild(wrapper);
+        } else {
+          var form = modal.querySelector('form');
+          if(form) form.appendChild(wrapper);
+        }
+      }
+
+      // Move nearest ul/li block (CheckboxSelectMultiple renders a <ul>) into wrapper
+      var ul = null;
+      // search for ul that contains inputs for this field
+      Array.from(modal.querySelectorAll('ul')).forEach(function(u){
+        if(u.querySelector('[name*="' + fieldName + '"]')) ul = u;
+      });
+      if(ul){
+        // clear wrapper and move ul inside
+        wrapper.innerHTML = '';
+        wrapper.appendChild(ul);
+        // ensure ul is visible
+        ul.style.display = '';
+      } else {
+        // if no ul, but inputs exist directly, move their parent elements
+        inputs.forEach(function(inp){
+          var p = inp.closest('label') || inp.parentElement;
+          if(p) wrapper.appendChild(p.cloneNode(true));
+        });
+      }
+    });
+  }
   });
   
   // Confirmation modal support for links and forms using data-confirm

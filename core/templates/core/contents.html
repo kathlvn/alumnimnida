@@ -60,9 +60,9 @@
             <p><strong>Location:</strong> {{ event.location }}</p>
           </a>
           <div class="event-actions">
-            <button class="interest-btn" data-event-id="{{ event.pk }}" aria-pressed="{% if event.pk in user_interested_ids %}true{% else %}false{% endif %}">
+            <button class="interest-btn attend-button" data-event-id="{{ event.pk }}" aria-pressed="{% if event.pk in user_interested_ids %}true{% else %}false{% endif %}">
               <span class="star">{% if event.pk in user_interested_ids %}★{% else %}☆{% endif %}</span>
-              <span class="sr-only">Mark interest</span>
+              <span class="sr-only">Mark interested</span>
             </button>
             {% if event.done %}
               <span class="interest-count">{{ event.interested.count }}</span>
@@ -428,6 +428,13 @@
       </form>
     </div>
   </div>
+  {% elif page_name == 'events' %}
+  <div id="detailModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="close" onclick="closeDetailModal()">&times;</span>
+      <div id="detail-modal-body"></div>
+    </div>
+  </div>
   {% endif %}
 {% endblock %}
 
@@ -450,6 +457,13 @@
         .then(r => { if(!r.ok) throw new Error('Failed to load'); return r.text(); })
         .then(html => openDetailModalWithHTML(html))
         .catch(() => openDetailModalWithHTML('<p>Error loading detail view.</p>'));
+    }
+    function closeDetailModal(){
+      const modal = document.getElementById('detailModal');
+      if(!modal) return;
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-opened');
     }
     document.addEventListener('DOMContentLoaded', function(){
       document.querySelectorAll('.detail-link').forEach(function(link){

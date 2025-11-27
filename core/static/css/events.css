@@ -72,6 +72,13 @@
   background-color: rgba(0,0,0,0.8);
 }
 
+/* When opened via JS, make modal visible */
+.modal.open {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .modal-content {
   background-color: #2a003f;
   margin: 10% auto;
@@ -94,6 +101,27 @@
 .close:hover {
   color: white;
 }
+
+/* Interest (Mark interested) button styling - match other primary buttons */
+.interest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: white;
+  color: #5b1780;
+  border: none;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.08s ease;
+}
+.interest-btn:hover { transform: scale(1.03); }
+.interest-btn[aria-pressed="true"] {
+  background-color: #5b1780;
+  color: white;
+}
+.interest-btn .star { font-size: 16px; }
 
 
 

@@ -75,9 +75,15 @@
     const body = document.getElementById('detail-modal-body');
     if(!modal || !body) return;
     body.innerHTML = html;
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden','false');
-    document.body.classList.add('modal-opened');
+    // Use the shared modal helper when available to ensure styling and behavior are consistent
+    if(window.__detailModal && typeof window.__detailModal.open === 'function'){
+      window.__detailModal.open();
+    } else {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-opened');
+      modal.style.display = 'flex';
+    }
   }
 
   function loadSearchDetail(url){
@@ -141,6 +147,9 @@
     justify-content: center;
     background-color: rgba(0,0,0,0.8);
   }
+
+  /* Ensure the shared detail modal (in base.html) appears above the global backdrop. */
+  #detailModal { z-index: 1250; }
 
   .modal-card {
     box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);

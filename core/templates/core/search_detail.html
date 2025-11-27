@@ -6,13 +6,21 @@
     <p><strong>Date & Time:</strong> {{ event.datetime }}</p>
     <p><strong>Location:</strong> {{ event.location }}</p>
     <p><strong>Description:</strong> {{ event.description }}</p>
+    <div class="event-modal-actions">
+      <button id="modal-interest-btn" data-event-id="{{ event.pk }}">
+        {% if request.user in event.interested.all %}Unmark Interest{% else %}Mark Interest{% endif %}
+      </button>
+      <span id="modal-interest-count">{{ event.interested.count }}</span>
+    </div>
 
   {% elif forum %}
     <h2>{{ forum.title }}</h2>
     <p>{{ forum.content }}</p>
     <p>Posted by: {{ forum.author.full_name }}</p>
     <p>Created at: {{ forum.created_at }}</p>
-    <p>Likes: {{ forum.likes.count }}</p>
+    <p>Likes: <span id="modal-like-count">{{ forum.likes.count }}</span>
+      <button id="modal-like-btn" data-post-id="{{ forum.pk }}">{% if request.user in forum.likes.all %}Unlike{% else %}Like{% endif %}</button>
+    </p>
 
     <h4>Comments:</h4>
     <ul>
@@ -22,6 +30,10 @@
         <li>No comments yet.</li>
       {% endfor %}
     </ul>
+    <div class="modal-comment-form">
+      <textarea id="modal-comment-text" rows="3" placeholder="Write a comment..."></textarea>
+      <button id="modal-comment-send" data-post-id="{{ forum.pk }}">Send</button>
+    </div>
 
   {% elif updates %}
     <h2>{{ updates.title }}</h2>
@@ -54,3 +66,89 @@
     <p>No detail found.</p>
   {% endif %}
 </div>
+{% comment %} small client-side handlers for modal interactions {% endcomment %}
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  (function(){
+    const csrftoken = getCookie('csrftoken');
+
+    // Event interest toggle
+    const interestBtn = document.getElementById('modal-interest-btn');
+    if(interestBtn){
+      interestBtn.addEventListener('click', function(){
+        const pk = this.getAttribute('data-event-id');
+        if(!pk) return;
+        fetch(`/event/${pk}/toggle-interest/`, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'X-CSRFToken': csrftoken }
+        }).then(r=>r.json()).then(data=>{
+          const count = document.getElementById('modal-interest-count');
+          if(count) count.textContent = data.interest_count;
+          interestBtn.textContent = data.interested ? 'Unmark Interest' : 'Mark Interest';
+        }).catch(()=>alert('Failed to toggle interest'));
+      });
+    }
+
+    // Forum like handler
+    const likeBtn = document.getElementById('modal-like-btn');
+    if(likeBtn){
+      likeBtn.addEventListener('click', function(e){
+        const postId = this.getAttribute('data-post-id');
+        if(!postId) return;
+        const formData = new FormData(); formData.append('post_id', postId);
+        fetch('{% url "like_post_ajax" %}', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'X-CSRFToken': csrftoken },
+          body: formData
+        }).then(r=>r.json()).then(data=>{
+          const countEl = document.getElementById('modal-like-count'); if(countEl) countEl.textContent = data.like_count;
+          likeBtn.textContent = data.liked ? 'Unlike' : 'Like';
+        }).catch(()=>alert('Failed to like/unlike'));
+      });
+    }
+
+    // Forum comment handler (AJAX)
+    const commentSend = document.getElementById('modal-comment-send');
+    if(commentSend){
+      commentSend.addEventListener('click', function(){
+        const postId = this.getAttribute('data-post-id');
+        const textarea = document.getElementById('modal-comment-text');
+        if(!postId || !textarea) return;
+        const content = textarea.value.trim(); if(!content) return;
+        // Use a runtime URL so this template does not require `forum` at render-time
+        fetch(`/forum/comment/${postId}/`, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ post_id: postId, comment_content: content })
+        }).then(r=>r.json()).then(data=>{
+          if(data.success){
+            const ul = document.querySelector('.search-detail-modal-body ul');
+            if(ul){
+              const li = document.createElement('li');
+              li.innerHTML = `<strong>${data.user_name}</strong>: ${data.comment_content}`;
+              ul.appendChild(li);
+            }
+            textarea.value = '';
+          } else alert('Failed to post comment');
+        }).catch(()=>alert('Failed to post comment'));
+      });
+    }
+  })();
+</script>

@@ -100,6 +100,15 @@
       {% if request.user.is_authenticated and request.user.is_staff %}
         {% include 'admin_panel/form_modals.html' %}
       {% endif %}
+      <!-- Shared detail modal used by search results and other pages. -->
+      <div id="detailModal" class="modal-overlay" role="dialog" aria-hidden="true" style="display:none;">
+        <div class="modal-card" role="document">
+          <button type="button" class="close-btn" aria-label="Close" id="detail-modal-close">&times;</button>
+          <div id="detail-modal-body" class="detail-modal-body">
+            <!-- AJAX-injected detail HTML appears here -->
+          </div>
+        </div>
+      </div>
     {% endblock %}
 
     
@@ -121,5 +130,48 @@
   {% load static %}
   <script src="{% static 'js/logout-modal.js' %}"></script>
   <script src="{% static 'js/modal-focus-blur.js' %}"></script>
+  <script>
+    // Close/open helpers for the shared detail modal
+    (function(){
+      function closeDetailModal(){
+        var modal = document.getElementById('detailModal');
+        if(!modal) return;
+        modal.style.display = 'none';
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        document.body.classList.remove('modal-opened');
+        var body = document.getElementById('detail-modal-body');
+        if(body) body.innerHTML = '';
+      }
+
+      function openDetailModal(){
+        var modal = document.getElementById('detailModal');
+        if(!modal) return;
+        modal.style.display = 'flex';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        document.body.classList.add('modal-opened');
+      }
+
+      document.addEventListener('click', function(e){
+        var modal = document.getElementById('detailModal');
+        if(!modal) return;
+        // close when clicking backdrop
+        if(e.target === modal){
+          closeDetailModal();
+        }
+      });
+
+      var closeBtn = document.getElementById('detail-modal-close');
+      if(closeBtn){ closeBtn.addEventListener('click', closeDetailModal); }
+
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') closeDetailModal();
+      });
+
+      // Expose helpers for pages that set modal content
+      window.__detailModal = { open: openDetailModal, close: closeDetailModal };
+    })();
+  </script>
 </body>
 </html>
